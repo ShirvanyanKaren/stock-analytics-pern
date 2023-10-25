@@ -1,0 +1,29 @@
+{
+  "name": "stock-analysis-pern",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "cd server && npm run start",
+    "develop": "concurrently \"cd server && npm run watch\" \"cd client && npm run dev\"",
+    "install": "cd server && npm i && cd ../client && npm i",
+    "seed": "cd server && npm run seed",
+    "build": "cd client && npm run build",
+    "heroku-postbuild": "npm run build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  },
+  "dependencies": {
+    "@fortawesome/react-fontawesome": "^0.2.0",
+    "animate.css": "^4.1.1",
+    "axios": "^1.5.0",
+    "bootstrap": "^5.3.1",
+    "dotenv": "^16.3.1",
+    "react-bootstrap": "^2.8.0",
+    "sequelize": "^6.33.0"
+  }
+}
