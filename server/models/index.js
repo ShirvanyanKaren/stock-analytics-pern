@@ -1,5 +1,6 @@
-const User = require('./User');
-const Portfolio = require('./Portfolio');
+const User = require('./user');
+const Portfolio = require('./portfolio');
+const Stock = require('./stock');
 
 User.hasMany(Portfolio, {
     foreignKey: 'user_id',
@@ -10,7 +11,14 @@ Portfolio.belongsTo(User, {
     foreignKey: 'user_id'
 });
 
+Portfolio.hasMany(Stock, {
+    foreignKey: 'portfolio_id',
+    onDelete: 'CASCADE'
+});
+
+Stock.belongsTo(Portfolio, {
+    foreignKey: 'portfolio_id'
+});
 
 
-
-module.exports = { User, Portfolio };
+module.exports = { User, Portfolio, Stock };

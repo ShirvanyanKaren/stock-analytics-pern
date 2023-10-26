@@ -23,6 +23,13 @@ Portfolio.init(
               key: 'id',
             },
           },
+          stock_id: {
+            type: DataTypes.INTEGER,
+            references: {
+              model: 'stock',
+              key: 'id',
+            },
+          },
     },
     {
         sequelize,

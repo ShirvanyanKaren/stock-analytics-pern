@@ -1,5 +1,5 @@
 const { AuthenticationError } = require('../utils/auth');
-const { User, Portfolio } = require('../models');
+const { User, Portfolio, Stock} = require('../models');
 const { signToken } = require('../utils/auth');
 
 const resolvers = {
@@ -19,6 +19,15 @@ const resolvers = {
     users: async () => {
       return await User.findAll();
     },
+    portfolios: async () => {
+      return await Portfolio.findAll();
+    },
+    stocks: async () => {
+        return await Stock.findAll();
+    },
+    stock: async (parent, { portfolio_id }) => {
+        return await Stock.findAll({ where: { portfolio_id: portfolio_id } });
+    },
   },
   Mutation: {
     addUser: async (parent, args) => {
@@ -29,7 +38,6 @@ const resolvers = {
       });
       
 
-      // Handle token generation logic here if needed
       const token = signToken(user);
       return { token, user };
     },
@@ -38,7 +46,7 @@ const resolvers = {
       if (!user || !user.checkPassword(password)) {
         throw new AuthenticationError('Incorrect Credentials');
       }
-      // Handle token generation logic here if needed
+
       const token = signToken(user);
       return { token, user };
     },
@@ -48,6 +56,15 @@ const resolvers = {
         portfolio_name: args.portfolio_name,
       });
     },
+    addStocksPortfolio: async (parent, args) => {
+      return await Stock.create({
+        portfolio_id: args.portfolio_id,
+        stock_quantity: args.quantity,
+        purchase_date: args.purchase_date,
+        stock_name: args.stock_name,
+        stock_symbol: args.stock_symbol,
+      });
+    }, 
   },
 };
 
