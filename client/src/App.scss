@@ -1,0 +1,31 @@
+
+.search-bar {
+    width: 500px;
+    margin-right: 5px;
+
+
+}
+
+.dropdown-menu {
+    width: 300px;
+    margin-right: 5px;
+    max-height: 300px;
+    overflow-y: scroll;
+
+    .search-list {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: 20px;
+        img{
+            width: 50px;
+            height: 50px;
+            margin-right: 5px;
+        }
+        .search-items{
+           display: flex;
+           width: 100%;
+           justify-content: space-around;
+        }
+    }
+}
