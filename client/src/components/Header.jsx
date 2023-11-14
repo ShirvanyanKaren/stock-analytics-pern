@@ -125,13 +125,13 @@ useEffect(() => {
                     {option.change > 0 ? (
                       <>
                       <FontAwesomeIcon icon={faCaretUp} className="text-success me-1" />
-                      {option.change.toFixed(2)}%
+                      {(option.change * 100).toFixed(2)}%
                       </>
                     
                     ) : (
                       <>
                       <FontAwesomeIcon icon={faCaretDown} className="text-danger me-1" />
-                      {option.change.toFixed(2)}%
+                      {(option.change * 100).toFixed(2)}%
                       </>
                     )}
                     </li>
@@ -163,7 +163,7 @@ useEffect(() => {
               <Nav.Link to="/features">Dashboard</Nav.Link>
               <Nav.Link to="/pricing">Create Portfolio</Nav.Link>
               <NavDropdown title="Features" id="collapsible-nav-dropdown">
-                <NavDropdown.Item to="/action/3.1">
+                <NavDropdown.Item href="/stocklinreg">
                   Compare Portfolio
                 </NavDropdown.Item>
                 <NavDropdown.Item to="/action/3.2">

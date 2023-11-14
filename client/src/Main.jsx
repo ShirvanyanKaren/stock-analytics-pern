@@ -7,6 +7,7 @@ import StockInfo from "./pages/StockInfo";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import StockLinReg from "./pages/StockLinReg";
+import FamaFrench from "./pages/FamaFrench";
 
 import App from "./App";
 
@@ -28,8 +29,16 @@ const router = createBrowserRouter([
             element: <StockInfo />,
         },
         {
+            path: "/stocklinreg/:symbol",
+            element: <StockLinReg />,
+        },
+        {
             path: "/stocklinreg",
             element: <StockLinReg />,
+        },
+        {
+            path: "/famafrench",
+            element: <FamaFrench />,
         }
 
     ]
