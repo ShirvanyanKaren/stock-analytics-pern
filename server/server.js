@@ -6,12 +6,33 @@ const { authMiddleware } = require("./utils/auth.js");
 const { typeDefs, resolvers } = require("./schemas");
 const cors = require("cors");
 const sequelize = require("./config/connection");
+const { spawn } = require("child_process");
 const axios = require("axios");
+
 
 const PORT = process.env.PORT || 5000;
 const app = express();
 
 const FINNHUB_API_KEY = 'cl1dmlhr01qkvip7mcn0cl1dmlhr01qkvip7mcng';
+
+const childPython = spawn("python", ["../python/main.py"]);
+
+childPython.stdout.on("data", (data) => {
+  console.log(`stdout: ${data}`);
+}
+
+);
+
+childPython.stderr.on("data", (data) => {
+  console.error(`stderr: ${data}`);
+}
+);
+
+childPython.on("close", (code) => {
+  console.log(`child process exited with code ${code}`);
+}
+);
+
 
 app.get('/api/search', async (req, res) => {
   const { query } = req.query;

@@ -50,9 +50,9 @@ const FamaFrench = () => {
     });
   };
 
-  const stocks = ["AAPL", "MSFT", "AMZN"];
+  const stocks = ["AAPL", "MSFT", "AMZN","TSLA","GOOG"];
 
-  const weights = [0.4, 0.4, 0.2];
+  const weights = [0.2, 0.2, 0.2, 0.2, 0.2];
 
   useEffect(() => {
     const getFamaFrench = async () => {
@@ -68,7 +68,7 @@ const FamaFrench = () => {
         console.log("response", response);
         var dataArray = JSON.parse(response.data[0]);
         console.log(dataArray);
-        const expectedReturn = response.data[1]["expected_return"] * 1000;
+        const expectedReturn = response.data[1]["expected_return"] * 100;
         setExpectedReturn(expectedReturn.toFixed(2));
         console.log(expectedReturn);
 

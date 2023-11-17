@@ -2,16 +2,17 @@ import { useEffect, useState } from "react";
 import CanvasJSReact from "@canvasjs/react-stockcharts";
 import { useParams } from "react-router-dom";
 import { useLocation } from "react-router-dom";
+import axios from "axios";
+import { stockData } from "../utils/helpers";
+import StockDetails from "../components/StockDetails";
 
 const CanvasJS = CanvasJSReact.CanvasJS;
 const CanvasJSStockChart = CanvasJSReact.CanvasJSStockChart;
 
 const StockInfo = () => {
   const { symbol } = useParams();
-
   const location = useLocation();
   const stockSymbol = location.pathname.split(("/"))[2];
-  console.log("stockSymbol", stockSymbol);
   const [dataPoints1, setDataPoints1] = useState([]);
   const [dataPoints2, setDataPoints2] = useState([]);
   const [dataPoints3, setDataPoints3] = useState([]);
@@ -19,51 +20,64 @@ const StockInfo = () => {
   const [startDate, setStartDate] = useState(
     new Date(new Date().getFullYear(), 0, 1).toISOString().slice(0, 10)
   );
+  const [stockDetails, setStockDetails] = useState([]);
   const [endDate, setEndDate] = useState(new Date().toISOString().slice(0, 10));
-  console.log("startDate", startDate);  
-  console.log("endDate", endDate);
-  console.log("stockSymbol", stockSymbol);
- 
 
+
+
+ 
   useEffect(() => {
-    fetch(`http://127.0.0.1:8000/${stockSymbol}/${startDate}/${endDate}`)
-      .then((res) => res.json())
-      .then((data) => {
-        const dataArray = JSON.parse(data);
-        var dps1 = [],
-          dps2 = [],
-          dps3 = [];
-        for (var i = 0; i < dataArray.length; i++) {
-          dps1.push({
-            x: new Date(dataArray[i].Date),
-            y: [
-              Number(dataArray[i].Open),
-              Number(dataArray[i].High),
-              Number(dataArray[i].Low),
-              Number(dataArray[i].Close),
-            ],
-          });
-          dps2.push({
-            x: new Date(dataArray[i].Date),
-            y: Number(dataArray[i].Volume),
-          });
-          dps3.push({
-            x: new Date(dataArray[i].Date),
-            y: Number(dataArray[i].Close),
-          });
-        }
-        setDataPoints1(dps1);
-        setDataPoints2(dps2);
-        setDataPoints3(dps3);
-        setIsLoaded(true);
-      });
-  }, [symbol, startDate, endDate]);
+    const getStockInfo = async () => {
+
+      try {
+        const data = await stockData(stockSymbol, startDate, endDate);
+        const dataArr = JSON.parse(data[0]);
+        console.log("dataArr", dataArr);
+        setStockDetails(data[1][stockSymbol]);
+    
+            const dps1 = [];
+            const dps2 = [];
+            const dps3 = [];
+            for (var i = 0; i < dataArr.length; i++) {
+              dps1.push({
+                x: new Date(dataArr[i].Date),
+                y: [
+                  Number(dataArr[i].Open),
+                  Number(dataArr[i].High),
+                  Number(dataArr[i].Low),
+                  Number(dataArr[i].Close),
+                ],
+              });
+              dps2.push({
+                x: new Date(dataArr[i].Date),
+                y: Number(dataArr[i].Volume),
+              });
+              dps3.push({
+                x: new Date(dataArr[i].Date),
+                y: Number(dataArr[i].Close),
+              });
+            }
+            setDataPoints1(dps1);
+            setDataPoints2(dps2);
+            setDataPoints3(dps3);
+            setIsLoaded(true);
+          } catch (err) {
+            console.log(err);
+          }
+        };
+        
+        getStockInfo();
+
+
+      
+    
+      }, [stockSymbol, startDate, endDate]);
 
   const options = {
-    theme: "dark2",
-    title: {
-      text: `${symbol} StockChart with Date-Time Axis`,
+    theme: "dark1",
+    title: { text: `${stockDetails.longName} Stock Price and Volume`,
     },
+
     subtitles: [
       {
         text: "Price-Volume Trend",
@@ -98,6 +112,7 @@ const StockInfo = () => {
             name: "Price (in USD)",
             yValueFormatString: "$#,###.##",
             type: "candlestick",
+            color: "#049C",
             dataPoints: dataPoints1,
           },
         ],
@@ -120,6 +135,7 @@ const StockInfo = () => {
         },
         data: [
           {
+            color: "#049C",
             name: "Volume",
             yValueFormatString: "$#,###.##",
             type: "column",
@@ -130,13 +146,21 @@ const StockInfo = () => {
     ],
     navigator: {
       data: [
+
         {
+          color: "white",
+          fillOpacity: 0.4,
+          indexLabel: "",
           dataPoints: dataPoints3,
+          type: "area",
+          
         },
       ],
       slider: {
         minimum: new Date("2022-05-01"),
         maximum: new Date("2022-07-01"),
+        fontColor: "white",
+        indexLabelFontColor: "white", 
         // 
       },
     },
@@ -146,161 +170,77 @@ const StockInfo = () => {
     height: "450px",
     margin: "auto",
   };
+
+
+
+
+
+
+
+
+
+
+
   return (
     <div>
-      <div>
+
         {isLoaded && (
+          <div>
+         <div className=" col-10 m-auto justify-center stock-volume mt-5">
+
           <CanvasJSStockChart
             containerProps={containerProps}
             options={options}
             /* onRef = {ref => this.chart = ref} */
           />
+          </div>
+                <div>
+                <StockDetails
+                  stockSymbol={stockSymbol}
+                  previousClose={stockDetails.previousClose}
+                  open={stockDetails.open}
+                  high={stockDetails.dayHigh}
+                  low={stockDetails.dayLow}
+                  forwardPE={
+                    stockDetails.forwardPE ? (
+                      <>{(stockDetails.forwardPE).toFixed(3)}</>
+                    ) : (
+                      <>N/A</>
+                    )
+                  }
+                  sharesOutstanding={stockDetails.sharesOutstanding}
+                  date={new Date().toISOString().slice(0, 10)}
+                  marketCap={stockDetails.marketCap}
+                  longName={stockDetails.longName}
+                  beta={stockDetails.beta}
+                  dividendYield={
+                    stockDetails.dividendYield ? (
+                      <>{(stockDetails.dividendYield).toFixed(4)}</>
+                    ) : (
+                      <>N/A</>
+                    )
+                  }
+                  dividendRate={
+                    stockDetails.dividendRate ? (
+                      <>{stockDetails.dividendRate}</>
+                    ) : (
+                      <>N/A</>
+                    )
+                  }
+                  volume={stockDetails.volume}
+                  week52High={stockDetails.fiftyTwoWeekHigh}
+                  week52Low={stockDetails.fiftyTwoWeekLow}
+                />
+            </div>
+            </div>
         )}
-      </div>
+
+
     </div>
   );
 };
 
 
-
-
-
-//   componentDidMount() {
-
-
-//     // useEffect(() => {
-//     //   const searchParams = new URLSearchParams(location.search);
-//     //   const symbol = searchParams.get("symbol");
-//     //   if (symbol) {
-//     //     setStockSymbol(symbol);
-//     //     // Fetch stock information based on the symbol here
-//     //   }
-//     // }, [location.search]);
-
-
-//     //Reference: https://reactjs.org/docs/faq-ajax.html#example-using-ajax-results-to-set-local-state
-//     // fetch("https://canvasjs.com/data/docs/ltcusd2018.json")
-//     fetch(`http://127.0.0.1:8000/TSLA/${this.state.startDate}/${this.state.endDate}`)
-//       .then(res => res.json())
-//       .then(
-//         (data) => {
-//           const dataArray = JSON.parse(data);
-//           var dps1 = [], dps2 = [], dps3 = [];
-//           for (var i = 0; i < dataArray.length; i++) {
-//             dps1.push({
-//               x: new Date(dataArray[i].Date),
-//               y: [
-//                 Number(dataArray[i].Open),
-//                 Number(dataArray[i].High),
-//                 Number(dataArray[i].Low),
-//                 Number(dataArray[i].Close)
-//               ]
-//             });
-//             dps2.push({x: new Date(dataArray[i].Date), y: Number(dataArray[i].Volume)});
-//             dps3.push({x: new Date(dataArray[i].Date), y: Number(dataArray[i].Close)});
-//           }
-//           this.setState({
-//             isLoaded: true,
-//             dataPoints1: dps1,
-//             dataPoints2: dps2,
-//             dataPoints3: dps3
-//           });
-//         }
-//       )
-//   }
-
-//   render() {
-    
-//     const options = {
-//       theme: "light2",
-//       title:{
-//         text:"Test StockChart with Date-Time Axis"
-//       },
-//       subtitles: [{
-//         text: "Price-Volume Trend"
-//       }],
-//       charts: [{
-//         axisX: {
-//           lineThickness: 5,
-//           tickLength: 0,
-//           labelFormatter: function(e) {
-//             return "";
-//           },
-//           crosshair: {
-//             enabled: true,
-//             snapToDataPoint: true,
-//             labelFormatter: function(e) {
-//               return "";
-//             }
-//           }
-//         },
-//         axisY: {
-//           title: "Stock Price",
-//           prefix: "$",
-//           tickLength: 0
-//         },
-//         toolTip: {
-//           shared: true
-//         },
-//         data: [{
-//           name: "Price (in USD)",
-//           yValueFormatString: "$#,###.##",
-//           type: "candlestick",
-//           dataPoints : this.state.dataPoints1
-//         }]
-//       },{
-//         height: 100,
-//         axisX: {
-//           crosshair: {
-//             enabled: true,
-//             snapToDataPoint: true
-//           }
-//         },
-//         axisY: {
-//           title: "Volume",
-//           prefix: "$",
-//           tickLength: 0
-//         },
-//         toolTip: {
-//           shared: true
-//         },
-//         data: [{
-//           name: "Volume",
-//           yValueFormatString: "$#,###.##",
-//           type: "column",
-//           dataPoints : this.state.dataPoints2
-//         }]
-//       }],
-//       navigator: {
-//         data: [{
-//           dataPoints: this.state.dataPoints3
-//         }],
-//         slider: {
-//           minimum: new Date("2022-05-01"),
-//           maximum: new Date("2022-07-01")
-//         }
-//       }
-//     };
-//     const containerProps = {
-//       width: "%",
-//       height: "450px",
-//       margin: "auto"
-//     };
-//     return (
-//       <div> 
-//         <div>
-//           {
-//             // Reference: https://reactjs.org/docs/conditional-rendering.html#inline-if-with-logical--operator
-//             this.state.isLoaded && 
-//             <CanvasJSStockChart containerProps={containerProps} options = {options}
-//               /* onRef = {ref => this.chart = ref} */
-//             />
-//           }
-//         </div>
-//       </div>
-//     );
-//   }
-// }
 
 
 export default StockInfo; 

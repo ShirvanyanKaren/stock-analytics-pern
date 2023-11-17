@@ -57,15 +57,14 @@ useEffect(() => {
 
 
   const handleSubmit = (event) => {
-    console.log(query);
     event.preventDefault();
+    console.log(query);
     if (query) {
       navigate(`/stockinfo/${query}`);
     }
   };
 
   const handleInputChange = (event) => {
-
     console.log(event.target.value);
     setQuery(event.target.value);
   };
@@ -74,9 +73,11 @@ useEffect(() => {
     Auth.logout();
   };
 
+
+
   return (
     <>
-      <Navbar expand="xxl" bg="dark" data-bs-theme="dark" className="nav-bar">
+      <Navbar expand="xxl" bg="light" data-bs-theme="light" className="nav-bar nav-bar-custom">
         <Container expand="xxl" className="justify-content-between navbar">
           <Navbar.Brand className="ms-0" to="/home">
             <Link to="/" className="navbar-brand">
@@ -87,7 +88,7 @@ useEffect(() => {
             <form onSubmit={handleSubmit} className="d-flex">
             <ul className="list-group me-3">
               <Dropdown>
-              <Dropdown.Toggle variant="dark" id="dropdown-search">
+              <Dropdown.Toggle variant="light" id="dropdown-search" >
                 <input
                 className="search-bar me-3 mt-2 mb-2 h-300"
                 placeholder="Search"
@@ -152,7 +153,7 @@ useEffect(() => {
                 Search
               </button> */}
             </form>
-            <Nav className="ms-auto">
+            <Nav className="align-items-center ">
               {Auth.loggedIn() ? (
                 <Nav.Link to="/" onClick={handleLogout}>
                   Logout

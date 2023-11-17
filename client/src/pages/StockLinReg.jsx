@@ -4,6 +4,10 @@ import CanvasJSReact from "@canvasjs/react-stockcharts";
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Dropdown } from "react-bootstrap";
+import { linReg } from "../utils/helpers";
+import { indexOptions } from "../utils/helpers";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faLineChart, faRssSquare } from "@fortawesome/free-solid-svg-icons";
 
 const CanvasJS = CanvasJSReact.CanvasJS;
 
@@ -21,34 +25,43 @@ const StockLinReg = () => {
     new Date(new Date().getFullYear(), 0, 1).toISOString().slice(0, 10)
   );
   const [searchSymbol, setSearchSymbol] = useState();
-  const [searchIndex, setSearchIndex] = useState();
+  const [searchIndex, setSearchIndex] = useState("^GSPC");
   const [endDate, setEndDate] = useState(new Date().toISOString().slice(0, 10));
 
-  
+  console.log(searchIndex)
+  const getLinReg = async (stockSymbol) => {
+    if (startDate > endDate) {
+      alert("Start date must be before end date");
+      return;
+    } else if (startDate === endDate) {
+      alert("Start date cannot be the same as end date");
+      return;
+    } 
+    else {
+    const data = await linReg(stockSymbol, searchIndex, startDate, endDate);
+    const dataArray = JSON.parse(data[0]);
+        var dps = [];
+        for (var i = 0; i < dataArray.length; i++) {
+          dps.push({
+            x: Number(dataArray[i][1]),
+            y: Number(dataArray[i][0]),
+          });
+        }
 
-  const indexoptions = {
-    "SP500": "^GSPC",
-    "Dow Jones": "^DJI",
-    "Nasdaq": "^IXIC",
-    "Russell 2000": "^RUT",
-    "S&P 400 Mid Cap": "^MID",
-    "S&P 600 Small Cap": "^SML",
-    "S&P 100": "^OEX",
-    "S&P 500 Growth": "^SGX",
-    "S&P 500 Value": "^SVX",
-    "S&P 500 High Beta": "^SPHB",
-    "S&P 500 Low Volatility": "^SPLV",
-    "S&P 500 High Quality": "^SPHQ",
-    "Wilshire 5000": "^W5000",
-    "NYSE Composite": "^NYA",
-    "NYSE American Composite": "^XAX",
-    "Unemployment Rate": "UNRATE",
-    "Consumer Price Index": "CPIAUCSL",
-    "Producer Price Index": "PPIACO",
-    "Federal Funds Rate": "FEDFUNDS",
-    "Volatile Index": "^VIX",
-    "Economic Policy Uncertainty Index": "USEPUINDXD",
-  };
+        setFormulaB(data[1]['coef']);
+        setFormulaY(data[1]['intercept']);
+        setIndex(dps);
+
+    setIsLoaded(true);
+    }
+
+  }
+
+  var date = "2021-04-01"
+
+var convertedDate = new Date(date)
+
+console.log(convertedDate)
 
 
   useEffect(() => {
@@ -63,8 +76,6 @@ const StockLinReg = () => {
   });
 
 
-
-
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setSearchParams({
@@ -76,62 +87,21 @@ const StockLinReg = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
     console.log(searchSymbol);
+    try {
     const { symbol } = searchParams;
     searchParams.index = searchIndex
-    fetch(
-      `http://127.0.0.1:8000/${searchParams.symbol}/${searchIndex}/${startDate}/${endDate}`
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        var dataArray = JSON.parse(data[0]);
-     
-        // console.log(dataArray);
-        var dps = [];
-        for (var i = 0; i < dataArray.length; i++) {
-          dps.push({
-            x: Number(dataArray[i][1]),
-            y: Number(dataArray[i][0]),
-          });
-        }
-
-        setFormulaB(data[1]['coef']);
-        setFormulaY(data[1]['intercept']);
-        setIndex(dps);
-      });
-    event.preventDefault();
     setStockSymbol(symbol);
-    if (symbol) {
-      navigate(`/stocklinreg/${symbol}`);
-    }
+
+  getLinReg(searchParams.symbol);
+
+    navigate(`/stocklinreg/${symbol}`);
+  }
+  catch (err) {
+    console.log(err);
+  }
   };
 
-  useEffect(() => {
-    if (stockSymbol) {
-      fetch(
-        `http://127.0.0.1:8000/${stockSymbol}/${searchIndex}/${startDate}/${endDate}`
-      )
-        .then((res) => res.json())
-        .then((data) => {
-          console.log(data);
-          console.log(data[1]['coef'])
-          var dataArray = JSON.parse(data[0]);
-          // console.log(dataArray);
-          var dps = [];
-          for (var i = 0; i < dataArray.length; i++) {
-            dps.push({
-              x: Number(dataArray[i][1]),
-              y: Number(dataArray[i][0]),
-            });
-          }
 
-          setFormulaB(data[1]['coef']);
-          setFormulaY(data[1]['intercept']);
-          setIndex(dps);
-        });
-      setIsLoaded(true);
-    }
-  }, [index, formulaB, formulaY]);
 
   const regressionLine = index.map((point) => {
     return {
@@ -141,7 +111,7 @@ const StockLinReg = () => {
   });
   
   const findIndexName = (index) => {
-    for (const [key, value] of Object.entries(indexoptions)) {
+    for (const [key, value] of Object.entries(indexOptions)) {
       if (value === index) {
         return key;
       }
@@ -154,10 +124,11 @@ const StockLinReg = () => {
       text: `${stockSymbol} vs ${findIndexName(searchParams.index)} Linear Regression`,
     },
     axisX: {
-      title: `${stockSymbol}`,
+      title: `${searchParams.index}`,
     },
     axisY: {
-      title: `${searchParams.index}`,
+      title: `${stockSymbol}`,
+      margin: 0,
     },
 
     data: [
@@ -175,7 +146,11 @@ const StockLinReg = () => {
       {
         type: "line",
         showInLegend: true,
-        legendText: "Linear Regression Line",
+        legendText: `${searchIndex}`,
+      //  center the legend
+        margin: 10,
+        padding: 10,
+        legendMarkerType: "none",
         dataPoints: regressionLine.map((point) => ({
           x: point.x,
           y: point.y,
@@ -212,11 +187,11 @@ const StockLinReg = () => {
               </Dropdown.Toggle>
 
               <Dropdown.Menu className="w-50 text-center dropdown-menu">
-                {Object.keys(indexoptions).map((option) => (
+                {Object.keys(indexOptions).map((option) => (
                   <Dropdown.Item
                     key={option}
                     name="index"
-                    onClick={() => setSearchIndex(indexoptions[option])}
+                    onClick={() => setSearchIndex(indexOptions[option])}
                   >
                     {option}
                   </Dropdown.Item>
@@ -268,7 +243,24 @@ const StockLinReg = () => {
           <div></div>
         )}
         {isLoaded && index.length !== 0 ? (
+          <div>
+            <div>
           <CanvasJSChart options={options} className="mt-10" />
+          </div>
+          <div className="col-lg d-flex justify-content-center">
+              <div className="form-group inline text-center w-50">
+                <FontAwesomeIcon icon={faLineChart} size="1x" />
+                <input
+                  type="text"
+                  className="form-control text-center"
+                  value={`y = ${(formulaY).toFixed(2)} + ${(formulaB.toFixed(4))}x`}
+                  readOnly
+                />
+
+              </div>
+              </div>
+          </div>
+
         ) : (
           <div></div>
         )}

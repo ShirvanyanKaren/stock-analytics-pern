@@ -5,6 +5,9 @@
 
 
 }
+body {
+    background-color: #f1f1f1; /* Very light grey */
+}
 
 .dropdown-menu {
     width: 300px;
@@ -28,4 +31,38 @@
            justify-content: space-around;
         }
     }
+}
+
+.custom-card {
+    // add shadow
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    // add a light grey  color
+    background-color: #f1f1f1;
+    .card-items-custom{
+    //   increase the border thickness
+    border-top: 1px solid #ccc;
+    
+ 
+
+    }
+    .list-group-item {
+        background: #f1f1f1;
+        // increase the bottom and top border thickness
+        border-top: 1px solid #ccc;
+        border-bottom: 1px solid #ccc;
+        }
+    
+}
+
+.stock-volume{
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    border-radius: 4px;
+}
+
+.nav-bar-custom{
+    background-color: #f1f1f1;
+    box-shadow: 0 10px 12px 0 rgba(0,0,0,0.2);
+    // add heavy bottom box shadow
+    box-shadow: 0 15px 12px 0 rgba(0,0,0,0.2);
+
 }
