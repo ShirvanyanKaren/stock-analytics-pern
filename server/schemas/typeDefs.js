@@ -4,6 +4,8 @@ const typeDefs = `
         username: String
         email: String
         password: String
+        portfolio_id: ID
+        portfolios: Portfolio 
     }
     type Portfolio {
         portfolio_name: String
@@ -20,12 +22,13 @@ const typeDefs = `
         portfolio_id: ID
     } 
     type Auth {
-        token: ID
+        token: ID!
         user: User
     }
     type Query {
         me: User
         user(username: String!): User
+        userFindByPk(id: ID!, context: Int): User
         portfolio(user_id: ID!): [Portfolio]
         users: [User]
         portfolios: [Portfolio]

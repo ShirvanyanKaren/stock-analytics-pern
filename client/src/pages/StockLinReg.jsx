@@ -119,7 +119,7 @@ console.log(convertedDate)
   };
 
   const options = {
-    theme: "dark2",
+    theme: "dark1",
     title: {
       text: `${stockSymbol} vs ${findIndexName(searchParams.index)} Linear Regression`,
     },
@@ -165,8 +165,9 @@ console.log(convertedDate)
   return (
     <div className="linear-reg mt-3 ">
       <div className="container">
-        <div className="row w-100">
+        <div className="row w-100 card">
           <div className="row text-center">
+            <h1 className="mt-3 card-header">Linear Regression</h1>
             <form
               onSubmit={handleSubmit}
               useref={searchParams}
@@ -243,8 +244,9 @@ console.log(convertedDate)
           <div></div>
         )}
         {isLoaded && index.length !== 0 ? (
-          <div>
-            <div>
+          <div className="d-flex justify-content-center">
+            <div className="card lin-reg-card w-50 ">
+            <div className="col-10 m-auto justify-center stock-volume mt-5">
           <CanvasJSChart options={options} className="mt-10" />
           </div>
           <div className="col-lg d-flex justify-content-center">
@@ -259,6 +261,7 @@ console.log(convertedDate)
 
               </div>
               </div>
+          </div>
           </div>
 
         ) : (

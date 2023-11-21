@@ -96,9 +96,10 @@ import {
   
       case SAVE_USER:
         console.log("SAVE_USER action dispatched with payload:", action.payload);
+        console.log(action.payload);
         return {
           ...state,
-          user: { _id: action.payload },
+          user: { id: action.payload },
         };
       default:
         return state;

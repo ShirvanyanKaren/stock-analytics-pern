@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import defaultStockImage from "../assets/default-stock.jpeg";
 import { faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
+import AddPortfolio  from "./AddPortfolio";
 
 
 
@@ -43,6 +44,7 @@ useEffect(() => {
           open: stock.open,
           close: stock.close,
           change: (stock.close - stock.open)/stock.open.toFixed(2),
+          name: stock.name,
         }));
         console.log(options);
         setOptions(options);
@@ -60,7 +62,11 @@ useEffect(() => {
     event.preventDefault();
     console.log(query);
     if (query) {
-      navigate(`/stockinfo/${query}`);
+      if(options[0].exchange == "KO"){
+        navigate(`/stockinfo/${options[0].label}.KS`);
+      } else {
+      navigate(`/stockinfo/${options[0].label}`);
+      }
     }
   };
 
@@ -68,6 +74,8 @@ useEffect(() => {
     console.log(event.target.value);
     setQuery(event.target.value);
   };
+
+
 
   const handleLogout = () => {
     Auth.logout();
@@ -101,8 +109,9 @@ useEffect(() => {
               <Dropdown.Menu className="w-100 dropdown-menu">
               {options ? (
                 options.map((option) => (
-                    <Link to={`/stockinfo/${option.label}`} className="text-decoration-none">
-                    <li className="list-group-item list-group-item-action active absolute search-list ">
+                  <div>
+
+                    <div className="list-group-item list-group-item-action active absolute search-list text-decoration-none ">
                       {option.image == "https://eodhd.comnull" ? (
                         <>
                        
@@ -114,9 +123,11 @@ useEffect(() => {
                         </>
                         
                         )}
-                    <div className="search-items justify-content-around">
+                    <div className="search-items justify-content-around align-items-center">
                     <li className="">
+                    <Link to={`/stockinfo/${option.label}`} className="text-decoration-underline text-dark" >
                     {option.label.concat(`.${option.exchange}`)}
+                    </Link>
                     </li>
                     {option.open.toFixed(2)}
                     <li className="">
@@ -136,10 +147,19 @@ useEffect(() => {
                       </>
                     )}
                     </li>
+                      <div>
+                      <AddPortfolio
+                    stockDetails={option}
+                    stockSymbol={option.label}
+                    longName={option.name}
+                    open={option.open}
+                    page={Boolean(false)}
+                    />
+                      </div>
                     </div>
 
-                 </li>
-                  </Link>
+                 </div>
+                  </div>
                 ))
 
               ) : (

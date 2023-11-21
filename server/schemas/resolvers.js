@@ -4,14 +4,21 @@ const { signToken } = require('../utils/auth');
 
 const resolvers = {
   Query: {
-    me: async (parent, args, context) => {
+    me: async (parent, args, {context}) => {
+      context.user = await User.findByPk(context.user.id);
+      console.log(context.user);
       if (context.user) {
         return await User.findByPk(context.user.id);
       }
       throw new AuthenticationError('Not logged in');
     },
-    user: async (parent, { username }) => {
+    user: async (parent, {username: username} ) => {
+      console.log(username);
       return await User.findOne({ where: { username: username } });
+    },
+    userFindByPk: async (parent, {id}) => {
+      console.log(id);
+      return await User.findByPk(id);
     },
     portfolio: async (parent, { user_id }) => {
       return await Portfolio.findAll({ where: { user_id: user_id } });

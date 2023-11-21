@@ -57,12 +57,43 @@ body {
 .stock-volume{
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
     border-radius: 4px;
+    .lin-reg-card{
+        width: fit-content;
+    }
+
 }
 
+
+
 .nav-bar-custom{
-    background-color: #f1f1f1;
+    // MAKE NAVBAR TRANSPARENT
+    background: transparent;
+    z-index: 10;
     box-shadow: 0 10px 12px 0 rgba(0,0,0,0.2);
     // add heavy bottom box shadow
     box-shadow: 0 15px 12px 0 rgba(0,0,0,0.2);
+    .nav-bar{
+        opacity: 1.8;
+        z-index: 2;
+    }
 
+}
+
+#tsparticles {
+    position: absolute;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: -10;
+}
+
+.add-portfolio-modal{
+    height: 1000px;
+    .modal-header{
+        background-color: #f1f1f1;
+        border-bottom: 1px solid #ccc;
+        .modal-title{
+            font-size: 25px;
+            font-weight: bold;
+        }
+    }
 }

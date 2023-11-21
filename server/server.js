@@ -7,13 +7,11 @@ const { typeDefs, resolvers } = require("./schemas");
 const cors = require("cors");
 const sequelize = require("./config/connection");
 const { spawn } = require("child_process");
-const axios = require("axios");
 
 
 const PORT = process.env.PORT || 5000;
 const app = express();
 
-const FINNHUB_API_KEY = 'cl1dmlhr01qkvip7mcn0cl1dmlhr01qkvip7mcng';
 
 const childPython = spawn("python", ["../python/main.py"]);
 
@@ -33,26 +31,10 @@ childPython.on("close", (code) => {
 }
 );
 
-
-app.get('/api/search', async (req, res) => {
-  const { query } = req.query;
-  try {
-    const response = await axios.get(`https://finnhub.io/api/v1/search?q=${query}&token=${FINNHUB_API_KEY}`);
-    const companies = response.data.result;
-    res.json(companies);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-
 const server = new ApolloServer({
   typeDefs,
   resolvers,
 });
-
-
 
 
 const startApolloServer = async () => {

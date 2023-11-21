@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   MDBContainer,
   MDBTabs,
@@ -19,6 +19,7 @@ import { SAVE_USER } from '../utils/actions';
 import Auth from '../utils/auth';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 const Login = () => {
 
@@ -29,6 +30,24 @@ const Login = () => {
   const [submitted, setSubmitted] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const location = useLocation(); 
+
+  console.log(location);
+
+  useEffect(() => {
+    if (Auth.loggedIn()) {
+      navigate('/');
+    }
+  }, []);
+
+  useEffect(() => { 
+    if (location.pathname === '/signup') {
+        setJustifyActive('tab2');
+    }
+}, [location.pathname]);
+
+  
 
   const [formState, setFormState] = useState({ 
     email: '', 
@@ -73,7 +92,6 @@ const handleLoginSubmit = async (event) => {
       const userId = mutationResponse.data.login.user.id;
       console.log(userId);
 
- 
       dispatch({
           type: SAVE_USER,
           payload: userId,
@@ -113,7 +131,7 @@ const handleLoginSubmit = async (event) => {
                     type: LOGIN,
                     payload: data.data,
                 });
-                navigate("/");
+                // navigate("/");
             });
         } catch (e) {
             if (e.graphQLErrors && e.graphQLErrors.length > 0) {
@@ -139,7 +157,7 @@ const handleLoginSubmit = async (event) => {
 
 
   return (
-    <MDBContainer className="p-3 my-5 d-flex flex-column w-50">
+    <MDBContainer className="p-3 my-5 d-flex flex-column w-50 card">
 
       <MDBTabs pills justify className='mb-3 d-flex flex-row justify-content-between'>
         <MDBTabsItem>

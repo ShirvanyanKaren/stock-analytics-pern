@@ -36,7 +36,11 @@ app.add_middleware(
 
 @app.get("/stockgraph")
 async def stock_graph(symbol: str, start: str, end: str):
+    symbol = symbol.upper()
     print(symbol)
+    if "-" in symbol and "KS" in symbol:
+        symbol = symbol.replace("-", ".")
+    print("check", symbol)
     stock_info = Ticker(symbol).summary_detail
     stock_key_stats = Ticker(symbol).key_stats
     long_name = Ticker(symbol).price[symbol]['longName']

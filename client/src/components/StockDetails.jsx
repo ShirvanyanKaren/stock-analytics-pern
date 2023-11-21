@@ -1,3 +1,5 @@
+import AddPortfolio from "./AddPortfolio";
+
 
 
 
@@ -43,7 +45,16 @@ const StockDetails = (props) => {
                         <li className="list-group-item">Dividend Yield: <span className="float-end fw-bold">{props.dividendYield}</span></li>
                     </ul>
                 </div>
-                <button className="btn btn-primary w-25 mt-5 mb-2 ms-2">Add to Portfolio</button>
+                <form>
+                <AddPortfolio 
+                stockDetails={props}
+                page={Boolean(true)}
+                longName={props.longName}
+                open={props.open}
+                />
+                </form>
+ 
+
             </div>
         </div>
         )

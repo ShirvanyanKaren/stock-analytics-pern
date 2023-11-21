@@ -14,6 +14,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "react-bootstrap";
 import "./App.scss";
 import store from "./utils/store";
+import AppPar from "./tsParticles/Particles";
 
 const httpLink = createHttpLink({
     uri: "http://localhost:5000/graphql",
@@ -35,11 +36,14 @@ const client = new ApolloClient({
     cache: new InMemoryCache(),
 });
 
+console.log(store.user);
+
 function App() {
     return (
         <ApolloProvider client={client}>
             <StoreProvider>
             <Provider store={store}>
+                <AppPar className="particles"/>
                 <Header />
                 <div className="App">
                     <Outlet />

@@ -5,11 +5,16 @@ import { useLocation } from "react-router-dom";
 import axios from "axios";
 import { stockData } from "../utils/helpers";
 import StockDetails from "../components/StockDetails";
+import { QUERY_ME } from "../utils/queries";
+import { useQuery } from "@apollo/client";
+
+
 
 const CanvasJS = CanvasJSReact.CanvasJS;
 const CanvasJSStockChart = CanvasJSReact.CanvasJSStockChart;
 
 const StockInfo = () => {
+  const { data } = useQuery(QUERY_ME);
   const { symbol } = useParams();
   const location = useLocation();
   const stockSymbol = location.pathname.split(("/"))[2];
@@ -24,7 +29,7 @@ const StockInfo = () => {
   const [endDate, setEndDate] = useState(new Date().toISOString().slice(0, 10));
 
 
-
+console.log(data);
  
   useEffect(() => {
     const getStockInfo = async () => {
@@ -170,16 +175,6 @@ const StockInfo = () => {
     height: "450px",
     margin: "auto",
   };
-
-
-
-
-
-
-
-
-
-
 
   return (
     <div>
