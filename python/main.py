@@ -34,6 +34,8 @@ app.add_middleware(
 
 
 
+
+
 @app.get("/stockgraph")
 async def stock_graph(symbol: str, start: str, end: str):
     symbol = symbol.upper()
@@ -127,10 +129,13 @@ async def fama_french(stocks: str, weights: str, start: str, end: str):
     risk_free = merged_port['RF'].mean()
     expected_return = risk_free + beta_m * market_premium + beta_s * size_premium + beta_v * value_premium
     expected_return = expected_return * 12
-    results = {'rsq': model.rsquared,
+    # calculate the sharpe ratio
+    sharpe = (expected_return - risk_free) / merged_port['Excess Portfolio'].std()
+    results = {'rsquared': model.rsquared,
                'params': model.params,
                'expected_return': expected_return,
-               'pvalues': pvalues,}
+               'pvalues': pvalues,
+               'sharpe': sharpe,}
     port_data['Portfolio'] = port_data['Portfolio'] * 100
     json_data = port_data.to_json( orient='index')
     return json_data, results

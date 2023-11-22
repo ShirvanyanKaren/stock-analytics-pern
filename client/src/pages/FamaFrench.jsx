@@ -3,7 +3,18 @@ import { useParams } from "react-router-dom";
 import CanvasJSReact from "@canvasjs/react-stockcharts";
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
+
+import ToolTip from "../components/ToolTip";
+
+
+
+import StockDetails from "../components/StockDetails";
+
 import axios from "axios";
+
+// beta symbol for text box
+
+
 
 const CanvasJS = CanvasJSReact.CanvasJS;
 
@@ -15,8 +26,28 @@ const FamaFrench = () => {
   const [mktRf, setMktRf] = useState([]);
   const [smb, setSmb] = useState([]);
   const [hml, setHml] = useState([]);
-  const [expectedReturn, setExpectedReturn] = useState();
-  const [pValues, setPValues] = useState();
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [stats, setStats] = useState({
+    sharpe: 0,
+    beta: 0,
+    smb: 0,
+    hml: 0,
+    mktRf: 0,
+    smbPval: 0,
+    hmlPval: 0,
+    mktRfPval: 0,
+    rSquared: 0,
+    expectedReturn: 0,
+  })
+
+  const convertToScientific = (num) => {
+    if (num < 0.0001) {
+      num = num.toExponential(2);
+      return num
+    } else {
+      return num.toFixed(4);
+    }
+  };
 
 
   const endDate = new Date(
@@ -66,12 +97,39 @@ const FamaFrench = () => {
           },
         });
         console.log("response", response);
-        var dataArray = JSON.parse(response.data[0]);
-        console.log(dataArray);
-        const expectedReturn = response.data[1]["expected_return"] * 100;
-        setExpectedReturn(expectedReturn.toFixed(2));
-        console.log(expectedReturn);
+        var stats = response.data[1];
 
+        console.log("stats click here", stats)
+        var dataArray = JSON.parse(response.data[0]);
+        console.log("dataArr", dataArray);
+        for (const key in stats ) {
+          if(key == "params"){
+            setStats((prevStats) => ({
+              ...prevStats,
+              hml: stats[key]["HML"].toFixed(4),
+              mktRf: stats[key]["Mkt-RF"].toFixed(4),
+              smb: stats[key]["SMB"].toFixed(4)
+            }));
+          } else if (key == "pvalues"){
+            setStats((prevStats) => ({
+              ...prevStats,
+              hmlPval: convertToScientific(stats[key]["HML"]),
+              mktRfPval: convertToScientific(stats[key]["Mkt-RF"]),
+              smbPval: convertToScientific(stats[key]["SMB"]),
+            }));
+          } else {
+            setStats((prevStats) => ({
+              ...prevStats,
+              rSquared: stats["rsquared"].toFixed(4),
+              expectedReturn: (stats["expected_return"] * 100).toFixed(2),
+              sharpe: stats["sharpe"].toFixed(4),
+            }));
+          }
+        }
+
+  
+
+        
         for (const key in dataArray) {
           let MktRf = "Mkt-RF";
           setDates((prevDates) => [...prevDates, key]);
@@ -82,35 +140,20 @@ const FamaFrench = () => {
           setMktRf((prevMktRf) => [...prevMktRf, dataArray[key][MktRf]]);
           setSmb((prevSmb) => [...prevSmb, dataArray[key].SMB]);
           setHml((prevHml) => [...prevHml, dataArray[key].HML]);
+
         }
+        setIsLoaded(true);
       } catch (err) {
         console.log(err);
       }
     };
     getFamaFrench();
-  }, [dates, portfolio, mktRf, smb, hml]);
+  }, []);
 
-  console.log(mktRf);
 
-  // useEffect(() => {
-  //     fetch("http://127.0.0.1:8000/fama/AAPL,MSFT,AMZN/0.4,0.4,0.2/2010-06-30/2023-6-30")
-  //     .then((res) => res.json())
-  //     .then((data) => {
+  console.log("stats recheck", stats)
 
-  //         var dataArray = JSON.parse(data[0]);
-  //         console.log(dataArray);
 
-  //         for(const key in dataArray){
-  //             let MktRf = 'Mkt-Rf'
-  //             setDates(prevDates => [...prevDates, key]);
-  //             setPortfolio(prevPortfolio => [...prevPortfolio, dataArray[key].Portfolio]);
-  //             setMktRf(prevMktRf => [...prevMktRf, dataArray[key][MktRf]]);
-  //             setSmb(prevSmb => [...prevSmb, dataArray[key].SMB]);
-  //             setHml(prevHml => [...prevHml, dataArray[key].HML]);
-  //         }
-  //     }
-  //     )
-  // }, [dates, portfolio, mktRf, smb, hml]);
 
   const options = {
     animdationEnabled: true,
@@ -183,7 +226,8 @@ const FamaFrench = () => {
 
   return (
     <>
-      <div className="container">
+      <div className={isLoaded ? "d-flex justify-content-center" : "d-none"}>
+        <div className="card mt-5 col-10">
         <form
           className="col-lg d-flex justify-content-center mb-2"
           ref={graphParams}
@@ -229,15 +273,36 @@ const FamaFrench = () => {
             All Factors
           </button>
         </form>
-        <div className="row">
+        <div className="justify-content-center">
           <div className="col-lg d-flex justify-content-center">
-            <h4>Expected Yearly Return: {expectedReturn}% </h4>
+            <h4>Expected Yearly Return: {stats.expectedReturn}% </h4>
+          </div>
+
+        <div className=" d-flex justify-content-center ">
+          <div className="col-10 mb-5">
+          <CanvasJSChart options={options} />
           </div>
         </div>
-        <div className="row">
-          <CanvasJSChart options={options} />
+
+        </div>
         </div>
       </div>
+      <div className={isLoaded ? "d-flex justify-content-center" : "d-none"}>
+  
+      <StockDetails
+        sharpeRatio={stats.sharpe}
+        mktRfBeta={stats.mktRf}
+        smbBeta={stats.smb}
+        hmlBeta={stats.hml}
+        smbPval={stats.smbPval}
+        hmlPval={stats.hmlPval}
+        mktRfPval={stats.mktRfPval}
+        rSquared={stats.rSquared}
+        stockInfo={Boolean(false)}
+      />
+     </div>
+
+
     </>
   );
 };

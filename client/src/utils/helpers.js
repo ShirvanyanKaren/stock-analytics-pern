@@ -50,3 +50,8 @@ export async function linReg(stockSymbol, searchIndex, startDate, endDate) {
     return response.data;
 }
 
+export async function stockSearch(query) {
+        const response = await axios.get(`https://eodhd.com/api/query-search-extended/?q=${query}&api_token=65431c249ef2b9.93958016`);
+    return response.data;
+
+}

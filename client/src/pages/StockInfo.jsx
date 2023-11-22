@@ -225,6 +225,7 @@ console.log(data);
                   volume={stockDetails.volume}
                   week52High={stockDetails.fiftyTwoWeekHigh}
                   week52Low={stockDetails.fiftyTwoWeekLow}
+                  stockInfo={Boolean(true)}
                 />
             </div>
             </div>

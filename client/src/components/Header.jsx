@@ -11,71 +11,18 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import defaultStockImage from "../assets/default-stock.jpeg";
-import { faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
+import { faCaretDown, faCaretUp, faMoneyCheck } from "@fortawesome/free-solid-svg-icons";
+import { stockSearch } from "../utils/helpers";
 import AddPortfolio  from "./AddPortfolio";
+import SearchBar from "./SearchBar";
 
 
 
 
 const Header = () => {
-  const navigate = useNavigate();
-  const [query, setQuery] = useState("");
-  const [options, setOptions] = useState([]);
+
+
   
-
-console.log(options);
-useEffect(() => {
-  console.log("useEffect");
-
-  const fetchData = async () => {
-    if (query.length > 0) {
-      console.log("query", query);
-      try {
-        const response = await fetch(
-          `https://eodhd.com/api/query-search-extended/?q=${query}&api_token=65431c249ef2b9.93958016`
-        );
-        const data = await response.json();
-        console.log(data);
-        console.log("here");
-        const options = data.map((stock) => ({
-          exchange: stock.exchange,
-          image: "https://eodhd.com".concat(stock.image),
-          label: stock.code,
-          open: stock.open,
-          close: stock.close,
-          change: (stock.close - stock.open)/stock.open.toFixed(2),
-          name: stock.name,
-        }));
-        console.log(options);
-        setOptions(options);
-      } catch (err) {
-        console.log(err);
-      }
-    }
-  };
-
-  fetchData();
-}, [query]); // Run the effect whenever the 'query' state changes
-
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    console.log(query);
-    if (query) {
-      if(options[0].exchange == "KO"){
-        navigate(`/stockinfo/${options[0].label}.KS`);
-      } else {
-      navigate(`/stockinfo/${options[0].label}`);
-      }
-    }
-  };
-
-  const handleInputChange = (event) => {
-    console.log(event.target.value);
-    setQuery(event.target.value);
-  };
-
-
 
   const handleLogout = () => {
     Auth.logout();
@@ -93,86 +40,7 @@ useEffect(() => {
             </Link>
           </Navbar.Brand>
           <div className="nav">
-            <form onSubmit={handleSubmit} className="d-flex">
-            <ul className="list-group me-3">
-              <Dropdown>
-              <Dropdown.Toggle variant="light" id="dropdown-search" >
-                <input
-                className="search-bar me-3 mt-2 mb-2 h-300"
-                placeholder="Search"
-                name="query"
-                onChange={handleInputChange}
-              />
-              </Dropdown.Toggle>
-
-
-              <Dropdown.Menu className="w-100 dropdown-menu">
-              {options ? (
-                options.map((option) => (
-                  <div>
-
-                    <div className="list-group-item list-group-item-action active absolute search-list text-decoration-none ">
-                      {option.image == "https://eodhd.comnull" ? (
-                        <>
-                       
-                        <img src={defaultStockImage} alt={defaultStockImage} />
-                        </>
-                      ) : (
-                        <>
-                         <img src={option.image} alt={defaultStockImage} />
-                        </>
-                        
-                        )}
-                    <div className="search-items justify-content-around align-items-center">
-                    <li className="">
-                    <Link to={`/stockinfo/${option.label}`} className="text-decoration-underline text-dark" >
-                    {option.label.concat(`.${option.exchange}`)}
-                    </Link>
-                    </li>
-                    {option.open.toFixed(2)}
-                    <li className="">
-                    {option.close.toFixed(2)}
-                    </li>
-                    <li className="">
-                    {option.change > 0 ? (
-                      <>
-                      <FontAwesomeIcon icon={faCaretUp} className="text-success me-1" />
-                      {(option.change * 100).toFixed(2)}%
-                      </>
-                    
-                    ) : (
-                      <>
-                      <FontAwesomeIcon icon={faCaretDown} className="text-danger me-1" />
-                      {(option.change * 100).toFixed(2)}%
-                      </>
-                    )}
-                    </li>
-                      <div>
-                      <AddPortfolio
-                    stockDetails={option}
-                    stockSymbol={option.label}
-                    longName={option.name}
-                    open={option.open}
-                    page={Boolean(false)}
-                    />
-                      </div>
-                    </div>
-
-                 </div>
-                  </div>
-                ))
-
-              ) : (
-                <></>
-              )}
-              </Dropdown.Menu>
-              </Dropdown>
-            </ul>
-
-              {/* <button className="btn btn-outline-light ms-3 me-3" type="submit">
-                Search
-              </button> */}
-            </form>
+            <SearchBar />
             <Nav className="align-items-center ">
               {Auth.loggedIn() ? (
                 <Nav.Link to="/" onClick={handleLogout}>
@@ -189,6 +57,9 @@ useEffect(() => {
                 </NavDropdown.Item>
                 <NavDropdown.Item to="/action/3.2">
                   Edit Portfolio
+                </NavDropdown.Item>
+                <NavDropdown.Item href="/famafrench">
+                  Expected Return
                 </NavDropdown.Item>
               </NavDropdown>
             </Nav>
