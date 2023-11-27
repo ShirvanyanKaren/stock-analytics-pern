@@ -55,3 +55,55 @@ export async function stockSearch(query) {
     return response.data;
 
 }
+
+export async function getStockWeights(stockNumbers) {
+  const response = await axios.get('http:////127.0.0.1:8000/stockweights',
+  {
+    params: {
+      stocks: stockNumbers,
+    },
+  });
+  return response.data;
+}
+
+
+export function idbPromise(stockWeights, method, object){
+  return new Promise((resolve, reject) => {
+    const request = window.indexedDB.open('stockWeights', 1);
+
+    let db, tx, store;
+
+    request.onupgradeneeded = function(e) {
+      const db = request.result;
+      db.createObjectStore('stockWeights', { keyPath: '_id' });
+    };
+
+    request.onerror = function(e) {
+      console.log('There was an error');
+    };
+
+    request.onsuccess = function(e) {
+      db = request.result;
+      tx = db.transaction('stockWeights', 'readwrite');
+      store = tx.objectStore('stockWeights');
+
+      db.onerror = function(e) {
+        console.log('error', e);
+      };
+      if (method === 'put') {
+        store.put(object);
+      }
+      if (method === 'get') {
+        const all = store.getAll();
+        all.onsuccess = function() {
+          resolve(all.result);
+        };
+      }
+      tx.oncomplete = function() {
+        db.close();
+      };
+    };
+  });
+
+
+}

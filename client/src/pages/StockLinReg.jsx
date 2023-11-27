@@ -192,6 +192,7 @@ console.log(convertedDate)
                   <Dropdown.Item
                     key={option}
                     name="index"
+                    className={searchIndex === indexOptions[option] ? "active fw-bold" : ""}
                     onClick={() => setSearchIndex(indexOptions[option])}
                   >
                     {option}

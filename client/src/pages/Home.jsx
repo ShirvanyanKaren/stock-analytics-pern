@@ -2,42 +2,79 @@ import React from 'react'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@apollo/client'
-import { QUERY_ME } from '../utils/queries'
-import { useStoreContext } from '../utils/GlobalState'
 import {useDispatch, useSelector} from "react-redux";
+import { useReducer } from 'react';
 import { QUERY_USER } from '../utils/queries'
 import Auth  from '../utils/auth'
 import decode from 'jwt-decode';
+import { QUERY_STOCK } from '../utils/queries'
+import { getStockWeights } from '../utils/helpers';
+import { SET_STOCK_WEIGHTS } from '../utils/actions';
+import axios from 'axios';
 
 
 
 const Home = () => {
     const [decodedToken, setToken] = useState('');
     const dispatch = useDispatch();
+    const [stockNumbers, setStockNumbers] = useState({});
+    const [stockWeights, setStockWeights] = useState({});
 
-
-    useEffect(() => {
-        const token = localStorage.getItem('id_token');
-        if (token) {
-          const decoded = decode(token);
-          setToken(decoded);
-        } else {
-          setToken('');
-        }
-      }, []);
-
-      const { data: userData } = useQuery(QUERY_USER, {
-        variables: { username: decodedToken?.data?.username },
-        skip: !decodedToken?.data?.username, 
-      });
     
-      if (userData) {
-      console.log(userData);
-      }
 
 
+useEffect(() => {
+    const token = localStorage.getItem('id_token');
+    if (token) {
+      const decoded = decode(token);
+      setToken(decoded);
+    } else {
+      setToken('');
+    }
+  }, []);
 
 
+const { data: userData } = useQuery(QUERY_USER, {
+  variables: { username: decodedToken?.data?.username },
+  skip: !decodedToken?.data?.username, 
+});
+const { data: stockData } = useQuery(QUERY_STOCK, {
+  variables: { portfolioId: userData?.user?.portfolio_id },
+  skip: !userData?.user?.portfolio_id, 
+});
+
+useEffect(() => {
+  const getStockObject = async () => {
+    const data = await stockData;
+    console.log(data);
+    const stockObjects = await data.stock;
+    const promises = stockObjects.map(async (stockObject) => {
+      return {
+        [stockObject.stock_symbol]: stockObject.stock_quantity,
+      };
+    });
+    const stockNumbersArray = await Promise.all(promises);
+    var stockNumbers = Object.assign({}, ...stockNumbersArray);
+    stockNumbers = JSON.stringify(stockNumbers);
+    const stockWeights = await getStockWeights(stockNumbers);
+    setStockWeights(stockWeights);
+  };
+
+  getStockObject();
+}, [stockData, decodedToken]);
+
+if(stockWeights) {
+  try {
+    dispatch({
+      type: SET_STOCK_WEIGHTS,
+      stockWeights: "stockWeights",
+    });
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+console.log(stockWeights);
 
     return (
         <div className='container d-flex justify-content-center'>

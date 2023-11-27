@@ -29,11 +29,7 @@ Portfolio.init(
             },
           },
           stock_id: {
-            type: DataTypes.INTEGER,
-            references: {
-              model: 'stock',
-              key: 'id',
-            },
+            type: DataTypes.ARRAY(DataTypes.INTEGER),
           },
     },
     {

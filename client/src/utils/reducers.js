@@ -9,6 +9,7 @@ import {
     CLEAR_CART,
     TOGGLE_CART,
     SAVE_USER,
+    SET_STOCK_WEIGHTS,
   } from "./actions";
   
   // initial state of the store
@@ -22,6 +23,7 @@ import {
     stores: [],
     user: [],
     currencyRates: [],
+    stockWeights: {},
   };
   
   // export the reducer function
@@ -100,6 +102,11 @@ import {
         return {
           ...state,
           user: { id: action.payload },
+        };
+      case SET_STOCK_WEIGHTS:
+        return {
+          ...state,
+          stockWeights: action.payload,
         };
       default:
         return state;

@@ -44,8 +44,24 @@ const resolvers = {
         email: args.email,
         password: args.password,
       });
-      
 
+      const portfolio = await Portfolio.create({
+        user_id: user.id,
+        portfolio_name: `${user.username}'s Portfolio`,
+        stock_id: [],
+        
+      });
+
+      await User.update({
+        portfolio_id: portfolio.id,
+      }, {
+        where: {
+          id: user.id,
+        },
+      });
+
+
+      
       const token = signToken(user);
       return { token, user };
     },
@@ -65,16 +81,50 @@ const resolvers = {
       });
     },
     addStocksPortfolio: async (parent, args) => {
-      return await Stock.create({
-        portfolio_id: args.portfolio_id,
-        stock_quantity: args.quantity,
-        purchase_date: args.purchase_date,
-        stock_name: args.stock_name,
-        stock_symbol: args.stock_symbol,
-      });
-    }, 
-  },
-};
+      console.log(args);
+      const findStock = await Stock.findOne({ where: { stock_symbol: args.stock_symbol, portfolio_id: args.portfolio_id } });
+      if (findStock) {
+        const newQuantity = findStock.stock_quantity + args.stock_quantity;
+        await Stock.update({
+          stock_quantity: newQuantity,
+        }, {
+          where: {
+            stock_symbol: args.stock_symbol,
+            portfolio_id: args.portfolio_id,
+          }
+        
+        });
+        return findStock;
+      } else {
+        const stock = await Stock.create({
+          portfolio_id: args.portfolio_id,
+          stock_quantity: args.stock_quantity,
+          stock_purchase_date: args.stock_purchase_date,
+          stock_name: args.stock_name,
+          stock_symbol: args.stock_symbol,
+        });
+        const portfolio = await Portfolio.findByPk(args.portfolio_id);
+        const newStockId = stock.id;
+        console.log(newStockId);
+        console.log(portfolio.stock_id);
+        if (!portfolio.stock_id.includes(newStockId)) {
+          await Portfolio.update({
+            stock_id: [...portfolio.stock_id, newStockId],
+          }, {
+            where: {
+              id: args.portfolio_id,
+            },
+          });
+        return stock;
+        
+
+
+      }
+    }
+
+    }
+    },
+  };
 
 module.exports = resolvers;
  

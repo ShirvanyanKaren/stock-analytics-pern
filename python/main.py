@@ -33,6 +33,16 @@ app.add_middleware(
 )
 
 
+@app.get("/stockweights")
+async def stock_weights(stocks):
+    stocks = json.loads(stocks)
+    values = [Ticker(key).summary_detail[key]['open'] * value for key, value in stocks.items()]
+    total = sum(values)
+    for key, value in zip(stocks.keys(), values):
+        stocks[key] = value / total
+    print(stocks)
+    stocks = {key: value for key, value in stocks.items()}
+    return stocks
 
 
 
@@ -139,6 +149,8 @@ async def fama_french(stocks: str, weights: str, start: str, end: str):
     port_data['Portfolio'] = port_data['Portfolio'] * 100
     json_data = port_data.to_json( orient='index')
     return json_data, results
+
+
 
 
 if __name__ == "__main__":

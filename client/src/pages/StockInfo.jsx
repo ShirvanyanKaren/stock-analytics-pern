@@ -7,6 +7,7 @@ import { stockData } from "../utils/helpers";
 import StockDetails from "../components/StockDetails";
 import { QUERY_ME } from "../utils/queries";
 import { useQuery } from "@apollo/client";
+import { useSelector } from "react-redux";
 
 
 
@@ -196,32 +197,14 @@ console.log(data);
                   open={stockDetails.open}
                   high={stockDetails.dayHigh}
                   low={stockDetails.dayLow}
-                  forwardPE={
-                    stockDetails.forwardPE ? (
-                      <>{(stockDetails.forwardPE).toFixed(3)}</>
-                    ) : (
-                      <>N/A</>
-                    )
-                  }
+                  forwardPE={stockDetails.forwardPE}
                   sharesOutstanding={stockDetails.sharesOutstanding}
                   date={new Date().toISOString().slice(0, 10)}
                   marketCap={stockDetails.marketCap}
                   longName={stockDetails.longName}
                   beta={stockDetails.beta}
-                  dividendYield={
-                    stockDetails.dividendYield ? (
-                      <>{(stockDetails.dividendYield).toFixed(4)}</>
-                    ) : (
-                      <>N/A</>
-                    )
-                  }
-                  dividendRate={
-                    stockDetails.dividendRate ? (
-                      <>{stockDetails.dividendRate}</>
-                    ) : (
-                      <>N/A</>
-                    )
-                  }
+                  dividendYield={stockDetails.dividendYield}
+                  dividendRate={stockDetails.dividendRate}
                   volume={stockDetails.volume}
                   week52High={stockDetails.fiftyTwoWeekHigh}
                   week52Low={stockDetails.fiftyTwoWeekLow}

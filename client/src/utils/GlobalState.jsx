@@ -12,6 +12,7 @@ const StoreProvider = ({ value = [], ...props }) => {
     categories: [],
     currentCategory: "",
     stores: [],
+    stockWeights: ""
 
   });
 

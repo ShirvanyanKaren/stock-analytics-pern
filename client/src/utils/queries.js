@@ -20,3 +20,18 @@ export const QUERY_USER = gql`
         }
     }
 `;
+
+export const QUERY_STOCK = gql`
+    query stock($portfolioId: ID!) {
+        stock(portfolio_id: $portfolioId) {
+            stock_name
+            stock_purchase_date
+            stock_quantity
+            stock_symbol
+            id
+          }
+    }
+`; 
+
+
+

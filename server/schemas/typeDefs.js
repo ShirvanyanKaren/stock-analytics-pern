@@ -39,7 +39,7 @@ const typeDefs = `
         login(email: String!, password: String!): Auth
         addUser(username: String!, email: String!, password: String!): Auth
         addPortfolio(user_id: ID!, portfolio_name: String!): Portfolio
-        addStocksPortfolio(portfolio_id: ID!, stock_name: String!, stock_symbol: String!, quantity: Int!, purchase_date: String ): Stock
+        addStocksPortfolio(portfolio_id: ID!, stock_name: String!, stock_symbol: String!, stock_quantity: Int!, stock_purchase_date: String!): Stock
     }
 `;
 

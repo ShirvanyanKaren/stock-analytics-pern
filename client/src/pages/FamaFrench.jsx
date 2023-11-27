@@ -6,13 +6,12 @@ import { useNavigate } from "react-router-dom";
 
 import ToolTip from "../components/ToolTip";
 
-
-
 import StockDetails from "../components/StockDetails";
+import { useSelector } from "react-redux";
 
 import axios from "axios";
 
-// beta symbol for text box
+
 
 
 
@@ -39,6 +38,11 @@ const FamaFrench = () => {
     rSquared: 0,
     expectedReturn: 0,
   })
+
+  // STOCK weights is an object, lets pull it from redux
+  const stockWeights = useSelector((state) => state.stockWeights);
+
+  console.log("stock weights", stockWeights);
 
   const convertToScientific = (num) => {
     if (num < 0.0001) {
