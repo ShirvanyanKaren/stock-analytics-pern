@@ -34,9 +34,11 @@ console.log(data);
  
   useEffect(() => {
     const getStockInfo = async () => {
-
       try {
+        console.log(startDate, endDate)
         const data = await stockData(stockSymbol, startDate, endDate);
+
+        console.log("data", data);
         const dataArr = JSON.parse(data[0]);
         console.log("dataArr", dataArr);
         setStockDetails(data[1][stockSymbol]);

@@ -2,29 +2,24 @@ import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
-import { Dropdown } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import AsyncSelect from "react-select/async";
-import Form from "react-bootstrap/Form";
 import Auth from "../utils/auth";
-import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import defaultStockImage from "../assets/default-stock.jpeg";
-import { faCaretDown, faCaretUp, faMoneyCheck } from "@fortawesome/free-solid-svg-icons";
-import { stockSearch } from "../utils/helpers";
-import AddPortfolio  from "./AddPortfolio";
 import SearchBar from "./SearchBar";
-
-
+import { idbPromise } from "../utils/helpers";
 
 
 const Header = () => {
-
-
-  
-
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    const getPortfolioId = async () => {
+      const userPortfolio = await idbPromise('stockWeights', 'get', 'portfolio_id');
+      console.log(userPortfolio);
+      const id = userPortfolio[0].portfolio_id;
+      console.log(id);
+      return id;
+    }
+    const portfolioId = await getPortfolioId();
+    console.log(portfolioId);
+    idbPromise('stockWeights', 'delete', portfolioId);
     Auth.logout();
   };
 

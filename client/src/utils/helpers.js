@@ -26,7 +26,9 @@ export const indexOptions = {
 
 
 export async function stockData(stockSymbol, startDate, endDate) {
+  console.log("stockSymbol", stockSymbol);
         const response = await axios.get('http:////127.0.0.1:8000/stockgraph', 
+
         {
           params: {
             symbol: stockSymbol,
@@ -75,7 +77,7 @@ export function idbPromise(stockWeights, method, object){
 
     request.onupgradeneeded = function(e) {
       const db = request.result;
-      db.createObjectStore('stockWeights', { keyPath: '_id' });
+      db.createObjectStore('stockWeights', { keyPath: 'portfolio_id' });
     };
 
     request.onerror = function(e) {
@@ -98,6 +100,10 @@ export function idbPromise(stockWeights, method, object){
         all.onsuccess = function() {
           resolve(all.result);
         };
+      }
+      if (method === 'delete') {
+        console.log("delete object", object);
+        store.delete(object);
       }
       tx.oncomplete = function() {
         db.close();

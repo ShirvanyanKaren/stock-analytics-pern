@@ -8,6 +8,12 @@ import ToolTip from "../components/ToolTip";
 
 import StockDetails from "../components/StockDetails";
 import { useSelector } from "react-redux";
+import { QUERY_USER } from '../utils/queries'
+import Auth  from '../utils/auth'
+import decode from 'jwt-decode';
+import { idbPromise } from "../utils/helpers";
+import { QUERY_STOCK } from '../utils/queries'
+import { getStockWeights } from '../utils/helpers';
 
 import axios from "axios";
 
@@ -25,6 +31,7 @@ const FamaFrench = () => {
   const [mktRf, setMktRf] = useState([]);
   const [smb, setSmb] = useState([]);
   const [hml, setHml] = useState([]);
+  const stockWeights = useState({});
   const [isLoaded, setIsLoaded] = useState(false);
   const [stats, setStats] = useState({
     sharpe: 0,
@@ -39,10 +46,10 @@ const FamaFrench = () => {
     expectedReturn: 0,
   })
 
-  // STOCK weights is an object, lets pull it from redux
-  const stockWeights = useSelector((state) => state.stockWeights);
+  
 
-  console.log("stock weights", stockWeights);
+  // STOCK weights is an object, lets pull it from redux
+
 
   const convertToScientific = (num) => {
     if (num < 0.0001) {
@@ -62,6 +69,8 @@ const FamaFrench = () => {
     .toISOString()
     .slice(0, 10);
 
+  console.log("endDate", endDate);
+
   const startDate = new Date(
     new Date().getFullYear() - 5,
     new Date().getMonth() - 1,
@@ -69,6 +78,8 @@ const FamaFrench = () => {
   )
     .toISOString()
     .slice(0, 10);
+
+  console.log("startDate", startDate);  
 
   const [graphParams, setGraphParams] = useState({
     hml: true,
@@ -85,17 +96,23 @@ const FamaFrench = () => {
     });
   };
 
-  const stocks = ["AAPL", "MSFT", "AMZN","TSLA","GOOG"];
 
-  const weights = [0.2, 0.2, 0.2, 0.2, 0.2];
+
+
 
   useEffect(() => {
+
+
     const getFamaFrench = async () => {
       try {
+        const weights =  await idbPromise("stockWeights", "get");
+        console.log("WEIGHTS", weights[0])
+        var {portfolio_id, ...weightsStorage} = weights[0];
+        weightsStorage = await JSON.stringify(weightsStorage);
+        console.log("weightsStorage", weightsStorage);
         const response = await axios.get("http://127.0.0.1:8000/famafrench", {
           params: {
-            stocks: stocks.join(","),
-            weights: weights.join(","),
+            stockWeights: weightsStorage,
             start: startDate,
             end: endDate,
           },

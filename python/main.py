@@ -13,11 +13,13 @@ import json
 import requests
 import sys
 from yahooquery import Ticker 
+
 sys.setrecursionlimit(5000)
 
 import statsmodels.api as sma
 
 import uvicorn
+
 
 # run this script with uvicorn main:app --reload to start the server
 
@@ -69,7 +71,6 @@ async def stock_graph(symbol: str, start: str, end: str):
     return stock, stock_info
 
 
-
 @app.get("/linreg")
 async def lin_reg(stocks: str, index: str, start: str, end: str):
     print(stocks)
@@ -106,23 +107,32 @@ async def lin_reg(stocks: str, index: str, start: str, end: str):
 
 
 @app.get("/famafrench")
-async def fama_french(stocks: str, weights: str, start: str, end: str):
+async def fama_french(stockWeights: str, start: str, end: str):
     print(start)
+    stock_weights = json.loads(stockWeights)
+    print("stock weights", stock_weights)
     ff3_monthly = pd.DataFrame(gff.famaFrench3Factor(frequency='m'))
     ff3_monthly.rename(columns={'date_ff_factors':'Date'}, inplace=True)
     ff3_monthly.set_index('Date', inplace=True)
     market_premium = ff3_monthly['Mkt-RF'].mean()
     size_premium = ff3_monthly['SMB'].mean()
     value_premium = ff3_monthly['HML'].mean()
-    weights = [float(w) for w in weights.split(',')]
-    stocks = stocks.split(',')
+    stocks = list(stock_weights.keys())
+    print("stock keys", stocks)
     start = dt.datetime.strptime(start, '%Y-%m-%d')
     end = dt.datetime.strptime(end, '%Y-%m-%d')
     uw_portfolio = yf.download(stocks, start=start, end=end)['Adj Close'].pct_change()[1:]
-    # uw_portfolio = uw_portfolio[1:]
-    weights = {stocks[i]: weights[i] for i in range(len(stocks))}
-    weighted_returns = uw_portfolio * pd.Series(weights)
-    portfolio = pd.DataFrame({'Portfolio': weighted_returns.sum(axis=1)})
+    print("uw portfolio", uw_portfolio)
+    print("stock weights", stock_weights)
+    print("pd series", pd.Series(stock_weights))
+    if len(stocks) == 1:
+        weighted_returns = uw_portfolio * stock_weights[stocks[0]]
+        portfolio = pd.DataFrame({'Portfolio': weighted_returns})
+    else:
+        weighted_returns = uw_portfolio * pd.Series(stock_weights)
+        portfolio = pd.DataFrame({'Portfolio': weighted_returns.sum(axis=1)})
+    print("weighted returns", weighted_returns)
+    print("portfolio", portfolio)
     portfolio_mtl = portfolio.resample('M').agg(lambda x: (x + 1).prod() - 1)
     factors = pdr.DataReader('F-F_Research_Data_Factors', 'famafrench', start, end)[0][1:]
     portfolio_mtl.index = factors.index
@@ -139,7 +149,6 @@ async def fama_french(stocks: str, weights: str, start: str, end: str):
     risk_free = merged_port['RF'].mean()
     expected_return = risk_free + beta_m * market_premium + beta_s * size_premium + beta_v * value_premium
     expected_return = expected_return * 12
-    # calculate the sharpe ratio
     sharpe = (expected_return - risk_free) / merged_port['Excess Portfolio'].std()
     results = {'rsquared': model.rsquared,
                'params': model.params,

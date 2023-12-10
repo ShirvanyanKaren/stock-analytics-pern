@@ -10,6 +10,7 @@ import decode from 'jwt-decode';
 import { QUERY_STOCK } from '../utils/queries'
 import { getStockWeights } from '../utils/helpers';
 import { SET_STOCK_WEIGHTS } from '../utils/actions';
+import { idbPromise } from '../utils/helpers';
 import axios from 'axios';
 
 
@@ -17,16 +18,17 @@ import axios from 'axios';
 const Home = () => {
     const [decodedToken, setToken] = useState('');
     const dispatch = useDispatch();
-    const [stockNumbers, setStockNumbers] = useState({});
     const [stockWeights, setStockWeights] = useState({});
 
-    
+    const CheckStockWeights = useSelector((state) => state.stockWeights);
+
 
 
 useEffect(() => {
     const token = localStorage.getItem('id_token');
     if (token) {
       const decoded = decode(token);
+      console.log(decoded);
       setToken(decoded);
     } else {
       setToken('');
@@ -46,7 +48,6 @@ const { data: stockData } = useQuery(QUERY_STOCK, {
 useEffect(() => {
   const getStockObject = async () => {
     const data = await stockData;
-    console.log(data);
     const stockObjects = await data.stock;
     const promises = stockObjects.map(async (stockObject) => {
       return {
@@ -57,24 +58,31 @@ useEffect(() => {
     var stockNumbers = Object.assign({}, ...stockNumbersArray);
     stockNumbers = JSON.stringify(stockNumbers);
     const stockWeights = await getStockWeights(stockNumbers);
+    if(stockWeights) {
+      try {
+        stockWeights['portfolio_id'] = userData.user.portfolio_id;
+
+         idbPromise('stockWeights', 'put', {
+          ...stockWeights,
+          portfolio_id: stockWeights.portfolio_id
+        });
+    
+        dispatch({
+          type: SET_STOCK_WEIGHTS,
+          payload: stockWeights,
+        });
+      } catch (err) {
+        console.log(err);
+      }
+    }
     setStockWeights(stockWeights);
   };
 
   getStockObject();
 }, [stockData, decodedToken]);
 
-if(stockWeights) {
-  try {
-    dispatch({
-      type: SET_STOCK_WEIGHTS,
-      stockWeights: "stockWeights",
-    });
-  } catch (err) {
-    console.log(err);
-  }
-}
 
-console.log(stockWeights);
+
 
     return (
         <div className='container d-flex justify-content-center'>

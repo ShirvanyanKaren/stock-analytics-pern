@@ -70,7 +70,6 @@ const resolvers = {
       if (!user || !user.checkPassword(password)) {
         throw new AuthenticationError('Incorrect Credentials');
       }
-
       const token = signToken(user);
       return { token, user };
     },

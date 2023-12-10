@@ -104,6 +104,7 @@ import {
           user: { id: action.payload },
         };
       case SET_STOCK_WEIGHTS:
+        console.log("SET_STOCK_WEIGHTS action dispatched with payload:", action.payload);
         return {
           ...state,
           stockWeights: action.payload,
