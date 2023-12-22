@@ -12,12 +12,12 @@ import pandas as pd
 import urllib3
 import json
 import requests
-import sys
+# import sys
 from yahooquery import Ticker 
 
 
 
-sys.setrecursionlimit(5000)
+# sys.setrecursionlimit(5000)
 
 import statsmodels.api as sma
 
