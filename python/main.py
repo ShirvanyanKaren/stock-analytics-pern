@@ -6,7 +6,7 @@ import pandas_datareader.data as pdr
 import datetime as dt
 import yfinance as yf
 import numpy as np
-from sklearn.linear_model import LinearRegression
+# from sklearn.linear_model import LinearRegression
 import getFamaFrenchFactors as gff
 import pandas as pd
 import urllib3
