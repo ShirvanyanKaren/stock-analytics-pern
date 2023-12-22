@@ -15,6 +15,8 @@ import requests
 import sys
 from yahooquery import Ticker 
 
+
+
 sys.setrecursionlimit(5000)
 
 import statsmodels.api as sma
