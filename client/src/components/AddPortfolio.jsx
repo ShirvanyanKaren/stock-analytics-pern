@@ -70,7 +70,6 @@ const AddPortfolio = (props) => {
     }, [props.stockSymbol, props.longName] );
 
 
-console.log("props", props.longName)
 
 
 const handleInputChange = (event) => {
@@ -95,7 +94,7 @@ const handleInputChange = (event) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log(stockState);
+
     try {
     if (stockState.shares) {
     
@@ -120,7 +119,7 @@ const handleInputChange = (event) => {
 
   console.log("portfolio id", userData?.user.portfolio_id)
 
-  console.log("stock state", stockState)
+
 
 
   const stockDetails = props.stockDetails;

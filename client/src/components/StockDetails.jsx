@@ -24,7 +24,6 @@ const isNullOrUndefined = (value) => {
 
 const StockDetails = (props) => {
 
-    console.log(props.sharesOutstanding)
         return (
             <div className="container mt-5">
             <div className="row card custom-card">

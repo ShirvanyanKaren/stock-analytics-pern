@@ -38,6 +38,15 @@ export async function stockData(stockSymbol, startDate, endDate) {
         });
     return response.data;
 }
+export async function stockInfo(stockSymbol) {
+ const response = await axios.get('http:////127.00.1:8000/stockinfo',
+ {
+   params: {
+     symbol: stockSymbol,
+   },
+ });
+  return response.data;
+}
 
 export async function linReg(stockSymbol, searchIndex, startDate, endDate) {
         const response = await axios.get('http:////127.0.0.1:8000/linreg',

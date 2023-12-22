@@ -1,3 +1,4 @@
+# give me all the pip installs for this file
 from typing import Union
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -33,7 +34,42 @@ app.add_middleware(
     allow_methods=["*"],  
     allow_headers=["*"],  
 )
+@app.get("/stockinfo")
+async def stock_info(symbol: str):
+    symbol = process_symbol(symbol)
+    stock_info = fetch_stock_info(symbol)
+    return stock_info
 
+@app.get("/stockgraph")
+async def stock_graph(symbol: str, start: str, end: str):
+    symbol = process_symbol(symbol)
+    stock = fetch_stock_graph(symbol, start, end)
+    return stock
+
+def process_symbol(symbol: str):
+    symbol = symbol.upper()
+    if "-" in symbol and "KS" in symbol:
+        symbol = symbol.replace("-", ".")
+    return symbol
+
+def fetch_stock_info(symbol: str):
+    stock_info = Ticker(symbol).summary_detail
+    stock_key_stats = Ticker(symbol).key_stats
+    long_name = Ticker(symbol).price[symbol]['longName']
+    for key, value in stock_key_stats[symbol].items():
+        if key not in stock_info[symbol]:
+            stock_info[symbol][key] = value
+    stock_info[symbol]['longName'] = long_name
+    return stock_info
+
+def fetch_stock_graph(symbol: str, start: str, end: str):
+    start_date = dt.datetime.strptime(start, '%Y-%m-%d')
+    end_date = dt.datetime.strptime(end, '%Y-%m-%d')
+    stock = yf.download(symbol, start=start_date, end=end_date)
+    stock.reset_index(inplace=True)
+    stock['Date'] = stock['Date'].dt.strftime('%Y-%m-%d')
+    stock = stock.to_json(orient='records')
+    return stock
 
 @app.get("/stockweights")
 async def stock_weights(stocks):
@@ -45,30 +81,6 @@ async def stock_weights(stocks):
     print(stocks)
     stocks = {key: value for key, value in stocks.items()}
     return stocks
-
-
-
-@app.get("/stockgraph")
-async def stock_graph(symbol: str, start: str, end: str):
-    symbol = symbol.upper()
-    print(symbol)
-    if "-" in symbol and "KS" in symbol:
-        symbol = symbol.replace("-", ".")
-    print("check", symbol)
-    stock_info = Ticker(symbol).summary_detail
-    stock_key_stats = Ticker(symbol).key_stats
-    long_name = Ticker(symbol).price[symbol]['longName']
-    for key, value in stock_key_stats[symbol].items():
-        if key not in stock_info[symbol]:
-            stock_info[symbol][key] = value
-    stock_info[symbol]['longName'] = long_name
-    start_date = dt.datetime.strptime(start, '%Y-%m-%d')
-    end_date = dt.datetime.strptime(end, '%Y-%m-%d')
-    stock = yf.download(symbol, start=start_date, end=end_date)
-    stock.reset_index(inplace=True)
-    stock['Date'] = stock['Date'].dt.strftime('%Y-%m-%d')
-    stock = stock.to_json(orient='records')
-    return stock, stock_info
 
 
 @app.get("/linreg")

@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
 import { stockData } from "../utils/helpers";
+import { stockInfo } from "../utils/helpers";
 import StockDetails from "../components/StockDetails";
 import { QUERY_ME } from "../utils/queries";
 import { useQuery } from "@apollo/client";
@@ -30,19 +31,24 @@ const StockInfo = () => {
   const [endDate, setEndDate] = useState(new Date().toISOString().slice(0, 10));
 
 
-console.log(data);
+
+
+
  
   useEffect(() => {
     const getStockInfo = async () => {
+      var startTime = performance.now();
+      console.log("functionTime", startTime);
       try {
+  
         console.log(startDate, endDate)
         const data = await stockData(stockSymbol, startDate, endDate);
+        const stockDeets = await stockInfo(stockSymbol)
+        const dataArr = JSON.parse(data);
 
-        console.log("data", data);
-        const dataArr = JSON.parse(data[0]);
-        console.log("dataArr", dataArr);
-        setStockDetails(data[1][stockSymbol]);
-    
+        // setStockDetails(data[1][stockSymbol]);
+        setStockDetails(stockDeets[stockSymbol] || {});
+        // console.log("stockDeets", stockDeets);
             const dps1 = [];
             const dps2 = [];
             const dps3 = [];
@@ -68,6 +74,9 @@ console.log(data);
             setDataPoints1(dps1);
             setDataPoints2(dps2);
             setDataPoints3(dps3);
+            var endTime = performance.now();
+            var functionTimeStart = endTime - startTime;
+            console.log("functionTime", functionTimeStart);
             setIsLoaded(true);
           } catch (err) {
             console.log(err);
@@ -76,9 +85,6 @@ console.log(data);
         
         getStockInfo();
 
-
-      
-    
       }, [stockSymbol, startDate, endDate]);
 
   const options = {
