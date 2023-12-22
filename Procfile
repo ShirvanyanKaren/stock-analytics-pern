@@ -1,1 +1,2 @@
-web: npm run develop
+web: npm start
+worker: uvicorn main:app --host=0.0.0.0 --port=${PORT:-5000}

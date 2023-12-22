@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 5000;
 const app = express();
 
 
-const childPython = spawn("python", ["../python/main.py"]);
+const childPython = spawn("python", ["../main.py"]);
 
 childPython.stdout.on("data", (data) => {
   console.log(`stdout: ${data}`);
