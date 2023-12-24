@@ -83,7 +83,7 @@ const SearchBar = (props) => {
           <Dropdown.Menu className="w-100 dropdown-menu">
           {options ? (
             options.map((option) => (
-              <div>
+              <div key={option.name}>
 
                 <div className="list-group-item list-group-item-action active absolute search-list text-decoration-none ">
                   {option.image == "https://eodhd.comnull" ? (
