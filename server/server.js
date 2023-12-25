@@ -13,23 +13,23 @@ const PORT = process.env.PORT || 3001;
 const app = express();
 
 
-// const childPython = spawn("python", ["../python/main.py"]);
+const childPython = spawn("python", ["../python/main.py"]);
 
-// childPython.stdout.on("data", (data) => {
-//   console.log(`stdout: ${data}`);
-// }
+childPython.stdout.on("data", (data) => {
+  console.log(`stdout: ${data}`);
+}
 
-// );
+);
 
-// childPython.stderr.on("data", (data) => {
-//   console.error(`stderr: ${data}`);
-// }
-// );
+childPython.stderr.on("data", (data) => {
+  console.error(`stderr: ${data}`);
+}
+);
 
-// childPython.on("close", (code) => {
-//   console.log(`child process exited with code ${code}`);
-// }
-// );
+childPython.on("close", (code) => {
+  console.log(`child process exited with code ${code}`);
+}
+);
 
 const server = new ApolloServer({
   typeDefs,
@@ -44,8 +44,6 @@ const startApolloServer = async () => {
   app.use(express.urlencoded({ extended: false }));
   app.use(express.json());
 
-  app.get
-
   app.use(
     "/graphql",
     cors(),
@@ -56,13 +54,11 @@ const startApolloServer = async () => {
 
   if (process.env.NODE_ENV === "production") {
     app.use(express.static(path.join(__dirname, "../client/dist")));
-
+    console.log("Path is:", path.join(__dirname, "../client/dist/index.html"));
     app.get("*", (req, res) => {
       res.sendFile(path.join(__dirname, "../client/dist/index.html"));
     });
   }
-
-
 
 
     await sequelize.sync({ force: false });
@@ -70,6 +66,7 @@ const startApolloServer = async () => {
       console.log(`🌍 Now listening on http://localhost:${PORT}`);
       console.log(`Use GraphQL at http://localhost:${PORT}/graphql`);
       console.log(process.env.NODE_ENV);
+      console.log("Path is:", path.join(__dirname, "../client/dist/index.html"));
     });
     
 };

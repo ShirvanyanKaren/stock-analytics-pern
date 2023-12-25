@@ -40,11 +40,11 @@ const HtmlTooltip = styled(({ className, ...props }) => (
         title={
             <React.Fragment>
             <Typography 
-            style={{ color: 'white', fontSize: '24px' }}
+            // style={{ color: 'white', fontSize: '24px' }}
             color="inherit">
                 <span className='fw-bold'>{props.info}</span></Typography>
             <em
-                style={{ color: 'white', fontSize: '20px' }}
+                // style={{ color: 'white', fontSize: '20px' }}
                 dangerouslySetInnerHTML={{ __html: checkInfoSource() }
 
                 }
