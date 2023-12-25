@@ -9,7 +9,7 @@ const sequelize = require("./config/connection");
 const { spawn } = require("child_process");
 
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3001;
 const app = express();
 
 
