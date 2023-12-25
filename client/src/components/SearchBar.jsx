@@ -20,9 +20,11 @@ const SearchBar = (props) => {
         if (props.fromPortfolio) {
             setFromPortfolio(true);
         }
+        console.log(props)
     }
     )
 
+    console.log(props.fromPortfolio)
 
     useEffect(() => {
         if(query.length > 0) {
@@ -37,6 +39,7 @@ const SearchBar = (props) => {
                     change: (stock.close - stock.open)/stock.open.toFixed(2),
                     name: stock.name,
                 }));
+                console.log(options);
                 setOptions(options);
             }
             fetchData();
@@ -50,6 +53,7 @@ const SearchBar = (props) => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
+        console.log(query);
         if (query) {
           if(options[0].exchange == "KO"){
             navigate(`/stockinfo/${options[0].label}.KS`);
@@ -60,6 +64,7 @@ const SearchBar = (props) => {
       };
 
       const handleInputChange = (event) => {
+        console.log(event.target.value);
         setQuery(event.target.value);
       };
 
@@ -83,7 +88,7 @@ const SearchBar = (props) => {
           <Dropdown.Menu className="w-100 dropdown-menu">
           {options ? (
             options.map((option) => (
-              <div key={option.name}>
+              <div>
 
                 <div className="list-group-item list-group-item-action active absolute search-list text-decoration-none ">
                   {option.image == "https://eodhd.comnull" ? (
