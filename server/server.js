@@ -67,7 +67,7 @@ const startApolloServer = async () => {
 
     await sequelize.sync({ force: false });
     app.listen(PORT, () => {
-      console.log(`🌍 Now listening on http://localhost:3000`);
+      console.log(`🌍 Now listening on http://localhost:${PORT}`);
       console.log(`Use GraphQL at http://localhost:${PORT}/graphql`);
       console.log(process.env.NODE_ENV);
     });
