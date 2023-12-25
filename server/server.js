@@ -13,23 +13,23 @@ const PORT = process.env.PORT || 5000;
 const app = express();
 
 
-const childPython = spawn("python", ["../python/main.py"]);
+// const childPython = spawn("python", ["../python/main.py"]);
 
-childPython.stdout.on("data", (data) => {
-  console.log(`stdout: ${data}`);
-}
+// childPython.stdout.on("data", (data) => {
+//   console.log(`stdout: ${data}`);
+// }
 
-);
+// );
 
-childPython.stderr.on("data", (data) => {
-  console.error(`stderr: ${data}`);
-}
-);
+// childPython.stderr.on("data", (data) => {
+//   console.error(`stderr: ${data}`);
+// }
+// );
 
-childPython.on("close", (code) => {
-  console.log(`child process exited with code ${code}`);
-}
-);
+// childPython.on("close", (code) => {
+//   console.log(`child process exited with code ${code}`);
+// }
+// );
 
 const server = new ApolloServer({
   typeDefs,
