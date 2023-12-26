@@ -14,6 +14,7 @@ import json
 import requests
 from yahooquery import Ticker 
 import statsmodels.api as sma
+from dotenv import load_dotenv
 import uvicorn
 import gunicorn
 import os
@@ -172,7 +173,6 @@ async def fama_french(stockWeights: str, start: str, end: str):
 
 
 if __name__ == "__main__":
-    print(port)
     uvicorn.run(app, host="127.0.0.1", port=8000)
 
 
