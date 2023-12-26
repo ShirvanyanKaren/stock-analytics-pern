@@ -1,2 +1,2 @@
-web: npm start & uvicorn python.main:app --host=127.0.0.1 --port=8000 --workers 2
+web: npm start & gunicorn -w 4 -k uvicorn.workers.UvicornWorker python.main:app
 worker: uvicorn python.main:app --workers 4

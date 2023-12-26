@@ -169,7 +169,7 @@ async def fama_french(stockWeights: str, start: str, end: str):
     return json_data, results
 
 
-print(os.environ.get("PORT", 8000))
+print(os.environ.get("PORT_PY", 8000))
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT_PY", 8000))
