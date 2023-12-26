@@ -14,23 +14,7 @@ const app = express();
 
 
 
-const childPython = spawn("python", ["../python/main.py"]);
 
-childPython.stdout.on("data", (data) => {
-  console.log(`stdout: ${data}`);
-}
-
-);
-
-childPython.stderr.on("data", (data) => {
-  console.error(`stderr: ${data}`);
-}
-);
-
-childPython.on("close", (code) => {
-  console.log(`child process exited with code ${code}`);
-}
-);
 
 const server = new ApolloServer({
   typeDefs,
@@ -58,6 +42,20 @@ const startApolloServer = async () => {
     app.get("*", (req, res) => {
       res.sendFile(path.join(__dirname, "../client/dist/index.html"));
     });
+  } else {
+    const childPython = spawn("python", ["../python/main.py"]);
+    childPython.stdout.on("data", (data) => {
+      console.log(`stdout: ${data}`);
+    }
+    );
+    childPython.stderr.on("data", (data) => {
+      console.error(`stderr: ${data}`);
+    }
+    );
+    childPython.on("close", (code) => {
+      console.log(`child process exited with code ${code}`);
+    }
+    );
   }
 
 

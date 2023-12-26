@@ -172,7 +172,7 @@ async def fama_french(stockWeights: str, start: str, end: str):
 print(os.environ.get("PORT", 8000))
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8000))
+    port = int(os.environ.get("PORT_PY", 8000))
     print(port)
     uvicorn.run(app, host="127.0.0.1", port=port)
 
