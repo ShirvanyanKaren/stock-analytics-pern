@@ -15,6 +15,7 @@ import requests
 from yahooquery import Ticker 
 import statsmodels.api as sma
 import uvicorn
+import gunicorn
 
 
 # run this script with uvicorn main:app --reload to start the server

@@ -19,6 +19,7 @@ fastapi==0.104.1
 fonttools==4.46.0
 frozendict==2.3.8
 getFamaFrenchFactors==0.0.5
+gunicorn==21.2.0
 h11==0.14.0
 html5lib==1.1
 idna==3.4
