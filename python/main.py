@@ -14,7 +14,6 @@ import json
 import requests
 from yahooquery import Ticker 
 import statsmodels.api as sma
-from dotenv import load_dotenv
 import uvicorn
 import gunicorn
 import os
