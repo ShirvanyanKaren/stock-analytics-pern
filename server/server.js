@@ -11,6 +11,7 @@ const { spawn } = require("child_process");
 
 const PORT = process.env.PORT || 3001;
 const app = express();
+app.use(cors());
 
 
 const childPython = spawn("python", ["../python/main.py"]);
@@ -65,7 +66,6 @@ const startApolloServer = async () => {
     app.listen(PORT, () => {
       console.log(`🌍 Now listening on http://localhost:${PORT}`);
       console.log(`Use GraphQL at http://localhost:${PORT}/graphql`);
-      console.log(process.env.NODE_ENV);
       console.log("Path is:", path.join(__dirname, "../client/dist/index.html"));
     });
     

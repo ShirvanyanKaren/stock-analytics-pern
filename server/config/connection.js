@@ -11,7 +11,7 @@ const sequelize = process.env.DATABASE_URL
                 require: true,
                 rejectUnauthorized: false
             }
-        }
+        },
     })
     : new Sequelize(
         process.env.DB_NAME,

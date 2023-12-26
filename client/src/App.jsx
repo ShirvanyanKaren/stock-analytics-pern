@@ -17,7 +17,7 @@ import store from "./utils/store";
 import AppPar from "./tsParticles/Particles";
 
 const httpLink = createHttpLink({
-    uri: "http://localhost:5000/graphql",
+    uri: '/graphql',
 });
 
 const authLink = setContext((_, { headers }) => {
