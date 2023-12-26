@@ -18,8 +18,9 @@ const Header = () => {
       return id;
     }
     const portfolioId = await getPortfolioId();
-    console.log(portfolioId);
-    idbPromise('stockWeights', 'delete', portfolioId);
+    if (portfolioId) {
+      await idbPromise('stockWeights', 'delete', portfolioId);
+    }
     Auth.logout();
   };
 
