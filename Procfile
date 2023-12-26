@@ -1,2 +1,2 @@
-web: npm start && cd python && uvicorn main:app --host=127.0.0.1 --port=${PORT:-8000}
+web: npm start && gunicorn python.main:app
 # worker: cd python && uvicorn main:app --host=127.0.0.1 --port=${PORT:-8000}
