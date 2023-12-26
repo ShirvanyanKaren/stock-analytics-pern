@@ -11,7 +11,7 @@ const { spawn } = require("child_process");
 
 const PORT = process.env.PORT || 3001;
 const app = express();
-app.use(cors());
+
 
 
 const childPython = spawn("python", ["../python/main.py"]);
@@ -47,7 +47,6 @@ const startApolloServer = async () => {
 
   app.use(
     "/graphql",
-    cors(),
     expressMiddleware(server, {
       context: authMiddleware,
     })
