@@ -25,6 +25,8 @@ const CanvasJS = CanvasJSReact.CanvasJS;
 
 const CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
+// const port = process.env.PORT || 8000;
+
 const FamaFrench = () => {
   const [dates, setDates] = useState([]);
   const [portfolio, setPortfolio] = useState([]);
@@ -110,7 +112,7 @@ const FamaFrench = () => {
         var {portfolio_id, ...weightsStorage} = weights[0];
         weightsStorage = await JSON.stringify(weightsStorage);
         console.log("weightsStorage", weightsStorage);
-        const response = await axios.get("http://127.0.0.1:8000/famafrench", {
+        const response = await axios.get(`http://127.0.0.1:8000/famafrench`, {
           params: {
             stockWeights: weightsStorage,
             start: startDate,

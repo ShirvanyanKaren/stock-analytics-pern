@@ -33,6 +33,10 @@ const startApolloServer = async () => {
     })
   );
 
+  app.get('/port', (req, res) => {
+    res.json({ port: port });
+  });
+
   if (process.env.NODE_ENV === "production") {
     app.use(express.static(path.join(__dirname, "../client/dist")));
     console.log("Path is:", path.join(__dirname, "../client/dist/index.html"));

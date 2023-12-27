@@ -1,4 +1,5 @@
 import decode from "jwt-decode";
+import { idbPromise } from "./helpers";
 
 class AuthService {
   getProfile() {
@@ -35,6 +36,9 @@ class AuthService {
   }
 
   logout() {
+    const tokenId = decode(localStorage.getItem("id_token"));
+    console.log("tokenId", tokenId.data.id);
+    idbPromise("stockWeights", "delete", tokenId.data.id);
     localStorage.removeItem("id_token");
     window.location.reload();
   }

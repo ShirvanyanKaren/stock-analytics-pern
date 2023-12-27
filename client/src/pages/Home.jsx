@@ -15,15 +15,17 @@ import axios from 'axios';
 
 
 
+
 const Home = () => {
-    const [decodedToken, setToken] = useState('');
-    const dispatch = useDispatch();
-    const [stockWeights, setStockWeights] = useState({});
+const [decodedToken, setToken] = useState('');
+const dispatch = useDispatch();
+const [stockWeights, setStockWeights] = useState({});
 
-    const CheckStockWeights = useSelector((state) => state.stockWeights);
+const CheckStockWeights = useSelector((state) => state.stockWeights);
 
 
 
+  
 useEffect(() => {
     const token = localStorage.getItem('id_token');
     if (token) {
@@ -45,6 +47,10 @@ const { data: stockData } = useQuery(QUERY_STOCK, {
   skip: !userData?.user?.portfolio_id, 
 });
 
+if (userData?.user?.portfolio_id) {
+  console.log(userData);
+}
+
 useEffect(() => {
   const getStockObject = async () => {
     const data = await stockData;
@@ -57,6 +63,7 @@ useEffect(() => {
     const stockNumbersArray = await Promise.all(promises);
     var stockNumbers = Object.assign({}, ...stockNumbersArray);
     stockNumbers = JSON.stringify(stockNumbers);
+    console.log("stockNumbers", stockNumbers);
     const stockWeights = await getStockWeights(stockNumbers);
     if(stockWeights) {
       try {
@@ -79,7 +86,7 @@ useEffect(() => {
   };
 
   getStockObject();
-}, [stockData, decodedToken]);
+}, [stockData, decodedToken, userData]);
 
 
 

@@ -2,25 +2,21 @@ import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
+import {useState } from "react";
 import { Link } from "react-router-dom";
 import Auth from "../utils/auth";
 import SearchBar from "./SearchBar";
 import { idbPromise } from "../utils/helpers";
-
+import decode from "jwt-decode";
+import { QUERY_USER } from "../utils/queries";
+import { useEffect } from "react";
+import { useQuery } from "@apollo/client";
 
 const Header = () => {
+
+
   const handleLogout = async () => {
-    const getPortfolioId = async () => {
-      const userPortfolio = await idbPromise('stockWeights', 'get', 'portfolio_id');
-      console.log(userPortfolio);
-      const id = userPortfolio[0].portfolio_id;
-      console.log(id);
-      return id;
-    }
-    const portfolioId = await getPortfolioId();
-    if (portfolioId) {
-      await idbPromise('stockWeights', 'delete', portfolioId);
-    }
+
     Auth.logout();
   };
 

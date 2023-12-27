@@ -1,4 +1,10 @@
+const { GraphQLScalarType } = require('graphql');
+
+
 const typeDefs = ` 
+    scalar JSON 
+    scalar Object
+
     type User {
         id: ID
         username: String
@@ -21,10 +27,30 @@ const typeDefs = `
         stock_quantity: Int
         portfolio_id: ID
     } 
+    type StockData {
+        stockData: JSON
+    }
+    type StockInfo {
+        symbol: JSON
+    }
+    type LinReg {
+        linReg: JSON
+    }
+    type StockSearch {
+        stockSearch: JSON
+    }
+    type StockWeights {
+        stockWeights: Object
+    }
     type Auth {
         token: ID!
         user: User
     }
+
+    type Port {
+        port: Int
+    }
+
     type Query {
         me: User
         user(username: String!): User
@@ -34,6 +60,12 @@ const typeDefs = `
         portfolios: [Portfolio]
         stock(portfolio_id: ID!): [Stock]
         stocks: [Stock]
+        getStockData(symbol: String!, start: String!, end: String!): StockData
+        getStockInfo(symbol: String!): StockInfo
+        getLinReg(stocks: String!, index: String!, start: String!, end: String!): LinReg
+        getStockSearch(query: String!): StockSearch
+        getStockWeights(stocks: Object!): StockWeights
+        getPort: Port
     }
     type Mutation {
         login(email: String!, password: String!): Auth

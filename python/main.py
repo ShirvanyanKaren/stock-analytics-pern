@@ -70,6 +70,8 @@ def fetch_stock_graph(symbol: str, start: str, end: str):
 
 @app.get("/stockweights")
 async def stock_weights(stocks):
+    print(stocks)
+    print(type(stocks))
     stocks = json.loads(stocks)
     values = [Ticker(key).summary_detail[key]['open'] * value for key, value in stocks.items()]
     total = sum(values)
@@ -169,10 +171,12 @@ async def fama_french(stockWeights: str, start: str, end: str):
     return json_data, results
 
 
-
+PORT = int(os.environ.get("PORT", 8000))
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    print(f"os.environ.get('PORT'): {os.environ.get('PORT')}")
+    uvicorn.run(app, host="127.0.0.1", port=PORT)
+    print(f"process id: {os.getpid()}")
 
 
 
