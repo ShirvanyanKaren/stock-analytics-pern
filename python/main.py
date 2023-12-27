@@ -16,7 +16,11 @@ from yahooquery import Ticker
 import statsmodels.api as sma
 import uvicorn
 import gunicorn
+from dotenv import load_dotenv
 import os
+
+
+
 
 
 # run this script with uvicorn main:app --reload to start the server
@@ -171,11 +175,15 @@ async def fama_french(stockWeights: str, start: str, end: str):
     return json_data, results
 
 
-PORT = int(os.environ.get("PORT", 8000))
+
+
 
 if __name__ == "__main__":
+    load_dotenv()
+    PORT = int(os.getenv("PORT", 8000))
+    print(os.environ.get('PORT'))
     print(f"os.environ.get('PORT'): {os.environ.get('PORT')}")
-    uvicorn.run(app, host="127.0.0.1", port=PORT)
+    uvicorn.run(app, host="0.0.0.0", port=PORT)
     print(f"process id: {os.getpid()}")
 
 
