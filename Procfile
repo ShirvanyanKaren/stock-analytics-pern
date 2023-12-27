@@ -1,4 +1,4 @@
-web: NODE_PORT=3001 npm start & gunicorn -k uvicorn.workers.UvicornWorker python.main:app --bind 127.0.0.1:${PORT:-8000} 
+web: npm start & gunicorn -k uvicorn.workers.UvicornWorker python.main:app --bind 127.0.0.1:${PORT_PY} 
 
 # web: npm start & gunicorn -k uvicorn.workers.UvicornWorker python.main:app --bind 127.0.0.1:${8000} --log-level debug --reload
 
