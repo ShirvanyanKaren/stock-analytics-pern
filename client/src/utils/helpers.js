@@ -1,5 +1,5 @@
 import axios from "axios";
-const pyBackEnd = typeof process !== 'undefined' && process.env.BACK ? process.env.BACK : "http://0.0.0.0:8000";
+const pyBackEnd = (typeof process).toString() !== 'undefined' && process.env.BACK ? process.env.BACK : "http://0.0.0.0:8000";
 // const pyBackEnd = "https://pern-portfolio-backend-805cd64a428d.herokuapp.com"
 
 export const indexOptions = {
@@ -31,7 +31,10 @@ export const indexOptions = {
 
 export async function stockData(stockSymbol, startDate, endDate) {
   console.log("stockSymbol", stockSymbol);
-
+  console.log(typeof process !== 'undefined' && process.env.BACK ? process.env.BACK : "http://0.0.0.0:8000")
+  if (typeof process !== 'undefined' && process.env.BACK) {
+    console.log("process.env.BACK heeeeeeeeere", process.env.BACK);
+  }
         const response = await axios.get(`${pyBackEnd}/stockgraph`, 
 
         {
