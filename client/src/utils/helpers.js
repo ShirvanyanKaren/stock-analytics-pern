@@ -1,6 +1,6 @@
 import axios from "axios";
 const pyBackEnd = typeof process !== 'undefined' && process.env.BACK ? process.env.BACK : "http://0.0.0.0:8000";
-
+// const pyBackEnd = "https://pern-portfolio-backend-805cd64a428d.herokuapp.com"
 
 export const indexOptions = {
     "SP500": "^GSPC",
