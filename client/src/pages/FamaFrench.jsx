@@ -14,6 +14,7 @@ import decode from 'jwt-decode';
 import { idbPromise } from "../utils/helpers";
 import { QUERY_STOCK } from '../utils/queries'
 import { getStockWeights } from '../utils/helpers';
+import { getFamaFrenchData } from "../utils/helpers";
 
 import axios from "axios";
 
@@ -50,7 +51,7 @@ const FamaFrench = () => {
 
   
 
-  // STOCK weights is an object, lets pull it from redux
+
 
 
   const convertToScientific = (num) => {
@@ -112,19 +113,9 @@ const FamaFrench = () => {
         var {portfolio_id, ...weightsStorage} = weights[0];
         weightsStorage = await JSON.stringify(weightsStorage);
         console.log("weightsStorage", weightsStorage);
-        const response = await axios.get(`http://127.0.0.1:8000/famafrench`, {
-          params: {
-            stockWeights: weightsStorage,
-            start: startDate,
-            end: endDate,
-          },
-        });
-        console.log("response", response);
-        var stats = response.data[1];
-
-        console.log("stats click here", stats)
-        var dataArray = JSON.parse(response.data[0]);
-        console.log("dataArr", dataArray);
+        const response = await getFamaFrenchData(startDate, endDate, weightsStorage);
+        var stats = response[1];
+        var dataArray = JSON.parse(response[0]);
         for (const key in stats ) {
           if(key == "params"){
             setStats((prevStats) => ({
@@ -149,10 +140,6 @@ const FamaFrench = () => {
             }));
           }
         }
-
-  
-
-        
         for (const key in dataArray) {
           let MktRf = "Mkt-RF";
           setDates((prevDates) => [...prevDates, key]);

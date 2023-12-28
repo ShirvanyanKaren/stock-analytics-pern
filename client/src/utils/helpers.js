@@ -1,6 +1,6 @@
 import axios from "axios";
-// const pyBackEnd = (typeof process).toString() !== 'undefined' && process.env.BACK ? process.env.BACK : "http://0.0.0.0:8000";
-const pyBackEnd = process.env.BACK ? process.env.BACK : "https://pern-portfolio-backend-805cd64a428d.herokuapp.com"
+const pyBackEnd = typeof process == 'object' ? process.env.BACK : "http://0.0.0.0:8000";
+// const pyBackEnd = process.env.BACK ? process.env.BACK : "https://pern-portfolio-backend-805cd64a428d.herokuapp.com"
 
 export const indexOptions = {
     "SP500": "^GSPC",
@@ -85,6 +85,17 @@ export async function getStockWeights(stockNumbers) {
   return response.data;
 }
 
+export async function getFamaFrenchData(startDate, endDate, stockWeights) {
+  const response = await axios.get(`${pyBackEnd}/famafrench`,
+  {
+    params: {
+      stockWeights: stockWeights,
+      start: startDate,
+      end: endDate,
+    },
+  });
+  return response.data;
+}
 
 export function idbPromise(stockWeights, method, object){
   return new Promise((resolve, reject) => {
