@@ -1,5 +1,5 @@
 import axios from "axios";
-const port = typeof process !== 'undefined' && process.env.PORT ? process.env.PORT : 8000;
+const pyBackEnd = typeof process !== 'undefined' && process.env.BACK ? process.env.BACK : "http://0.0.0.0:8000";
 
 
 export const indexOptions = {
@@ -30,10 +30,9 @@ export const indexOptions = {
 
 
 export async function stockData(stockSymbol, startDate, endDate) {
-  // const port = typeof process !== 'undefined' && process.env.PORT ? process.env.PORT : 8000;
   console.log("stockSymbol", stockSymbol);
 
-        const response = await axios.get(`http://0.0.0.0:${port}/stockgraph`, 
+        const response = await axios.get(`${pyBackEnd}/stockgraph`, 
 
         {
           params: {
@@ -45,8 +44,7 @@ export async function stockData(stockSymbol, startDate, endDate) {
     return response.data;
 }
 export async function stockInfo(stockSymbol) {
-  // const port = typeof process !== 'undefined' && process.env.PORT ? process.env.PORT : 8000;
- const response = await axios.get(`http://0.0.0.0:${port}/stockinfo`,
+ const response = await axios.get(`${pyBackEnd}/stockinfo`,
  {
    params: {
      symbol: stockSymbol,
@@ -56,7 +54,7 @@ export async function stockInfo(stockSymbol) {
 }
 
 export async function linReg(stockSymbol, searchIndex, startDate, endDate) {
-        const response = await axios.get(`http://0.0.0.0:${port}/linreg`,
+        const response = await axios.get(`${pyBackEnd}/linreg`,
         {
           params: {
             stocks: stockSymbol,
@@ -75,7 +73,7 @@ export async function stockSearch(query) {
 }
 
 export async function getStockWeights(stockNumbers) {
-  const response = await axios.get(`http://0.0.0.0:${port}/stockweights`,
+  const response = await axios.get(`${pyBackEnd}/stockweights`,
   {
     params: {
       stocks: stockNumbers,

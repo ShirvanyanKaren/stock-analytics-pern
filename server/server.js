@@ -65,6 +65,7 @@ const startApolloServer = async () => {
       console.log(`🌍 Now listening on http://localhost:${PORT}`);
       console.log(`Use GraphQL at http://localhost:${PORT}/graphql`);
       console.log("Path is:", path.join(__dirname, "../client/dist/index.html"));
+      console.log("environment is", process.env.NODE_ENV)
     });
     
 };

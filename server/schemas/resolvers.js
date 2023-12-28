@@ -1,25 +1,22 @@
-const { AuthenticationError } = require("../utils/auth");
-const { User, Portfolio, Stock } = require("../models");
-const { signToken } = require("../utils/auth");
-const port = process.env.PORT || 8000;
-const axios = require("axios");
-
+const { AuthenticationError } = require('../utils/auth');
+const { User, Portfolio, Stock} = require('../models');
+const { signToken } = require('../utils/auth');
 
 const resolvers = {
   Query: {
-    me: async (parent, args, { context }) => {
+    me: async (parent, args, {context}) => {
       context.user = await User.findByPk(context.user.id);
       console.log(context.user);
       if (context.user) {
         return await User.findByPk(context.user.id);
       }
-      throw new AuthenticationError("Not logged in");
+      throw new AuthenticationError('Not logged in');
     },
-    user: async (parent, { username: username }) => {
+    user: async (parent, {username: username} ) => {
       console.log(username);
       return await User.findOne({ where: { username: username } });
     },
-    userFindByPk: async (parent, { id }) => {
+    userFindByPk: async (parent, {id}) => {
       console.log(id);
       return await User.findByPk(id);
     },
@@ -33,75 +30,15 @@ const resolvers = {
       return await Portfolio.findAll();
     },
     stocks: async () => {
-      return await Stock.findAll();
+        return await Stock.findAll();
     },
     stock: async (parent, { portfolio_id }) => {
-      return await Stock.findAll({ where: { portfolio_id: portfolio_id } });
+        return await Stock.findAll({ where: { portfolio_id: portfolio_id } });
     },
-    getStockData: async (parent, { symbol, start, end }) => {
-      const response = await axios.get(`http:////127.0.0.1:${port}/stockgraph`, 
-      {
-        params : {
-          symbol: symbol,
-          start: start,
-          end: end,
-        },
-      });
-      console.log(response.data);
-      return response.data;
-
-    },
-    getStockInfo: async (parent, {symbol}) => {
-      console.log(symbol);
-      const response = await axios.get(`http:////127.0.0.1:${port}/stockinfo`,
-      {
-        params : {
-          symbol: symbol,
-        },
-      });
-      console.log(response.data);
-      return response.data;
   },
-  getLinReg: async (parent, {stocks, index, start, end}) => {
-    const response = await axios.get(`http:////127.0.0.1:${port}/linreg`,
-    {
-      params : {
-        stocks: stocks,
-        index: index,
-        start: start,
-        end: end,
-    
-      }
-    });
-    console.log(response.data);
-    return response.data;
-  },
-  getStockSearch: async (parent, {query}) => {
-    const response = await axios.get(`https://eodhd.com/api/query-search-extended/?q=${query}&api_token=${process.env.API_KEY}`);
-    console.log(response.data);
-    return response.data;
-  },
-  getStockWeights: async (parent, {stocks}) => {
-    console.log(stocks);
-    const stockJson = JSON.stringify(stocks);
-    const response = await axios.get(`http:////127.0.0.1:${port}/stockweights`,
-    {
-      params : {
-        stocks: stockJson,
-      },
-    });
-    console.log(response.data);
-    return response.data;
-  },
-  getPort: async () => {
-    const port =  process.env.PORT || 8000; 
-    console.log(port);
-    return { port };
-  },
-},
   Mutation: {
     addUser: async (parent, args) => {
-      console.log(args);
+        console.log(args);
       const user = await User.create({
         username: args.username,
         email: args.email,
@@ -112,26 +49,26 @@ const resolvers = {
         user_id: user.id,
         portfolio_name: `${user.username}'s Portfolio`,
         stock_id: [],
+        
       });
 
-      await User.update(
-        {
-          portfolio_id: portfolio.id,
+      await User.update({
+        portfolio_id: portfolio.id,
+      }, {
+        where: {
+          id: user.id,
         },
-        {
-          where: {
-            id: user.id,
-          },
-        }
-      );
+      });
 
+
+      
       const token = signToken(user);
       return { token, user };
     },
     login: async (parent, { email, password }) => {
       const user = await User.findOne({ where: { email: email } });
       if (!user || !user.checkPassword(password)) {
-        throw new AuthenticationError("Incorrect Credentials");
+        throw new AuthenticationError('Incorrect Credentials');
       }
       const token = signToken(user);
       return { token, user };
@@ -144,25 +81,18 @@ const resolvers = {
     },
     addStocksPortfolio: async (parent, args) => {
       console.log(args);
-      const findStock = await Stock.findOne({
-        where: {
-          stock_symbol: args.stock_symbol,
-          portfolio_id: args.portfolio_id,
-        },
-      });
+      const findStock = await Stock.findOne({ where: { stock_symbol: args.stock_symbol, portfolio_id: args.portfolio_id } });
       if (findStock) {
         const newQuantity = findStock.stock_quantity + args.stock_quantity;
-        await Stock.update(
-          {
-            stock_quantity: newQuantity,
-          },
-          {
-            where: {
-              stock_symbol: args.stock_symbol,
-              portfolio_id: args.portfolio_id,
-            },
+        await Stock.update({
+          stock_quantity: newQuantity,
+        }, {
+          where: {
+            stock_symbol: args.stock_symbol,
+            portfolio_id: args.portfolio_id,
           }
-        );
+        
+        });
         return findStock;
       } else {
         const stock = await Stock.create({
@@ -177,21 +107,23 @@ const resolvers = {
         console.log(newStockId);
         console.log(portfolio.stock_id);
         if (!portfolio.stock_id.includes(newStockId)) {
-          await Portfolio.update(
-            {
-              stock_id: [...portfolio.stock_id, newStockId],
+          await Portfolio.update({
+            stock_id: [...portfolio.stock_id, newStockId],
+          }, {
+            where: {
+              id: args.portfolio_id,
             },
-            {
-              where: {
-                id: args.portfolio_id,
-              },
-            }
-          );
-          return stock;
-        }
+          });
+        return stock;
+        
+
+
       }
+    }
+
+    }
     },
-  },
-};
+  };
 
 module.exports = resolvers;
+ 
