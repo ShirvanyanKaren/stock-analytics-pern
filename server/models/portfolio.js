@@ -27,10 +27,8 @@ Portfolio.init(
               model: 'user',
               key: 'id',
             },
-          },
-          stock_id: {
-            type: DataTypes.ARRAY(DataTypes.INTEGER),
-          },
+          }
+
     },
     {
         sequelize,

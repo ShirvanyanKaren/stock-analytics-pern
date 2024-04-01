@@ -12,6 +12,7 @@ import { StoreProvider } from "./utils/GlobalState";
 import Header from "./components/Header";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-bootstrap";
+import "animate.css";
 import "./App.scss";
 import store from "./utils/store";
 import AppPar from "./tsParticles/Particles";

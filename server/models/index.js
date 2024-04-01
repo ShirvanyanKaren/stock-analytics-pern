@@ -2,7 +2,7 @@ const User = require('./user');
 const Portfolio = require('./portfolio');
 const Stock = require('./stock');
 
-User.hasMany(Portfolio, {
+User.hasOne(Portfolio, {
     foreignKey: 'user_id',
     onDelete: 'CASCADE'
 });

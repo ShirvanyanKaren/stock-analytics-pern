@@ -8,7 +8,7 @@ import { QUERY_USER } from '../utils/queries'
 import Auth  from '../utils/auth'
 import decode from 'jwt-decode';
 import { QUERY_STOCK } from '../utils/queries'
-import { getStockWeights } from '../utils/helpers';
+import { getStockWeights, getStockObject } from '../utils/helpers';
 import { SET_STOCK_WEIGHTS } from '../utils/actions';
 import { idbPromise } from '../utils/helpers';
 import axios from 'axios';
@@ -20,12 +20,12 @@ const Home = () => {
 const [decodedToken, setToken] = useState('');
 const dispatch = useDispatch();
 const [stockWeights, setStockWeights] = useState({});
+const [loading, setLoading] = useState(true);
 
 const CheckStockWeights = useSelector((state) => state.stockWeights);
 
 
 
-  
 useEffect(() => {
     const token = localStorage.getItem('id_token');
     if (token) {
@@ -43,66 +43,40 @@ const { data: userData } = useQuery(QUERY_USER, {
   skip: !decodedToken?.data?.username, 
 });
 const { data: stockData } = useQuery(QUERY_STOCK, {
-  variables: { portfolioId: userData?.user?.portfolio_id },
-  skip: !userData?.user?.portfolio_id, 
+  variables: { portfolioId: userData?.user?.id },
+  skip: !userData?.user?.id, 
 });
-
-if (userData?.user?.portfolio_id) {
-  console.log(userData);
-}
+useEffect(() => {
+  idbPromise('stockWeights', 'get').then(result => result.length === 0 ? setLoading(true) : setLoading(false));
+}, [stockWeights]);
 
 useEffect(() => {
-  const getStockObject = async () => {
-    const data = await stockData;
-    const stockObjects = await data.stock;
-    const promises = stockObjects.map(async (stockObject) => {
-      return {
-        [stockObject.stock_symbol]: stockObject.stock_quantity,
-      };
-    });
-    const stockNumbersArray = await Promise.all(promises);
-    var stockNumbers = Object.assign({}, ...stockNumbersArray);
-    stockNumbers = JSON.stringify(stockNumbers);
-    console.log("stockNumbers", stockNumbers);
-    const stockWeights = await getStockWeights(stockNumbers);
-    if(stockWeights) {
-      try {
-        stockWeights['portfolio_id'] = userData.user.portfolio_id;
-
-         idbPromise('stockWeights', 'put', {
-          ...stockWeights,
-          portfolio_id: stockWeights.portfolio_id
-        });
-    
-        dispatch({
-          type: SET_STOCK_WEIGHTS,
-          payload: stockWeights,
-        });
-      } catch (err) {
-        console.log(err);
-      }
-    }
-    setStockWeights(stockWeights);
-  };
-
-  getStockObject();
-}, [stockData, decodedToken, userData]);
-
-
+  getStockObject(userData, stockData, dispatch, setStockWeights)
+}, [userData, stockData]);
 
 
     return (
         <div className='container d-flex justify-content-center'>
-        <div className='card text-center mt-5 w-50 h-300 '>
+          { loading && userData && Auth.loggedIn()? (
+            <div className='container row justify-content-center'>
+            <div className="spinner-border" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+            <div className='container mt-5 d-flex justify-content-center'>
+            <h1>Setting eveything up. This will only take a moment</h1>
+            </div>
+            </div>
+          ) : (
+        <div className='card text-center mt-5 w-50 h-300 home-card'>
             <div className='card-header'>
-                <h2> Welcome to iStock Portfolio Creator</h2>
+                <h2> Welcome to Cinco Data</h2>
             </div>
             <div className='card-body'>
                 <h5 className='card-title'>Create your own portfolio</h5>
                 {( 
-                    Auth.loggedIn() ? 
+                    Auth.loggedIn()  ? 
                     <>
-                    <p className='card-text'>Click on the Add Portfolio button to get started</p>
+                    <p className='card-text'>Welcome to CincoData. Click on the Add Portfolio button to get started</p>
                     <button className='btn btn-primary'>Add Portfolio</button>
                     </>
                     :
@@ -114,7 +88,6 @@ useEffect(() => {
 
             
                 )}
-
                 </div>
                 <div className='card-footer text-muted'>
                     <h2>Happy Investing!</h2>
@@ -123,8 +96,11 @@ useEffect(() => {
             
             
         </div>
+        )}
         </div>
+                  
     )
+
 }
 
 export default Home

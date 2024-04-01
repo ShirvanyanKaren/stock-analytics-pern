@@ -30,6 +30,7 @@ class AuthService {
   }
 
   login(idToken) {
+    console.log("here")
     localStorage.setItem("id_token", idToken);
     console.log("idToken", idToken);
     window.location.assign("/");
@@ -39,6 +40,7 @@ class AuthService {
     const tokenId = decode(localStorage.getItem("id_token"));
     console.log("tokenId", tokenId.data.id);
     idbPromise("stockWeights", "delete", tokenId.data.id);
+    console.log(tokenId.data.id)
     localStorage.removeItem("id_token");
     window.location.reload();
   }

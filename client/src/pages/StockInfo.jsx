@@ -8,7 +8,10 @@ import { stockInfo } from "../utils/helpers";
 import StockDetails from "../components/StockDetails";
 import { QUERY_ME } from "../utils/queries";
 import { useQuery } from "@apollo/client";
+import Nav from "react-bootstrap/Nav";
+import Navbar from "react-bootstrap/Navbar";
 import { useSelector } from "react-redux";
+import StockFinancials from "../components/StockFinancials";
 
 
 
@@ -29,8 +32,9 @@ const StockInfo = () => {
   );
   const [stockDetails, setStockDetails] = useState([]);
   const [endDate, setEndDate] = useState(new Date().toISOString().slice(0, 10));
+  const [infoType, setInfoType] = useState("summary");
 
-
+  console.log(infoType, "infoType")
 
 
 
@@ -187,10 +191,30 @@ const StockInfo = () => {
 
   return (
     <div>
+    <Navbar
+            expand="xxl"
+            bg="light"
+            data-bs-theme="light"
+            className="nav-bar nav-bar-custom justify-content-center"
+
+    >
+      <Nav
+      className="d-flex justify-content-around w-100 stock-info"
+      >
+        <h3 onClick={() => setInfoType("summary")} className={infoType == "summary" ? "active info" : "info"}>Stock Summary</h3>
+        <h3 onClick={() => setInfoType("financials")} className={infoType == "financials" ? "active info" : "info"}>Stock Financials</h3>
+        <h3 onClick={() => setInfoType("linreg")} className={infoType == "linreg" ? "active info" : "info"}>Stock Linear Regression</h3>
+        <h3 onClick={() => setInfoType("analytics")} className={infoType == "analytics" ? "active info" : "info"}>Stock Analytics</h3>
+      </Nav>
+
+      </Navbar>
+
+
 
         {isLoaded && (
-          <div>
+        <div className={infoType == "summary" ? "" : "inactive"}>
          <div className=" col-10 m-auto justify-center stock-volume mt-5">
+          
 
           <CanvasJSStockChart
             containerProps={containerProps}
@@ -200,6 +224,7 @@ const StockInfo = () => {
           </div>
                 <div>
                 <StockDetails
+
                   stockSymbol={stockSymbol}
                   previousClose={stockDetails.previousClose}
                   open={stockDetails.open}
@@ -222,8 +247,14 @@ const StockInfo = () => {
             </div>
         )}
 
-
+    <div className={infoType == "financials" ? "" : "inactive"}>  
+      <StockFinancials
+      
+       symbol={stockSymbol} />
+    </div>  
     </div>
+
+
   );
 };
 

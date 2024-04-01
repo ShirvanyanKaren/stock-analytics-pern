@@ -8,6 +8,7 @@ import { linReg } from "../utils/helpers";
 import { indexOptions } from "../utils/helpers";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLineChart, faRssSquare } from "@fortawesome/free-solid-svg-icons";
+import { idbPromise } from "../utils/helpers";
 
 const CanvasJS = CanvasJSReact.CanvasJS;
 
@@ -24,12 +25,23 @@ const StockLinReg = () => {
   const [startDate, setStartDate] = useState(
     new Date(new Date().getFullYear(), 0, 1).toISOString().slice(0, 10)
   );
+  const [useWeights, setUseWeights] = useState(false);
+  const [stockWeights, setStockWeights] = useState({});
+
   const [searchSymbol, setSearchSymbol] = useState();
   const [searchIndex, setSearchIndex] = useState("^GSPC");
+ 
   const [endDate, setEndDate] = useState(new Date().toISOString().slice(0, 10));
 
-  console.log(searchIndex)
+  const [searchParams, setSearchParams] = useState({
+    symbol: "",
+    index: "",
+  });
+
+
+
   const getLinReg = async (stockSymbol) => {
+
     if (startDate > endDate) {
       alert("Start date must be before end date");
       return;
@@ -38,7 +50,13 @@ const StockLinReg = () => {
       return;
     } 
     else {
-    const data = await linReg(stockSymbol, searchIndex, startDate, endDate);
+    let weights = ""
+    if (useWeights){
+      weights = JSON.stringify(stockWeights);
+      setStockSymbol("Portfolio");
+    } 
+
+    const data = await linReg(stockSymbol, searchIndex, startDate, endDate, weights);
     const dataArray = JSON.parse(data[0]);
         var dps = [];
         for (var i = 0; i < dataArray.length; i++) {
@@ -56,24 +74,13 @@ const StockLinReg = () => {
     }
 
   }
-
-  var date = "2021-04-01"
-
-var convertedDate = new Date(date)
-
-console.log(convertedDate)
-
-
   useEffect(() => {
     var symbol = location.pathname.split("/")[2];
 
     setStockSymbol(symbol);
   }, [stockSymbol]);
 
-  const [searchParams, setSearchParams] = useState({
-    symbol: "",
-    index: "",
-  });
+
 
 
   const handleInputChange = (event) => {
@@ -88,7 +95,20 @@ console.log(convertedDate)
     event.preventDefault();
     console.log(searchSymbol);
     try {
-    const { symbol } = searchParams;
+      let symbol
+      if (!useWeights) {
+       symbol  = searchParams.symbol;
+      } else {
+        symbol = "Portfolio";
+        setSearchSymbol("Portfolio");
+      }
+    if (symbol === "" && !useWeights) {
+      alert("Please enter a stock symbol");
+      return;
+    } else if (searchIndex === "") {
+      alert("Please select an index");
+      return;
+    }
     searchParams.index = searchIndex
     setStockSymbol(symbol);
 
@@ -159,6 +179,17 @@ console.log(convertedDate)
       },
     ],
   };
+  const handleCheckbox = async (event) => {
+    let weights = await idbPromise("stockWeights", "get");
+    weights = weights.map(({ portfolio_id, ...rest }) => rest);
+    setStockWeights(weights[0]);
+    setUseWeights(event.target.checked);
+    //how to disable classname with symbol input
+
+
+    console.log("these", stockWeights, useWeights);
+
+  }
 
 
 
@@ -174,14 +205,24 @@ console.log(convertedDate)
               className="row justify-content-center"
             >
               <label htmlFor="symbol">Symbol</label>
+              <div className=" d-flex flex-column justify-content-center">
+                <div>
+              
               <input
                 type="search-bar"
                 name="symbol"
-                className="text-center w-50"
+                className={useWeights ? "disabled-input input-bar" : "input-bar"}
                 onChange={handleInputChange}
               />
+              </div>
+              <div className="form-check form-switch d-flex justify-content-center align-items-center mt-2 mb-2">
+                <div className="">
+                <input className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" onChange={handleCheckbox}/>
+                <label className="form-check-label align-items-center" for="flexSwitchCheckDefault">Compare Portfolio</label>
+                </div>
+              </div>
+              </div>
               <label htmlFor="symbol">Index</label>
-              {/* <input type="search-bar" name="index"  className="text-center w-50" onChange={handleInputChange}/> */}
               <Dropdown>
               <Dropdown.Toggle className="w-50" id="dropdown-index">
                 Select Index

@@ -104,8 +104,8 @@ const resolvers = {
         });
         const portfolio = await Portfolio.findByPk(args.portfolio_id);
         const newStockId = stock.id;
-        console.log(newStockId);
-        console.log(portfolio.stock_id);
+        console.log("stock id", newStockId);
+        console.log("port id", portfolio.stock_id);
         if (!portfolio.stock_id.includes(newStockId)) {
           await Portfolio.update({
             stock_id: [...portfolio.stock_id, newStockId],

@@ -31,7 +31,7 @@ const StockDetails = (props) => {
             <h3 className="text-left ms-2 mt-3">
             {props.stockInfo ? (
                     <>
-                    {props.longName} Financial Overview
+                    {props.longName} Summary Overview
                     </>
                 ) : (
                     <>

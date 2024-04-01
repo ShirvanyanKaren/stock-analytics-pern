@@ -2,7 +2,9 @@ import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
-import {useState } from "react";
+import { faDatabase } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import Auth from "../utils/auth";
 import SearchBar from "./SearchBar";
@@ -13,24 +15,25 @@ import { useEffect } from "react";
 import { useQuery } from "@apollo/client";
 
 const Header = () => {
-
-
   const handleLogout = async () => {
-
     Auth.logout();
   };
 
-
-
   return (
     <>
-      <Navbar expand="xxl" bg="light" data-bs-theme="light" className="nav-bar nav-bar-custom">
+      <Navbar
+        expand="xxl"
+        bg="light"
+        data-bs-theme="light"
+        className="nav-bar nav-bar-custom"
+      >
         <Container expand="xxl" className="justify-content-between navbar">
-          <Navbar.Brand className="ms-0" to="/home">
-            <Link to="/" className="navbar-brand">
-              myStocks
-            </Link>
-          </Navbar.Brand>
+            <Navbar.Brand className="ms-0" to="/home">
+              <FontAwesomeIcon icon={faDatabase} color="blue"/>
+              <Link to="/" className="navbar-brand">
+                CincoData
+              </Link>
+            </Navbar.Brand>
           <div className="nav">
             <SearchBar />
             <Nav className="align-items-center ">

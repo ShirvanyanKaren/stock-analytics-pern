@@ -100,7 +100,7 @@ const handleInputChange = (event) => {
     
       const mutation = await addStock({
         variables: {
-          portfolioId: userData.user.portfolio_id,
+          portfolioId: userData.user.id,
           stockQuantity: stockState.shares,
           stockPurchaseDate: stockState.purchase_date,
           stockName: stockState.stock_name,
@@ -117,7 +117,7 @@ const handleInputChange = (event) => {
   };
   };
 
-  console.log("portfolio id", userData?.user.portfolio_id)
+  console.log("portfolio id", userData?.user.id)
 
 
 

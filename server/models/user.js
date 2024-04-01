@@ -34,14 +34,7 @@ User.init(
             validate: {
                 len: [4],
             },
-        },
-        portfolio_id: {
-            type: DataTypes.INTEGER,
-            references: {
-                model: 'portfolio',
-                key: 'id',
-            },
-        },
+        }
     },
     {
         hooks: {

@@ -42,9 +42,12 @@ const HtmlTooltip = styled(({ className, ...props }) => (
             <Typography 
             // style={{ color: 'white', fontSize: '24px' }}
             color="inherit">
-                <span className='fw-bold'>{props.info}</span></Typography>
+                <span className='fw-bold tool-tip-header'>{props.info}</span>
+                </Typography>
+                
             <em
                 // style={{ color: 'white', fontSize: '20px' }}
+                className='tool-tip'
                 dangerouslySetInnerHTML={{ __html: checkInfoSource() }
 
                 }
@@ -52,6 +55,7 @@ const HtmlTooltip = styled(({ className, ...props }) => (
             </React.Fragment>
         }
         >
+
         <li className="list-group-item">
             {props.info}:    <span className="ms-1 fw-bold"> {props.text}</span>
         </li>

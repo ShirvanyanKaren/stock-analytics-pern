@@ -47,6 +47,18 @@ async def stock_graph(symbol: str, start: str, end: str):
     stock = fetch_stock_graph(symbol, start, end)
     return stock
 
+@app.get("/financials")
+def income_statement(symbol: str, statement: str, quarterly: bool):
+    quarterly = True if quarterly else False
+    if statement == 'income':
+        stock = Ticker(symbol).income_statement('q' if quarterly else 'a')
+    elif statement == 'balance':
+        stock = Ticker(symbol).balance_sheet('q' if quarterly else 'a')
+    elif statement == 'cash':
+        stock = Ticker(symbol).cash_flow('q' if quarterly else 'a')
+    stock.reset_index(inplace=True)
+    return stock.to_json(orient='records')
+
 def process_symbol(symbol: str):
     symbol = symbol.upper()
     if "-" in symbol and "KS" in symbol:
@@ -86,30 +98,53 @@ async def stock_weights(stocks):
     return stocks
 
 
-@app.get("/linreg")
-async def lin_reg(stocks: str, index: str, start: str, end: str):
-    print(stocks)
-    symbols = [index, stocks]
+def lin_reg_data(symbols, start, end, index, stockWeights):
     start_date = dt.datetime.strptime(start, '%Y-%m-%d')
     end_date = dt.datetime.strptime(end, '%Y-%m-%d')
+    using_weights = False
+    if len(stockWeights) > 0 and stockWeights != '{}':
+        using_weights = True
+        stock_weights = json.loads(stockWeights)
     if index == 'UNRATE' or index == 'CPIAUCSL' or index == 'PPIACO' or index == 'FEDFUNDS' or index == 'GDP' or index == 'USEPUINDXD' or index == 'VIXCLS':
         index_data = pdr.DataReader(index, 'fred', start, end)
         index_data.index = index_data.index.rename('Date')
-        stocks = yf.download(stocks, start=start_date, end=end_date)['Adj Close']
+        if using_weights:
+            stock_keys = list(stock_weights.keys())
+            stocks = yf.download(stock_keys, start=start_date, end=end_date)['Adj Close'].pct_change()[1:]
+            stocks = stocks * pd.Series(stock_weights)
+            stocks = stocks.sum(axis=1)
+            stocks = pd.DataFrame({'Adj Close': stocks})
+            index_data = index_data.pct_change()
+        else :
+            stocks = yf.download(stocks, start=start_date, end=end_date)['Adj Close']
         stock_data = pd.merge(stocks, index_data, on='Date')
-        print(stock_data)
-        stock_df = pd.DataFrame({
+    else:
+        if using_weights:
+            stock_keys = list(stock_weights.keys())
+            stocks = yf.download(stock_keys, start=start_date, end=end_date)['Adj Close'].pct_change()[1:]
+            stocks = stocks * pd.Series(stock_weights)
+            stocks = stocks.sum(axis=1)
+            stock_data = pd.DataFrame({'Adj Close': stocks})
+            index_data = yf.download(index, start=start_date, end=end_date)['Adj Close']
+            index_data = index_data.pct_change()
+            stock_data[index] = index_data
+        else: 
+            stock_data = yf.download(symbols, start=start_date, end=end_date)['Adj Close']
+            stock_data = stock_data.rename(columns={symbols[1]: 'Adj Close'})
+    stock_data = stock_data.dropna()
+    print(stock_data.columns)
+    stocks_df = pd.DataFrame({
             'Dependent': stock_data['Adj Close'],
             'Independent': stock_data[index]
         })
-        stocks_df = stock_df.dropna()
-    else:
-        stock_data = yf.download(symbols, start=start_date, end=end_date)['Adj Close']
-        stock_data = stock_data.dropna()
-        stocks_df= pd.DataFrame({
-            'Dependent': stock_data[stocks],
-            'Independent': stock_data[index]
-        })
+    if using_weights: stock_data = stock_data * 100
+    return stocks_df, stock_data
+
+
+@app.get("/linreg")
+async def lin_reg(stocks: str, index: str, start: str, end: str, stockWeights: str):
+    symbols = [index, stocks]
+    stocks_df, stock_data = lin_reg_data(symbols, start, end, index, stockWeights)
     formula = 'Dependent ~ Independent'
     model = sma.OLS.from_formula(formula, data=stocks_df).fit()
     coef = model.params[1]
