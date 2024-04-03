@@ -185,6 +185,12 @@ async def fama_french(stockWeights: str, start: str, end: str):
     print("portfolio", portfolio)
     portfolio_mtl = portfolio.resample('M').agg(lambda x: (x + 1).prod() - 1)
     factors = pdr.DataReader('F-F_Research_Data_Factors', 'famafrench', start, end)[0][1:]
+
+    if len(portfolio_mtl) != len(factors):
+        min_length = min(len(portfolio_mtl), len(factors))
+        portfolio_mtl = portfolio_mtl[:min_length]
+        factors = factors[:min_length]
+        
     portfolio_mtl.index = factors.index
     merged_port = pd.merge(portfolio_mtl, factors, on='Date')
     port_data = merged_port.copy()

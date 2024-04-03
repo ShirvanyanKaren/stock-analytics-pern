@@ -23,14 +23,7 @@ const StockFinancials = (props) => {
     getFinancials();
   }, [isQuarters, statement, symbol]);
 
-
-  financials.map((financial, index) => {
-    let date = new Date(financial.asOfDate).toISOString().slice(0, 10);
-    Object.entries(financial).map((key, index) => {
-        console.log(key, index);
-        });
-
-  });
+  console.log(financials);
 
   const formatDate = (date) => {
     let newDate = new Date(date).toISOString().slice(0, 10);
@@ -49,8 +42,6 @@ const StockFinancials = (props) => {
     if (num === null || num === undefined) {
       return "------"; // or any default value for null or undefined
     }
-    
-  
     if (Math.abs(num) > 1000000000) {
       return (num / 1000000000).toFixed(2) + ' B';
     } else if (Math.abs(num) > 1000000) {
@@ -88,34 +79,35 @@ const StockFinancials = (props) => {
 
   return (
     <div className="container mt-5">
+        {(isLoaded) && (
+            
       <div className="row card custom-card">
         <div className="card-header d-flex flex-direction-row justify-content-around">
-          <h3 onClick={() => changeStatement("income")} className={statement === "income" ? "active statement" : "statement"} >
+          <h3 onClick={() => changeStatement("income")} className={statement === "income" ? "active-stat statement" : "statement"} >
           Income Statement</h3>
-          <h3 onClick={() => changeStatement("balance")} className={statement === "balance" ? "active statement" : "statement"}> Balance Sheet</h3>
-          <h3 onClick={() => changeStatement("cash")} className={statement === "cash" ? "active statement" : "statement"}> Cash Flow Statement</h3>
+          <h3 onClick={() => changeStatement("balance")} className={statement === "balance" ? "active-stat statement" : "statement"}> Balance Sheet</h3>
+          <h3 onClick={() => changeStatement("cash")} className={statement === "cash" ? "active-stat statement" : "statement"}> Cash Flow Statement</h3>
         </div>
         <div className="card-body">
           <div className="row">
-            <div className="d-flex flex-direction-row justify-content-center">
-              <button
-                className="btn btn-primary me-2 fs-5"
+            <div className="d-flex flex-direction-row justify-content-center mb-2">
+              <h6
+                className={isQuarters ? "ms-3 fs-5 info" : "ms-3 fs-5 info active-stat "}
                 onClick={() => setIsQuarters(false)}
               >
                 Annual
-              </button>
-              <button
-                className="btn btn-primary ms-2 fs-5"
+              </h6>
+              <h6
+                className={isQuarters ? "ms-3 fs-5 info active-stat" : "ms-3 fs-5 info"}
                 onClick={() => setIsQuarters(true)}
               >
                 Quarterly
-              </button>
+              </h6>
             </div>
           </div>
           <div className="row">
             <div className="col-12">
               <table className="table table-striped">
-                {(isLoaded) && (
                 <thead>
                 <tr className="mt-2">
                     <th className="fs-6">Metrics</th>
@@ -127,12 +119,12 @@ const StockFinancials = (props) => {
                 </tr>
                         {formatTable(financials)}
                 </thead>
-            )}
               </table>
             </div>
           </div>
         </div>
       </div>
+        )}
     </div>
   );
   // how to change text color with bootstrap

@@ -29,6 +29,7 @@ export const indexOptions = {
   "Volatile Index": "VIXCLS",
   "Economic Policy Uncertainty Index": "USEPUINDXD",
 };
+console.log(indexOptions["SP500"]);
 
 export async function stockData(stockSymbol, startDate, endDate) {
   console.log("stockSymbol", stockSymbol);
@@ -102,6 +103,7 @@ export async function getCompanyFinancials(stockSymbol, statement, quarterly) {
 }
 
 export async function getFamaFrenchData(startDate, endDate, stockWeights) {
+  console.log("stockWeights", stockWeights, startDate, endDate);
   const response = await axios.get(`${pyBackEnd}/famafrench`, {
     params: {
       stockWeights: stockWeights,

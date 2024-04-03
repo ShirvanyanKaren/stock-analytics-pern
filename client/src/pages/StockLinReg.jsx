@@ -9,6 +9,7 @@ import { indexOptions } from "../utils/helpers";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLineChart, faRssSquare } from "@fortawesome/free-solid-svg-icons";
 import { idbPromise } from "../utils/helpers";
+import RegressionTool from "../components/RegressionTool";
 
 const CanvasJS = CanvasJSReact.CanvasJS;
 
@@ -184,10 +185,6 @@ const StockLinReg = () => {
     weights = weights.map(({ portfolio_id, ...rest }) => rest);
     setStockWeights(weights[0]);
     setUseWeights(event.target.checked);
-    //how to disable classname with symbol input
-
-
-    console.log("these", stockWeights, useWeights);
 
   }
 
@@ -289,7 +286,7 @@ const StockLinReg = () => {
           <div className="d-flex justify-content-center">
             <div className="card lin-reg-card w-50 ">
             <div className="col-10 m-auto justify-center stock-volume mt-5">
-          <CanvasJSChart options={options} className="mt-10" />
+          <RegressionTool stockSymbol={stockSymbol} searchParams={searchParams} index={index} formulaB={formulaB} formulaY={formulaY} indexName={findIndexName(searchParams.index)} searchIndex={searchIndex}/>
           </div>
           <div className="col-lg d-flex justify-content-center">
               <div className="form-group inline text-center w-50">

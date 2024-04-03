@@ -69,15 +69,22 @@ li{
     
 }
 
+.nav-brand{
+    cursor: pointer;
+    &:hover{
+        color: #504dff;
+        animation: bounce 1s;  
+    }
+}
+
 
 
 
 .search-bar {
     width: 500px;
     margin-right: 5px;
-
-
 }
+
 
 .navbar-brand {
     font-size: 2.5rem;
@@ -112,11 +119,26 @@ body {
         }
     }
 }
-.active {
+.active-stat{
     background-color: #f1f1f1;
     color: #504dff;
     text-decoration: underline;
     text-decoration-thickness: 5px;
+}
+.sidebar {
+    background-color: #f1f1f1;
+    text-align: center;
+    width: fit-content; 
+    z-index: 100;
+    height: fit-content; 
+    padding: 25px;
+
+}
+
+
+#page-content-wrapper {
+    min-width: 0;
+    width: 100%;
 }
 .inactive {
     display: none;
@@ -150,7 +172,7 @@ body {
     margin-right: 5px;
 }
 
-.statement {
+.statement, .info{
 
     font-size: 20px;
     font-weight: bold;
@@ -180,7 +202,7 @@ body {
     height: 100%;
     background-size: cover;
     background-position: center;
-    opacity: 0.75; 
+    opacity: 0.80; 
   }
 
 .custom-card {
@@ -237,6 +259,7 @@ body {
 
 #patricles{
     background-image: url("./assets/city-background.jpeg");
+    // background-color: #1a1a1a;
 }
 
 .add-portfolio-modal{

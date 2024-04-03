@@ -177,8 +177,10 @@ const handleLoginSubmit = async (event) => {
         <MDBTabsPane show={justifyActive === 'tab1'}>
 
           <form onSubmit={handleLoginSubmit}>
-          <MDBInput onChange={handleChange} name="email" wrapperClass='mb-4' label='Email address' id='form1' type='email'/>
-          <MDBInput onChange={handleChange} name="password" wrapperClass='mb-4' label='Password' id='form2' type='password'/>
+            <label htmlFor='form1' className='form-label'>Email address</label>
+          <MDBInput onChange={handleChange} name="email" wrapperClass='mb-4' id='form1' type='email'/>
+          <label> Password </label>
+          <MDBInput onChange={handleChange} name="password" wrapperClass='mb-4' id='form2' type='password'/>
 
           <div className="d-flex justify-content-between mx-4 mb-4">
             <MDBCheckbox name='flexCheck' value='' id='flexCheckDefault' label='Remember me' />
@@ -193,11 +195,14 @@ const handleLoginSubmit = async (event) => {
 
         <MDBTabsPane show={justifyActive === 'tab2'}>
         <form onSubmit={handleFormSubmit}>
-
-          <MDBInput onChange={handleChange} wrapperClass='mb-4' name='name' label='Name' id='form1' type='text'/>
-          <MDBInput onChange={handleChange} wrapperClass='mb-4' name='username' label='Username' id='form1' type='text'/>
-          <MDBInput onChange={handleChange} wrapperClass='mb-4' name='email' label='Email' id='form1' type='email'/>
-          <MDBInput onChange={handleChange} wrapperClass='mb-4' name='password' label='Password' id='form1' type='password'/>
+          <label htmlFor='form1' className='form-label'>Name</label>
+          <MDBInput onChange={handleChange} wrapperClass='mb-4' name='name' id='form1' type='text'/>
+          <label htmlFor='form1' className='form-label'>Username</label>
+          <MDBInput onChange={handleChange} wrapperClass='mb-4' name='username' id='form1' type='text'/>
+          <label htmlFor='form1' className='form-label'>Email address</label>
+          <MDBInput onChange={handleChange} wrapperClass='mb-4' name='email' id='form1' type='email'/>
+          <label htmlFor='form1' className='form-label'>Password</label>
+          <MDBInput onChange={handleChange} wrapperClass='mb-4' name='password' id='form1' type='password'/>
 
           <div className='d-flex justify-content-center mb-4'>
             <MDBCheckbox name='flexCheck' id='flexCheckDefault' label='I have read and agree to the terms' />

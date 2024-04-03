@@ -4,7 +4,7 @@ import {
   } from "./actions";
   
   // initial state of the store
-  const initialState = {
+  export const initialState = {
     user: [],
     currencyRates: [],
     stockWeights: {},
@@ -31,5 +31,5 @@ import {
     }
   };
   
-  export default reducer;
-  
+
+

@@ -12,6 +12,7 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import { useSelector } from "react-redux";
 import StockFinancials from "../components/StockFinancials";
+import SideBar from "../components/SideBar";
 
 
 
@@ -90,6 +91,11 @@ const StockInfo = () => {
         getStockInfo();
 
       }, [stockSymbol, startDate, endDate]);
+
+      // on location change, set info type to summary
+      useEffect(() => {
+        setInfoType("summary");
+      }, [location]);
 
   const options = {
     theme: "dark1",
@@ -201,13 +207,20 @@ const StockInfo = () => {
       <Nav
       className="d-flex justify-content-around w-100 stock-info"
       >
-        <h3 onClick={() => setInfoType("summary")} className={infoType == "summary" ? "active info" : "info"}>Stock Summary</h3>
-        <h3 onClick={() => setInfoType("financials")} className={infoType == "financials" ? "active info" : "info"}>Stock Financials</h3>
-        <h3 onClick={() => setInfoType("linreg")} className={infoType == "linreg" ? "active info" : "info"}>Stock Linear Regression</h3>
-        <h3 onClick={() => setInfoType("analytics")} className={infoType == "analytics" ? "active info" : "info"}>Stock Analytics</h3>
+        <h3 onClick={() => setInfoType("summary")} className={infoType == "summary" ? "active-stat info" : "info"}>Stock Summary</h3>
+        <h3 onClick={() => setInfoType("financials")} className={infoType == "financials" ? "active-stat info" : "info"}>Stock Financials</h3>
+        <h3 onClick={() => setInfoType("linreg")} className={infoType == "linreg" ? "active-stat info" : "info"}>Stock Linear Regression</h3>
+        <h3 onClick={() => setInfoType("analytics")} className={infoType == "analytics" ? "active-stat info" : "info"}>Stock Analytics</h3>
       </Nav>
 
       </Navbar>
+      <div className={infoType == "linreg" ? "" : "inactive"}>
+      <div className="container">
+      <SideBar
+    
+       />
+       </div>
+      </div> 
 
 
 
@@ -247,11 +260,12 @@ const StockInfo = () => {
             </div>
         )}
 
-    <div className={infoType == "financials" ? "" : "inactive"}>  
+    <div className={infoType == "financials" ? "" : "d-none"}>  
       <StockFinancials
       
        symbol={stockSymbol} />
-    </div>  
+    </div>
+ 
     </div>
 
 
