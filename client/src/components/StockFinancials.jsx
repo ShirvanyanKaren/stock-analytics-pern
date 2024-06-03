@@ -1,6 +1,4 @@
-// StockFinancials.jsx
-
-import { fetchFinancialStatement, transposeData } from "../utils/fetchFinanceData"; // Correct import path
+import { getCompanyFinancials } from "../utils/helpers";
 import { useEffect, useState } from "react";
 import ToolTip from "./ToolTip"; // Import the ToolTip component
 
@@ -14,8 +12,10 @@ const StockFinancials = (props) => {
   useEffect(() => {
     const getFinancials = async () => {
       try {
-        let data = await fetchFinancialStatement(symbol, statement, isQuarters ? 'quarterly' : 'annual');
-        data = transposeData(data);
+        let data = await getCompanyFinancials(symbol, statement, isQuarters ? 'quarterly' : 'annual');
+        data = JSON.parse(data);
+        data = data.filter((row, index, self) => index === 0 || row.asOfDate !== self[index - 1].asOfDate);
+        data.sort((a, b) => new Date(b.asOfDate) - new Date(a.asOfDate));
         setFinancials(data);
         setIsLoaded(true);
       } catch (error) {
