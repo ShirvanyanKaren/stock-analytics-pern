@@ -4,7 +4,7 @@ import { MainContainer, ChatContainer, MessageList, Message, MessageInput, Typin
 import UserInput from "../components/UserInput.jsx";
 import { useTable } from 'react-table';
 import '../customStyles.css';
-import { fetchFinancialStatement, transposeData, formatFinancialData } from "../utils/fetchFinanceData"; // Update the import path
+import { getCompanyFinancials, transposeData, formatFinancialData } from "../utils/helpers"; // Correct import path
 
 const API_KEY = "your-api-key-here";
 
@@ -19,7 +19,7 @@ function ChatbotPage() {
   const handleUserInputSubmit = async (ticker, statementType, frequency) => {
     try {
       setUserInput({ ticker, statementType, frequency });
-      const financialStatementData = await fetchFinancialStatement(ticker, statementType, frequency);
+      const financialStatementData = await getCompanyFinancials(ticker, statementType, frequency);
       console.log('Financial Statement Data:', financialStatementData);
 
       if (financialStatementData && Array.isArray(financialStatementData)) {
