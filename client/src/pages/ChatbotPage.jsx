@@ -7,9 +7,9 @@ import '../customStyles.css';
 
 const API_KEY = "your-api-key-here";
 
-async function fetchFinancialStratement(ticker, statementType, frequency) {
+async function fetchFinancialStatement(ticker, statementType, frequency) {
   try {
-    const response = await fetch(`http://localhost:8000/financial_statement?ticker=${ticker}&statement=${statementType}&frequency=${frequency}`);
+    const response = await fetch(`https://www.cincodata.com/financial_statement?ticker=${ticker}&statement=${statementType}&frequency=${frequency}`);
     if (!response.ok) {
       const message = `An error has occurred: ${response.status}`;
       throw new Error(message);
@@ -59,7 +59,7 @@ function ChatbotPage() {
       setUserInput({ ticker, statementType, frequency });
       const financialStatementData = await fetchFinancialStatement(ticker, statementType, frequency);
       console.log('Financial Statement Data:', financialStatementData);
-  
+
       if (financialStatementData && Array.isArray(financialStatementData)) {
         const transposedData = transposeData(financialStatementData);
 
@@ -67,10 +67,10 @@ function ChatbotPage() {
           Header: key === 'metric' ? 'Metric' : key, 
           accessor: key
         })) : [];
-  
+
         // Ensure 'Metric' column is the first one
         const orderedColumns = columns.sort((a, b) => (a.Header === 'Metric' ? -1 : b.Header === 'Metric' ? 1 : 0));
-  
+
         setColumns(orderedColumns);
         setData(transposedData);
         setFinancialData(transposedData);
@@ -81,7 +81,7 @@ function ChatbotPage() {
       console.error("Error handling user input submit:", error);
     }
   };
-  
+
   const handleSend = async (message) => {
     const newMessage = {
       message: message,
@@ -163,7 +163,7 @@ function ChatbotPage() {
       columns,
       data,
     });
-  
+
     return (
       <div className="table-container">
         <table {...getTableProps()} className="financial-table">
