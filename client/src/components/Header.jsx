@@ -1,3 +1,4 @@
+// src/components/Header.jsx
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
@@ -9,9 +10,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import Auth from "../utils/auth";
 import SearchBar from "./SearchBar";
-import { idbPromise } from "../utils/helpers";
 import decode from "jwt-decode";
-import { QUERY_USER } from "../utils/queries";
 import { useEffect } from "react";
 import { useQuery } from "@apollo/client";
 
@@ -23,19 +22,14 @@ const Header = () => {
 
   return (
     <>
-      <Navbar
-        expand="xxl"
-        bg="light"
-        data-bs-theme="light"
-        className="nav-bar nav-bar-custom theme"
-      >
+      <Navbar expand="xxl" bg="light" data-bs-theme="light" className="nav-bar nav-bar-custom theme">
         <Container expand="xxl" className="justify-content-between navbar">
-            <Navbar.Brand className="ms-0" to="/home">
-              <FontAwesomeIcon icon={faDatabase} className="nav-brand" color="blue"/>
-              <Link to="/" className="navbar-brand">
-                CincoData
-              </Link>
-            </Navbar.Brand>
+          <Navbar.Brand className="ms-0" to="/home">
+            <FontAwesomeIcon icon={faDatabase} className="nav-brand" color="blue" />
+            <Link to="/" className="navbar-brand">
+              CincoData
+            </Link>
+          </Navbar.Brand>
           <div className="nav">
             <SearchBar />
             <Nav className="align-items-center ">
@@ -57,6 +51,9 @@ const Header = () => {
                 </NavDropdown.Item>
                 <NavDropdown.Item href="/famafrench">
                   Expected Return
+                </NavDropdown.Item>
+                <NavDropdown.Item href="/chatbot">
+                  Chatbot
                 </NavDropdown.Item>
               </NavDropdown>
             </Nav>

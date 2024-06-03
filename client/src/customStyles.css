@@ -1,0 +1,75 @@
+/* customStyles.css */
+.form-container {
+    background-color: white;
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    box-sizing: border-box;
+    opacity: 1; /* Ensure no transparency */
+  }
+  
+  .input-form {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+  
+  .input-form label {
+    margin: 0 10px;
+    font-weight: bold;
+  }
+  
+  .input-form input,
+  .input-form select,
+  .input-form button {
+    margin-left: 5px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+  }
+  
+  .content-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+  }
+  
+  .table-container {
+    width: 60%;
+    overflow-x: auto;
+    background-color: white; /* Ensure white background */
+    opacity: 1; /* Ensure no transparency */
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: add a subtle shadow */
+  }
+  
+  .chat-container {
+    width: 35%;
+  }
+  
+  .financial-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background-color: white; /* Ensure white background */
+    opacity: 1; /* Ensure no transparency */
+  }
+  
+  .financial-table th,
+  .financial-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+    background-color: white; /* Ensure white background for cells */
+    opacity: 1; /* Ensure no transparency */
+  }
+  
+  .financial-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+    opacity: 1; /* Ensure no transparency */
+  }
+  

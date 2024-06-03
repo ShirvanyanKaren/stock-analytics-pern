@@ -7,49 +7,51 @@ import Login from "./pages/Login";
 import Home from "./pages/Home";
 import StockLinReg from "./pages/StockLinReg";
 import FamaFrench from "./pages/FamaFrench";
-
+import ChatbotPage from "./pages/ChatbotPage"; // Import the ChatbotPage component
 import App from "./App";
 
 const router = createBrowserRouter([
-    { path: "/", 
-    element: <App /> ,
+  {
+    path: "/",
+    element: <App />,
     errorElement: <ErrorPage />,
     children: [
-        {
-            index: true,
-            element: <Home />,
-        },
-        {
-            path: "/login",
-            element: <Login />,
-        },
-        {
-            path: "/signup",
-            element: <Login />,
-        },
-        {
-            path: "/stockinfo/:symbol",
-            element: <StockInfo />,
-        },
-        {
-            path: "/stocklinreg/:symbol",
-            element: <StockLinReg />,
-        },
-        {
-            path: "/stocklinreg",
-            element: <StockLinReg />,
-        },
-        {
-            path: "/famafrench",
-            element: <FamaFrench />,
-        }
-
-    ]
-},
-
+      {
+        index: true,
+        element: <Home />,
+      },
+      {
+        path: "/login",
+        element: <Login />,
+      },
+      {
+        path: "/signup",
+        element: <Login />,
+      },
+      {
+        path: "/stockinfo/:symbol",
+        element: <StockInfo />,
+      },
+      {
+        path: "/stocklinreg/:symbol",
+        element: <StockLinReg />,
+      },
+      {
+        path: "/stocklinreg",
+        element: <StockLinReg />,
+      },
+      {
+        path: "/famafrench",
+        element: <FamaFrench />,
+      },
+      {
+        path: "/chatbot",
+        element: <ChatbotPage />, // Add the ChatbotPage route
+      },
+    ],
+  },
 ]);
 
-
 ReactDOM.createRoot(document.getElementById("root")).render(
-    <RouterProvider router={router} />
+  <RouterProvider router={router} />
 );
