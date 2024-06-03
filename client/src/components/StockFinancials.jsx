@@ -6,7 +6,7 @@ const StockFinancials = (props) => {
   const [financials, setFinancials] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isQuarters, setIsQuarters] = useState(true);
-  const [statement, statementType] = useState("income");
+  const [statement, setStatement] = useState("income");
   const [symbol, setSymbol] = useState(props.symbol);
 
   useEffect(() => {
@@ -67,7 +67,7 @@ const StockFinancials = (props) => {
   };
 
   const changeStatement = (statement) => {
-    statementType(statement);
+    setStatement(statement);
   };
 
   return (
