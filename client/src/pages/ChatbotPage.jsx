@@ -4,47 +4,9 @@ import { MainContainer, ChatContainer, MessageList, Message, MessageInput, Typin
 import UserInput from "../components/UserInput.jsx";
 import { useTable } from 'react-table';
 import '../customStyles.css';
+import { fetchFinancialStatement, transposeData, formatFinancialData } from "../utils/fetchFinanceData"; // Update the import path
 
 const API_KEY = "your-api-key-here";
-
-async function fetchFinancialStatement(ticker, statementType, frequency) {
-  try {
-    const response = await fetch(`https://www.cincodata.com/financial_statement?ticker=${ticker}&statement=${statementType}&frequency=${frequency}`);
-    if (!response.ok) {
-      const message = `An error has occurred: ${response.status}`;
-      throw new Error(message);
-    }
-    return await response.json();
-  } catch (error) {
-    console.error("Error fetching financial statement:", error);
-    throw error;
-  }
-}
-
-function transposeData(data) {
-  const transposed = {};
-  data.forEach((row, rowIndex) => {
-    Object.entries(row).forEach(([key, value]) => {
-      const formattedKey = key.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
-      if (!transposed[formattedKey]) {
-        transposed[formattedKey] = [];
-      }
-      transposed[formattedKey][rowIndex] = value;
-    });
-  });
-
-  return Object.entries(transposed).map(([key, values]) => ({ metric: key, ...values }));
-}
-
-function formatFinancialData(data) {
-  let formattedData = "Financial Statement Data:\n";
-  data.forEach(row => {
-    const metric = row.metric;
-    const values = Object.values(row).slice(1); // exclude the 'metric' key
-    formattedData += `${metric}: ${values.join(', ')}\n`;
-  });
-  return formattedData;
-}
 
 function ChatbotPage() {
   const [messages, setMessages] = useState([]);
@@ -54,34 +16,33 @@ function ChatbotPage() {
   const [data, setData] = useState([]);
   const [userInput, setUserInput] = useState({ ticker: '', statementType: '', frequency: '' });
 
-const handleUserInputSubmit = async (ticker, statementType, frequency) => {
-  try {
-    setUserInput({ ticker, statementType, frequency });
-    const financialStatementData = await fetchFinancialStatement(ticker, statementType, frequency);
-    console.log('Financial Statement Data:', financialStatementData); // Log the data to verify
+  const handleUserInputSubmit = async (ticker, statementType, frequency) => {
+    try {
+      setUserInput({ ticker, statementType, frequency });
+      const financialStatementData = await fetchFinancialStatement(ticker, statementType, frequency);
+      console.log('Financial Statement Data:', financialStatementData);
 
-    if (financialStatementData && Array.isArray(financialStatementData)) {
-      const transposedData = transposeData(financialStatementData);
+      if (financialStatementData && Array.isArray(financialStatementData)) {
+        const transposedData = transposeData(financialStatementData);
 
-      const columns = transposedData.length > 0 ? Object.keys(transposedData[0]).map(key => ({
-        Header: key === 'metric' ? 'Metric' : key,
-        accessor: key
-      })) : [];
+        const columns = transposedData.length > 0 ? Object.keys(transposedData[0]).map(key => ({
+          Header: key === 'metric' ? 'Metric' : key,
+          accessor: key
+        })) : [];
 
-      // Ensure 'Metric' column is the first one
-      const orderedColumns = columns.sort((a, b) => (a.Header === 'Metric' ? -1 : b.Header === 'Metric' ? 1 : 0));
+        // Ensure 'Metric' column is the first one
+        const orderedColumns = columns.sort((a, b) => (a.Header === 'Metric' ? -1 : b.Header === 'Metric' ? 1 : 0));
 
-      setColumns(orderedColumns);
-      setData(transposedData);
-      setFinancialData(transposedData);
-    } else {
-      console.error("Received data is not an array:", financialStatementData);
+        setColumns(orderedColumns);
+        setData(transposedData);
+        setFinancialData(transposedData);
+      } else {
+        console.error("Received data is not an array:", financialStatementData);
+      }
+    } catch (error) {
+      console.error("Error handling user input submit:", error);
     }
-  } catch (error) {
-    console.error("Error handling user input submit:", error);
-  }
-};
-
+  };
 
   const handleSend = async (message) => {
     const newMessage = {
