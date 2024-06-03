@@ -240,3 +240,41 @@ export async function getStockObject(
   }
   setStockWeights(stockWeights);
 }
+
+export async function getCompanyFinancials(stockSymbol, statement, quarterly) {
+  if (!stockSymbol || !statement || !quarterly) {
+    throw new Error('Invalid input parameters');
+  }
+
+  const url = `${pyBackEnd}/financials`;
+  try {
+    const response = await axios.get(url, {
+      params: {
+        symbol: stockSymbol,
+        statement: statement,
+        quarterly: quarterly,
+      },
+    });
+    console.log('Fetch response:', response); // Log the response
+
+    if (!response.data) {
+      const message = `An error has occurred: ${response.status}`;
+      throw new Error(message);
+    }
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      // Server responded with a status other than 200 range
+      console.error("Error fetching financial statement:", error.response.status, error.response.data);
+      throw new Error(`Error fetching financial statement: ${error.response.status}`);
+    } else if (error.request) {
+      // Request was made but no response received
+      console.error("Error fetching financial statement:", error.request);
+      throw new Error("Error fetching financial statement: No response received");
+    } else {
+      // Something else caused an error
+      console.error("Error fetching financial statement:", error.message);
+      throw new Error(`Error fetching financial statement: ${error.message}`);
+    }
+  }
+}

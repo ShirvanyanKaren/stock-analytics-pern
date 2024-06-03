@@ -18,6 +18,10 @@ function ChatbotPage() {
 
   const handleUserInputSubmit = async (ticker, statementType, frequency) => {
     try {
+      if (!ticker || !statementType || !frequency) {
+        throw new Error('Invalid input parameters');
+      }
+      
       setUserInput({ ticker, statementType, frequency });
       const financialStatementData = await getCompanyFinancials(ticker, statementType, frequency);
       console.log('Financial Statement Data:', financialStatementData);
