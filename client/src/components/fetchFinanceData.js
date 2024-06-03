@@ -16,7 +16,7 @@ export const getCompanyFinancials = async (symbol, statement, isQuarters) => {
         throw new Error(message);
       }
       
-      return await response.text();
+      return await response.json();  // Make sure to parse as JSON
     } catch (error) {
       console.error("Error fetching financial statement:", error);
       throw error;

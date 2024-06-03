@@ -38,7 +38,7 @@ async def stock_graph(symbol: str, start: str, end: str):
     return stock
 
 @app.get("/financial_statement")
-async def get_financial_statement(request: Request, ticker: str, statement: str, frequency: str):
+async def get_financial_statement(ticker: str, statement: str, frequency: str):
     stock = yf.Ticker(ticker)
     data_map = {
         'balanceSheet': stock.balance_sheet,
@@ -50,15 +50,14 @@ async def get_financial_statement(request: Request, ticker: str, statement: str,
     if data is None or data.empty:
         raise HTTPException(status_code=404, detail="No data found")
 
-    # Properly format the data for client-side processing
     data = data.transpose()  # Transpose to make dates the columns if necessary
     data.reset_index(inplace=True)
     data.columns = [str(col).replace(' ', '_').lower() for col in data.columns]  # Ensure column names are consistent
     
-    # Convert data to JSON array using simplejson
     data['index'] = data['index'].astype(str)  # Convert Timestamp to string
     json_data = json.dumps(data.to_dict(orient='records'), ignore_nan=True)
-    return json.loads(json_data)  # Ensure the response is a valid JSON object
+    return json.loads(json_data)
+
 
 def process_symbol(symbol: str):
     symbol = symbol.upper()
