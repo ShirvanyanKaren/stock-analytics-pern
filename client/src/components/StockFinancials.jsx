@@ -1,4 +1,4 @@
-import { getCompanyFinancials } from "../utils/helpers";
+import { getCompanyFinancials } from "../components/fetchFinanceData.js";
 import { useEffect, useState } from "react";
 import ToolTip from "./ToolTip"; // Import the ToolTip component
 
@@ -6,19 +6,23 @@ const StockFinancials = (props) => {
   const [financials, setFinancials] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isQuarters, setIsQuarters] = useState(true);
-  const [statement, statementType] = useState("income");
+  const [statement, setStatementType] = useState("income");
   const [symbol, setSymbol] = useState(props.symbol);
 
   useEffect(() => {
     const getFinancials = async () => {
-      let data = await getCompanyFinancials(symbol, statement, isQuarters);
-      data = JSON.parse(data);
-      for (let row in data) {
-        if (data[row].asOfDate === data[row - 1]?.asOfDate) data.splice(row, 1);
+      try {
+        let data = await getCompanyFinancials(symbol, statement, isQuarters);
+        data = JSON.parse(data);
+        for (let row in data) {
+          if (data[row].asOfDate === data[row - 1]?.asOfDate) data.splice(row, 1);
+        }
+        data.sort((a, b) => new Date(b.asOfDate) - new Date(a.asOfDate));
+        setFinancials(data);
+        setIsLoaded(true);
+      } catch (error) {
+        console.error("Error fetching financials:", error);
       }
-      data.sort((a, b) => new Date(b.asOfDate) - new Date(a.asOfDate));
-      setFinancials(data);
-      setIsLoaded(true);
     };
     getFinancials();
   }, [isQuarters, statement, symbol]);
@@ -67,7 +71,7 @@ const StockFinancials = (props) => {
   };
 
   const changeStatement = (statement) => {
-    statementType(statement);
+    setStatementType(statement);
   };
 
   return (
