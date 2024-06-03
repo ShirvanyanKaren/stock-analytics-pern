@@ -1,4 +1,4 @@
-import { getCompanyFinancials } from "../utils/fetchFinanceData";
+import { getCompanyFinancials } from "./fetchFinanceData";
 import { useEffect, useState } from "react";
 import ToolTip from "./ToolTip"; // Import the ToolTip component
 
