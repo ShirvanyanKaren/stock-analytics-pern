@@ -1,8 +1,5 @@
-export const getCompanyFinancials = async (symbol, statement, isQuarters) => {
-    const statementType = statement === "balance" ? "balanceSheet" : statement === "cash" ? "cashflowStatement" : "incomeStatement";
-    const frequency = isQuarters ? "quarterly" : "annual";
-    const apiUrl = `https://www.cincodata.com/financial_statement?ticker=${symbol}&statement=${statementType}&frequency=${frequency}`;
-  
+export const fetchFinancialStatement = async (ticker, statementType, frequency) => {
+    const apiUrl = `https://www.cincodata.com/financial_statement?ticker=${ticker}&statement=${statementType}&frequency=${frequency}`;
     try {
       const response = await fetch(apiUrl, {
         method: 'GET',
@@ -15,8 +12,8 @@ export const getCompanyFinancials = async (symbol, statement, isQuarters) => {
         const message = `An error has occurred: ${response.status}`;
         throw new Error(message);
       }
-      
-      return await response.json();  // Make sure to parse as JSON
+  
+      return await response.json(); // Ensure response is JSON
     } catch (error) {
       console.error("Error fetching financial statement:", error);
       throw error;

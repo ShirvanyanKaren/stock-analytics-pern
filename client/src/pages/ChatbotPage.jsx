@@ -54,33 +54,34 @@ function ChatbotPage() {
   const [data, setData] = useState([]);
   const [userInput, setUserInput] = useState({ ticker: '', statementType: '', frequency: '' });
 
-  const handleUserInputSubmit = async (ticker, statementType, frequency) => {
-    try {
-      setUserInput({ ticker, statementType, frequency });
-      const financialStatementData = await fetchFinancialStatement(ticker, statementType, frequency);
-      console.log('Financial Statement Data:', financialStatementData);
+const handleUserInputSubmit = async (ticker, statementType, frequency) => {
+  try {
+    setUserInput({ ticker, statementType, frequency });
+    const financialStatementData = await fetchFinancialStatement(ticker, statementType, frequency);
+    console.log('Financial Statement Data:', financialStatementData); // Log the data to verify
 
-      if (financialStatementData && Array.isArray(financialStatementData)) {
-        const transposedData = transposeData(financialStatementData);
+    if (financialStatementData && Array.isArray(financialStatementData)) {
+      const transposedData = transposeData(financialStatementData);
 
-        const columns = transposedData.length > 0 ? Object.keys(transposedData[0]).map(key => ({
-          Header: key === 'metric' ? 'Metric' : key, 
-          accessor: key
-        })) : [];
+      const columns = transposedData.length > 0 ? Object.keys(transposedData[0]).map(key => ({
+        Header: key === 'metric' ? 'Metric' : key,
+        accessor: key
+      })) : [];
 
-        // Ensure 'Metric' column is the first one
-        const orderedColumns = columns.sort((a, b) => (a.Header === 'Metric' ? -1 : b.Header === 'Metric' ? 1 : 0));
+      // Ensure 'Metric' column is the first one
+      const orderedColumns = columns.sort((a, b) => (a.Header === 'Metric' ? -1 : b.Header === 'Metric' ? 1 : 0));
 
-        setColumns(orderedColumns);
-        setData(transposedData);
-        setFinancialData(transposedData);
-      } else {
-        console.error("Received data is not an array:", financialStatementData);
-      }
-    } catch (error) {
-      console.error("Error handling user input submit:", error);
+      setColumns(orderedColumns);
+      setData(transposedData);
+      setFinancialData(transposedData);
+    } else {
+      console.error("Received data is not an array:", financialStatementData);
     }
-  };
+  } catch (error) {
+    console.error("Error handling user input submit:", error);
+  }
+};
+
 
   const handleSend = async (message) => {
     const newMessage = {
