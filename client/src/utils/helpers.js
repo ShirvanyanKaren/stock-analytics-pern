@@ -35,7 +35,6 @@ export async function stockData(stockSymbol, startDate, endDate) {
   console.log("stockSymbol", stockSymbol);
   const response = await axios.get(
     `${pyBackEnd}/stockgraph`,
-
     {
       params: {
         symbol: stockSymbol,
@@ -46,6 +45,7 @@ export async function stockData(stockSymbol, startDate, endDate) {
   );
   return response.data;
 }
+
 export async function stockInfo(stockSymbol) {
   const response = await axios.get(`${pyBackEnd}/stockinfo`, {
     params: {
@@ -64,7 +64,6 @@ export async function linReg(stockSymbol, searchIndex, startDate, endDate, weigh
       start: startDate,
       end: endDate,
       stockWeights: weights,
-
     },
   });
   return response.data;
@@ -92,14 +91,37 @@ export async function getStockWeightsIdb() {
 }
 
 export async function getCompanyFinancials(stockSymbol, statement, quarterly) {
-  const response = await axios.get(`${pyBackEnd}/financials`, {
-    params: {
-      symbol: stockSymbol,
-      statement: statement,
-      quarterly: quarterly,
-    },
-  });
-  return response.data;
+  const url = `${pyBackEnd}/financials`;
+  try {
+    const response = await axios.get(url, {
+      params: {
+        symbol: stockSymbol,
+        statement: statement,
+        quarterly: quarterly,
+      },
+    });
+    console.log('Fetch response:', response); // Log the response
+
+    if (!response.data) {
+      const message = `An error has occurred: ${response.status}`;
+      throw new Error(message);
+    }
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      // Server responded with a status other than 200 range
+      console.error("Error fetching financial statement:", error.response.status, error.response.data);
+      throw new Error(`Error fetching financial statement: ${error.response.status}`);
+    } else if (error.request) {
+      // Request was made but no response received
+      console.error("Error fetching financial statement:", error.request);
+      throw new Error("Error fetching financial statement: No response received");
+    } else {
+      // Something else caused an error
+      console.error("Error fetching financial statement:", error.message);
+      throw new Error(`Error fetching financial statement: ${error.message}`);
+    }
+  }
 }
 
 export async function getFamaFrenchData(startDate, endDate, stockWeights) {
@@ -156,6 +178,7 @@ export function idbPromise(stockWeights, method, object) {
     };
   });
 }
+
 export async function getStockObject(
   userData,
   stockData,
@@ -181,17 +204,14 @@ export async function getStockObject(
         ...stockWeights,
         portfolio_id: userData?.user?.id,
       });
-  
 
       dispatch({
         type: SET_STOCK_WEIGHTS,
         payload: stockWeights,
       });
-      
     } catch (err) {
       console.log(err);
     }
   }
   setStockWeights(stockWeights);
-
 }

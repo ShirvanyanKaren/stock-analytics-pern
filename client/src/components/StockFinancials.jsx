@@ -13,7 +13,13 @@ const StockFinancials = (props) => {
     const getFinancials = async () => {
       try {
         let data = await getCompanyFinancials(symbol, statement, isQuarters ? 'quarterly' : 'annual');
-        data = JSON.parse(data);
+        console.log('Fetched data:', data); // Log the data before parsing
+
+        // Assuming the API response is an object. If it's a string, no need to parse
+        if (typeof data === 'string') {
+          data = JSON.parse(data);
+        }
+
         data = data.filter((row, index, self) => index === 0 || row.asOfDate !== self[index - 1].asOfDate);
         data.sort((a, b) => new Date(b.asOfDate) - new Date(a.asOfDate));
         setFinancials(data);
