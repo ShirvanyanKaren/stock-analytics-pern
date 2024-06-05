@@ -4,16 +4,15 @@ import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CloseIcon from '@mui/icons-material/Close';
 import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
-import { MainContainer, ChatContainer, MessageList, Message, MessageInput, TypingIndicator } from '@chatscope/chat-ui-kit-react';
 import { standardizeTerm } from '../utils/termFormatter';
 import { useHighlight } from '../contexts/HighlightContext';
-
-const API_KEY = "your_openai_api_key"; // Replace with your OpenAI API key
+import Chatbot from './Chatbot';
 
 const InfoPopup = ({ open, handleClose, info }) => {
   const [isChatbot, setIsChatbot] = useState(false);
   const [showDefinition, setShowDefinition] = useState(false);
   const [glossaryData, setGlossaryData] = useState({});
+  const [apiKey, setApiKey] = useState("");
   const navigate = useNavigate();
   const { helpMode } = useHighlight();
 
@@ -22,6 +21,16 @@ const InfoPopup = ({ open, handleClose, info }) => {
       .then(response => response.json())
       .then(data => setGlossaryData(data))
       .catch(error => console.error("Failed to fetch glossary data:", error));
+
+    fetch('/apikey')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch API key');
+        }
+        return response.json();
+      })
+      .then(data => setApiKey(data.api_key))
+      .catch(error => console.error("Failed to fetch API key:", error));
   }, []);
 
   const handleNavigate = () => {
@@ -50,8 +59,6 @@ const InfoPopup = ({ open, handleClose, info }) => {
   const matchedTerm = Object.keys(glossaryData).find(key => standardizeTerm(key) === standardizedTerm);
   const definition = matchedTerm ? glossaryData[matchedTerm] : 'Definition not found.';
 
-  const isFinancialTerm = info.match(/[A-Z][a-z]*[A-Z][a-z]*/); // Example pattern to identify financial terms
-
   return (
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle>
@@ -74,11 +81,11 @@ const InfoPopup = ({ open, handleClose, info }) => {
       </DialogTitle>
       <DialogContent>
         {isChatbot ? (
-          <Chatbot initialMessage={info} />
+          <Chatbot initialMessage={info} definition={definition} apiKey={apiKey} />
         ) : showDefinition ? (
           <Card>
             <CardContent>
-              <Typography variant="h6">{isFinancialTerm ? standardizeTerm(info) : info}</Typography>
+              <Typography variant="h6">{info}</Typography>
               <Typography variant="body1">{definition}</Typography>
               <Button variant="contained" color="primary" onClick={handleNavigate} style={{ marginTop: '10px' }}>
                 Learn More
@@ -87,7 +94,7 @@ const InfoPopup = ({ open, handleClose, info }) => {
           </Card>
         ) : (
           <>
-            <Typography variant="body1" className={helpMode ? 'highlight' : ''}>{isFinancialTerm ? standardizeTerm(info) : info}</Typography>
+            <Typography variant="body1" className={helpMode ? 'highlight' : ''}>{info}</Typography>
             <Button variant="contained" color="primary" onClick={handleReadMore} style={{ marginTop: '10px' }}>
               Read More
             </Button>
@@ -98,69 +105,6 @@ const InfoPopup = ({ open, handleClose, info }) => {
         )}
       </DialogContent>
     </Dialog>
-  );
-};
-
-const Chatbot = ({ initialMessage }) => {
-  const [messages, setMessages] = useState([{ message: initialMessage, sender: "system", direction: "incoming" }]);
-  const [typing, setTyping] = useState(false);
-  const [input, setInput] = useState('');
-
-  const handleSend = async (message) => {
-    const newMessage = { message, sender: "User", direction: "outgoing" };
-    const newMessages = [...messages, newMessage];
-    setMessages(newMessages);
-    setTyping(true);
-
-    await processMessageToChatGPT(newMessages, message);
-  };
-
-  const processMessageToChatGPT = async (chatMessages, userMessage) => {
-    const apiMessages = chatMessages.map((msg) => {
-      let role = msg.sender === "ChatGPT" ? "assistant" : "user";
-      return { role, content: msg.message };
-    });
-
-    const systemMessage = {
-      role: "system",
-      content: "You are a helpful assistant providing easy-to-understand definitions of financial terms."
-    };
-
-    const apiRequestBody = {
-      model: "gpt-4",
-      messages: [systemMessage, ...apiMessages, { role: "user", content: userMessage }]
-    };
-
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${API_KEY}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(apiRequestBody)
-    });
-
-    const data = await response.json();
-    const botMessage = { message: data.choices[0].message.content, sender: "ChatGPT", direction: "incoming" };
-    setMessages([...chatMessages, botMessage]);
-    setTyping(false);
-  };
-
-  return (
-    <MainContainer>
-      <ChatContainer>
-        <MessageList typingIndicator={typing ? <TypingIndicator content="ChatGPT is typing..." /> : null}>
-          {messages.map((msg, i) => (
-            <Message key={i} model={msg} />
-          ))}
-        </MessageList>
-        <MessageInput
-          placeholder="Type Message Here"
-          onSend={(msg) => handleSend(msg)}
-          attachButton={false}
-        />
-      </ChatContainer>
-    </MainContainer>
   );
 };
 

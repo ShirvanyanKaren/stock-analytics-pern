@@ -134,3 +134,9 @@ dist
 .DS_Store
 .vscode
 package-lock.json
+
+
+# api keys 
+# .gitignore
+.env
+

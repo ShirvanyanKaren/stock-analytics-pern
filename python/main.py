@@ -1,4 +1,3 @@
-from typing import Union
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 import pandas_datareader.data as pdr
@@ -16,6 +15,9 @@ import os
 
 app = FastAPI()
 
+# Load environment variables
+load_dotenv()
+
 # Allow CORS for local development
 app.add_middleware(
     CORSMiddleware,
@@ -24,6 +26,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.get("/apikey")
+async def get_api_key():
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise HTTPException(status_code=500, detail="API key not found")
+    return {"api_key": api_key}
+
 
 @app.get("/stockinfo")
 async def stock_info(symbol: str):
