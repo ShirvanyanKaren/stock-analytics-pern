@@ -82,44 +82,46 @@ const Glossary = () => {
   };
 
   return (
-    <div className="glossary-container">
-      {selectedTerm ? (
-        <div className="glossary-term-container">
-          <h2>{selectedTerm.term}</h2>
-          <p>{selectedTerm.definition}</p>
-          <button onClick={() => navigate('/glossary')}>Back to Glossary</button>
-        </div>
-      ) : (
-        <>
-          <div className="glossary-header">
-            <input
-              type="text"
-              placeholder="Search terms..."
-              value={searchTerm}
-              onChange={handleSearch}
-            />
+    <div className="glossary-wrapper">
+      <div className="glossary-container">
+        {selectedTerm ? (
+          <div className="glossary-term-container">
+            <h2>{selectedTerm.term}</h2>
+            <p>{selectedTerm.definition}</p>
+            <button onClick={() => navigate('/glossary')}>Back to Glossary</button>
           </div>
-          <div className="glossary-filter">
-            {'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(letter => (
-              <button
-                key={letter}
-                className={`filter-button ${selectedLetter === letter ? 'active' : ''}`}
-                onClick={() => handleLetterClick(letter)}
-              >
-                {letter}
-              </button>
-            ))}
-          </div>
-          <div className="glossary-terms">
-            {Object.keys(filteredTerms).map((term, index) => (
-              <div key={index} className="glossary-term-card" onClick={() => handleTermClick(term)}>
-                <h3>{term}</h3>
-                <p>{filteredTerms[term]}</p>
-              </div>
-            ))}
-          </div>
-        </>
-      )}
+        ) : (
+          <>
+            <div className="glossary-header">
+              <input
+                type="text"
+                placeholder="Search terms..."
+                value={searchTerm}
+                onChange={handleSearch}
+              />
+            </div>
+            <div className="glossary-filter">
+              {'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(letter => (
+                <button
+                  key={letter}
+                  className={`filter-button ${selectedLetter === letter ? 'active' : ''}`}
+                  onClick={() => handleLetterClick(letter)}
+                >
+                  {letter}
+                </button>
+              ))}
+            </div>
+            <div className="glossary-terms">
+              {Object.keys(filteredTerms).map((term, index) => (
+                <div key={index} className="glossary-term-card" onClick={() => handleTermClick(term)}>
+                  <h3>{term}</h3>
+                  <p>{filteredTerms[term]}</p>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 };

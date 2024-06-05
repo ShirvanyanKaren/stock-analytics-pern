@@ -1,5 +1,4 @@
-// src/components/InfoPopup.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogTitle, DialogContent, Typography, Button, IconButton, Card, CardContent } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -14,13 +13,20 @@ const API_KEY = "your_openai_api_key"; // Replace with your OpenAI API key
 const InfoPopup = ({ open, handleClose, info }) => {
   const [isChatbot, setIsChatbot] = useState(false);
   const [showDefinition, setShowDefinition] = useState(false);
+  const [glossaryData, setGlossaryData] = useState({});
   const navigate = useNavigate();
   const { helpMode } = useHighlight();
-  const glossaryData = {}; // Replace this with actual glossary data fetching logic
+
+  useEffect(() => {
+    fetch('/src/data/glossary.json')
+      .then(response => response.json())
+      .then(data => setGlossaryData(data))
+      .catch(error => console.error("Failed to fetch glossary data:", error));
+  }, []);
 
   const handleNavigate = () => {
     handleClose();
-    navigate(`/glossary/${encodeURIComponent(standardizeTerm(info))}`); // Use standardized term
+    navigate(`/glossary/${encodeURIComponent(standardizeTerm(info))}`);
   };
 
   const handleChat = () => {
@@ -39,7 +45,8 @@ const InfoPopup = ({ open, handleClose, info }) => {
     setShowDefinition(false);
   };
 
-  const definition = glossaryData[standardizeTerm(info)] || 'Definition not found.';
+  const standardizedTerm = standardizeTerm(info);
+  const definition = glossaryData[standardizedTerm] || 'Definition not found.';
 
   return (
     <Dialog open={open} onClose={handleClose}>

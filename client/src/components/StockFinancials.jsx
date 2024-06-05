@@ -1,16 +1,17 @@
-// src/components/StockFinancials.jsx
 import { getCompanyFinancials } from "../utils/helpers";
 import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import ToolTip from "./ToolTip";
 import { useHighlight } from '/src/contexts/HighlightContext'; // Correctly import useHighlight
+import { standardizeTerm } from '../utils/termFormatter'; // Import termFormatter
+
 const StockFinancials = (props) => {
   const { helpMode, handleElementClick } = useOutletContext();
   const { addHighlight } = useHighlight();
   const [financials, setFinancials] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isQuarters, setIsQuarters] = useState(true);
-  const [statement, statementType] = useState("income");
+  const [statement, setStatementType] = useState("income");
   const [symbol, setSymbol] = useState(props.symbol);
 
   useEffect(() => {
@@ -58,13 +59,14 @@ const StockFinancials = (props) => {
     metrics.shift();
     metrics.shift();
     return metrics.map((metric, index) => {
+      const standardizedMetric = standardizeTerm(metric);
       return (
         <tr key={index}>
           <td
             className={`fw-bold ${helpMode ? 'highlight' : ''}`}
             onClick={() => {
-              handleElementClick(metric);
-              addHighlight(metric);
+              handleElementClick(standardizedMetric);
+              addHighlight(standardizedMetric);
             }}
           >
             <ToolTip info={titleCase(metric)}>{titleCase(metric)}</ToolTip>
@@ -78,7 +80,7 @@ const StockFinancials = (props) => {
   };
 
   const changeStatement = (statement) => {
-    statementType(statement);
+    setStatementType(statement);
   };
 
   return (
