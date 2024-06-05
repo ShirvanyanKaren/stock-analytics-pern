@@ -18,15 +18,16 @@ const InfoPopup = ({ open, handleClose, info }) => {
   const { helpMode } = useHighlight();
 
   useEffect(() => {
-    fetch('/src/data/glossary.json')
+    fetch('/glossary.json')
       .then(response => response.json())
       .then(data => setGlossaryData(data))
       .catch(error => console.error("Failed to fetch glossary data:", error));
   }, []);
 
   const handleNavigate = () => {
+    const standardizedTerm = standardizeTerm(info);
     handleClose();
-    navigate(`/glossary/${encodeURIComponent(standardizeTerm(info))}`);
+    navigate(`/glossary/${encodeURIComponent(standardizedTerm)}`);
   };
 
   const handleChat = () => {
@@ -46,7 +47,8 @@ const InfoPopup = ({ open, handleClose, info }) => {
   };
 
   const standardizedTerm = standardizeTerm(info);
-  const definition = glossaryData[standardizedTerm] || 'Definition not found.';
+  const matchedTerm = Object.keys(glossaryData).find(key => standardizeTerm(key) === standardizedTerm);
+  const definition = matchedTerm ? glossaryData[matchedTerm] : 'Definition not found.';
 
   return (
     <Dialog open={open} onClose={handleClose}>

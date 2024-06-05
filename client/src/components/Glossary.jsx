@@ -1,3 +1,4 @@
+// src/components/Glossary.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { standardizeTerm } from '../utils/termFormatter';
@@ -21,11 +22,7 @@ const Glossary = () => {
         return response.json();
       })
       .then(data => {
-        const standardizedData = {};
-        for (const key in data) {
-          standardizedData[standardizeTerm(key)] = data[key];
-        }
-        setTerms(standardizedData);
+        setTerms(data);
       })
       .catch(error => {
         console.error("Failed to fetch glossary data:", error);
@@ -35,10 +32,11 @@ const Glossary = () => {
   useEffect(() => {
     if (term) {
       const standardizedTerm = standardizeTerm(decodeURIComponent(term));
-      if (terms[standardizedTerm]) {
-        setSelectedTerm({ term: standardizedTerm, definition: terms[standardizedTerm] });
+      const matchedTerm = Object.keys(terms).find(key => standardizeTerm(key) === standardizedTerm);
+      if (matchedTerm) {
+        setSelectedTerm({ term: matchedTerm, definition: terms[matchedTerm] });
       } else {
-        setSelectedTerm({ term: standardizedTerm, definition: 'Definition not found.' });
+        setSelectedTerm({ term: term, definition: 'Definition not found.' });
       }
     } else {
       setSelectedTerm('');

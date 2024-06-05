@@ -1,17 +1,17 @@
+// src/components/StockFinancials.jsx
 import { getCompanyFinancials } from "../utils/helpers";
 import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 import ToolTip from "./ToolTip";
-import { useHighlight } from '/src/contexts/HighlightContext'; // Correctly import useHighlight
-import { standardizeTerm } from '../utils/termFormatter'; // Import termFormatter
+import { useHighlight } from "../contexts/HighlightContext"; // Correct import
 
 const StockFinancials = (props) => {
   const { helpMode, handleElementClick } = useOutletContext();
-  const { addHighlight } = useHighlight();
+  const { highlightedElements, addHighlight, removeHighlight } = useHighlight(); // Use useHighlight
   const [financials, setFinancials] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isQuarters, setIsQuarters] = useState(true);
-  const [statement, setStatementType] = useState("income");
+  const [statement, statementType] = useState("income");
   const [symbol, setSymbol] = useState(props.symbol);
 
   useEffect(() => {
@@ -44,11 +44,11 @@ const StockFinancials = (props) => {
       return "------";
     }
     if (Math.abs(num) > 1000000000) {
-      return (num / 1000000000).toFixed(2) + ' B';
+      return (num / 1000000000).toFixed(2) + " B";
     } else if (Math.abs(num) > 1000000) {
-      return (num / 1000000).toFixed(2) + ' M';
+      return (num / 1000000).toFixed(2) + " M";
     } else if (Math.abs(num) > 1000) {
-      return (num / 1000).toFixed(2) + ' K';
+      return (num / 1000).toFixed(2) + " K";
     } else {
       return num;
     }
@@ -59,15 +59,11 @@ const StockFinancials = (props) => {
     metrics.shift();
     metrics.shift();
     return metrics.map((metric, index) => {
-      const standardizedMetric = standardizeTerm(metric);
       return (
         <tr key={index}>
           <td
-            className={`fw-bold ${helpMode ? 'highlight' : ''}`}
-            onClick={() => {
-              handleElementClick(standardizedMetric);
-              addHighlight(standardizedMetric);
-            }}
+            className={`fw-bold ${highlightedElements.includes(metric) ? "highlight" : ""}`} // Highlight if in help mode
+            onClick={() => handleElementClick(metric)}
           >
             <ToolTip info={titleCase(metric)}>{titleCase(metric)}</ToolTip>
           </td>
@@ -80,7 +76,7 @@ const StockFinancials = (props) => {
   };
 
   const changeStatement = (statement) => {
-    setStatementType(statement);
+    statementType(statement);
   };
 
   return (
@@ -111,7 +107,7 @@ const StockFinancials = (props) => {
             <div className="row">
               <div className="d-flex flex-direction-row justify-content-center mb-2">
                 <h6
-                  className={isQuarters ? "ms-3 fs-5 info" : "ms-3 fs-5 info active-stat "}
+                  className={isQuarters ? "ms-3 fs-5 info" : "ms-3 fs-5 info active-stat"}
                   onClick={() => setIsQuarters(false)}
                 >
                   Annual
