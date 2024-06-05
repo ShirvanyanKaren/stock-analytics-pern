@@ -1,4 +1,3 @@
-// src/main.jsx
 import "bootstrap/dist/css/bootstrap.min.css";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
@@ -9,6 +8,8 @@ import Home from "./pages/Home";
 import StockLinReg from "./pages/StockLinReg";
 import FamaFrench from "./pages/FamaFrench";
 import Glossary from "./components/Glossary";
+import Blog from "./pages/Blog";
+import InvestmentTutorials from "./pages/InvestmentTutorials";
 import App from "./App";
 
 const router = createBrowserRouter([
@@ -52,6 +53,14 @@ const router = createBrowserRouter([
       {
         path: "/glossary/:term",
         element: <Glossary />,
+      },
+      {
+        path: "/blog",
+        element: <Blog />,
+      },
+      {
+        path: "/investment-tutorials",
+        element: <InvestmentTutorials />,
       },
     ],
   },

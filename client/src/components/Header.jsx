@@ -1,4 +1,3 @@
-// src/components/Header.jsx
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
@@ -51,6 +50,8 @@ const Header = () => {
                 </NavDropdown.Item>
               </NavDropdown>
               <Nav.Link as={Link} to="/glossary">Glossary</Nav.Link>
+              <Nav.Link as={Link} to="/blog">Blog</Nav.Link>
+              <Nav.Link as={Link} to="/investment-tutorials">Investment Tutorials</Nav.Link>
             </Nav>
           </div>
         </Container>
