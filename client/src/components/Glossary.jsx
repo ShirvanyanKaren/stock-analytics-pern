@@ -1,8 +1,8 @@
-// src/components/Glossary.jsx
 import React, { useState, useEffect } from 'react';
+import { Container, Row, Col, Form, Button, Card } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
 import { standardizeTerm } from '../utils/termFormatter';
-import './Glossary.scss';
+import './Glossary.css';
 
 const Glossary = () => {
   const { term } = useParams();
@@ -15,18 +15,9 @@ const Glossary = () => {
 
   useEffect(() => {
     fetch('/glossary.json')
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then(data => {
-        setTerms(data);
-      })
-      .catch(error => {
-        console.error("Failed to fetch glossary data:", error);
-      });
+      .then(response => response.json())
+      .then(data => setTerms(data))
+      .catch(error => console.error("Failed to fetch glossary data:", error));
   }, []);
 
   useEffect(() => {
@@ -75,52 +66,83 @@ const Glossary = () => {
     setSelectedLetter(letter);
   };
 
+  const handleAllClick = () => {
+    setSelectedLetter('');
+    setSearchTerm('');
+  };
+
   const handleTermClick = (term) => {
     navigate(`/glossary/${encodeURIComponent(term)}`);
   };
 
   return (
-    <div className="glossary-wrapper">
-      <div className="glossary-container">
-        {selectedTerm ? (
-          <div className="glossary-term-container">
-            <h2>{selectedTerm.term}</h2>
-            <p>{selectedTerm.definition}</p>
-            <button onClick={() => navigate('/glossary')}>Back to Glossary</button>
-          </div>
-        ) : (
-          <>
-            <div className="glossary-header">
-              <input
-                type="text"
-                placeholder="Search terms..."
-                value={searchTerm}
-                onChange={handleSearch}
-              />
-            </div>
-            <div className="glossary-filter">
-              {'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(letter => (
-                <button
-                  key={letter}
-                  className={`filter-button ${selectedLetter === letter ? 'active' : ''}`}
-                  onClick={() => handleLetterClick(letter)}
-                >
-                  {letter}
-                </button>
-              ))}
-            </div>
-            <div className="glossary-terms">
-              {Object.keys(filteredTerms).map((term, index) => (
-                <div key={index} className="glossary-term-card" onClick={() => handleTermClick(term)}>
-                  <h3>{term}</h3>
-                  <p>{filteredTerms[term]}</p>
+    <Container>
+      <Row className="mt-3">
+        <Col>
+          <Card className="glossary-card">
+            <Card.Body>
+              <div className="glossary-header-container">
+                <h1>Glossary</h1>
+              </div>
+              <div className="glossary-search-container">
+                <Form className="d-flex">
+                  <Form.Control
+                    type="search"
+                    placeholder="Search terms"
+                    className="me-2"
+                    aria-label="Search"
+                    value={searchTerm}
+                    onChange={handleSearch}
+                  />
+                </Form>
+              </div>
+              <div className="glossary-filter-container">
+                <div className="glossary-filter">
+                  <Button
+                    className={`filter-button ${selectedLetter === '' ? 'active' : ''}`}
+                    onClick={handleAllClick}
+                  >
+                    All
+                  </Button>
+                  {'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(letter => (
+                    <Button
+                      key={letter}
+                      className={`filter-button ${selectedLetter === letter ? 'active' : ''}`}
+                      onClick={() => handleLetterClick(letter)}
+                      style={{ color: 'black' }} // Change font color to black
+                    >
+                      {letter}
+                    </Button>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </>
-        )}
-      </div>
-    </div>
+              </div>
+              {selectedTerm ? (
+                <Card className="mb-3">
+                  <Card.Body>
+                    <Card.Title>{selectedTerm.term}</Card.Title>
+                    <Card.Text>{selectedTerm.definition}</Card.Text>
+                    <Button onClick={() => navigate('/glossary')}>Back to Glossary</Button>
+                  </Card.Body>
+                </Card>
+              ) : (
+                <Row>
+                  {Object.keys(filteredTerms).map((term, index) => (
+                    <Col key={index} md={4} className="mb-3">
+                      <Card className="glossary-term-card" onClick={() => handleTermClick(term)}>
+                        <Card.Body>
+                          <Card.Title>{term}</Card.Title>
+                          <Card.Text>{filteredTerms[term]}</Card.Text>
+                        </Card.Body>
+                      </Card>
+                    </Col>
+                  ))}
+                </Row>
+              )}
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+    </Container>
   );
 };
 

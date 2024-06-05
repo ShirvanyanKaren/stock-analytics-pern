@@ -1,0 +1,74 @@
+.glossary-card {
+  padding: 20px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.glossary-header-container {
+  margin-bottom: 20px;
+}
+
+.glossary-search-container {
+  margin-bottom: 20px;
+}
+
+.glossary-filter-container {
+  margin-bottom: 20px;
+}
+
+.glossary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.glossary-header input {
+  padding: 10px;
+  width: 100%;
+  font-size: 16px;
+}
+
+.glossary-filter {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.filter-button {
+  padding: 10px;
+  margin: 0 5px;
+  cursor: pointer;
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  color: black; /* Ensuring the font color is black */
+}
+
+.filter-button.active {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.glossary-terms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.glossary-term-card {
+  background-color: #fff;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.glossary-term-card h3 {
+  margin-top: 0;
+}
+
+.glossary-term-card p {
+  margin-top: 10px;
+}

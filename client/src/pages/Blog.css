@@ -1,30 +1,17 @@
-.blog-page {
-    display: flex;
-  }
-  
-  .blog-content {
-    margin-left: 300px; /* Adjust this based on the width of your hamburger menu */
-    padding: 20px;
-  }
-  
-  .menu-search {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-  }
-  
-  .menu-categories {
-    width: 100%;
-    padding: 10px;
-  }
-  
-  .expandable-card {
-    transition: max-height 0.3s ease-in-out;
-    overflow: hidden;
-    max-height: 200px; /* Set a default max-height */
-  }
-  
-  .expandable-card.expanded {
-    max-height: 1000px; /* Set an expanded max-height to accommodate content */
-  }
-  
+.blog-card {
+  padding: 20px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.expandable-card {
+  transition: max-height 0.3s ease-in-out;
+  overflow: hidden;
+  max-height: 200px; /* Set a default max-height */
+}
+
+.expandable-card.expanded {
+  max-height: 1000px; /* Set an expanded max-height to accommodate content */
+}

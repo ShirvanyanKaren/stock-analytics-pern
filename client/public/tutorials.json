@@ -12,6 +12,76 @@
       "category": "Options",
       "summary": "Learn about options trading.",
       "content": "Options are financial derivatives that give buyers the right, but not the obligation, to buy or sell an underlying asset at an agreed-upon price and date..."
+    },
+    {
+      "id": 3,
+      "title": "The Role of Dividends in Stock Investments",
+      "category": "Stocks",
+      "summary": "Explore the importance of dividends in stock investments.",
+      "content": "Dividends are portions of a company's earnings distributed to shareholders. This tutorial explains the role dividends play in investment strategies and how they can impact investor returns."
+    },
+    {
+      "id": 4,
+      "title": "Risk Management in Stock Trading",
+      "category": "Stocks",
+      "summary": "Understanding risk management in trading.",
+      "content": "Risk management is crucial in stock trading to protect investments. This tutorial covers techniques to manage risk, including diversification, stop-loss orders, and risk/reward ratios."
+    },
+    {
+      "id": 5,
+      "title": "ETFs: An Alternative to Stock Trading",
+      "category": "Stocks",
+      "summary": "Introduction to Exchange Traded Funds (ETFs).",
+      "content": "ETFs offer a way to invest in a broad portfolio of stocks or other assets through a single security. This tutorial explains the benefits and considerations of investing in ETFs compared to individual stocks."
+    },
+    {
+      "id": 6,
+      "title": "Technical Analysis for Stock Trading",
+      "category": "Stocks",
+      "summary": "Learn the basics of technical analysis.",
+      "content": "Technical analysis involves studying past market data to forecast future price movements. This tutorial introduces basic concepts and tools of technical analysis used by traders."
+    },
+    {
+      "id": 7,
+      "title": "Fundamental Analysis of Stocks",
+      "category": "Stocks",
+      "summary": "Understanding the fundamentals of stock analysis.",
+      "content": "Fundamental analysis assesses the intrinsic value of a stock based on financial and economic factors. This tutorial explains how to perform fundamental analysis to make informed investment decisions."
+    },
+    {
+      "id": 8,
+      "title": "Options Trading Strategies",
+      "category": "Options",
+      "summary": "Advanced strategies for options trading.",
+      "content": "This tutorial explores various options trading strategies like the covered call, put buying, straddles, and strangles, detailing how and when to use them."
+    },
+    {
+      "id": 9,
+      "title": "Understanding Options Greeks",
+      "category": "Options",
+      "summary": "Decoding the Greeks in options trading.",
+      "content": "Options Greeks measure the sensitivity of an option's price to various factors. This tutorial covers Delta, Gamma, Theta, Vega, and Rho, and their importance in options trading."
+    },
+    {
+      "id": 10,
+      "title": "Volatility and Options Pricing",
+      "category": "Options",
+      "summary": "How volatility affects options pricing.",
+      "content": "Market volatility can significantly impact the pricing of options. This tutorial explains how volatility is measured and its effect on options."
+    },
+    {
+      "id": 11,
+      "title": "Binary Options: An Overview",
+      "category": "Options",
+      "summary": "Introduction to binary options trading.",
+      "content": "Binary options are a type of options contract that offers a fixed return based on a yes/no proposition. This tutorial discusses the risks and rewards of binary options trading."
+    },
+    {
+      "id": 12,
+      "title": "Leveraging Options for Portfolio Protection",
+      "category": "Options",
+      "summary": "Using options to protect your investment portfolio.",
+      "content": "Options can be used as tools for hedging and protecting your investment portfolio. This tutorial explains how options can be strategically used to hedge against market downturns."
     }
   ]
   

@@ -50,6 +50,8 @@ const InfoPopup = ({ open, handleClose, info }) => {
   const matchedTerm = Object.keys(glossaryData).find(key => standardizeTerm(key) === standardizedTerm);
   const definition = matchedTerm ? glossaryData[matchedTerm] : 'Definition not found.';
 
+  const isFinancialTerm = info.match(/[A-Z][a-z]*[A-Z][a-z]*/); // Example pattern to identify financial terms
+
   return (
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle>
@@ -76,7 +78,7 @@ const InfoPopup = ({ open, handleClose, info }) => {
         ) : showDefinition ? (
           <Card>
             <CardContent>
-              <Typography variant="h6">{info}</Typography>
+              <Typography variant="h6">{isFinancialTerm ? standardizeTerm(info) : info}</Typography>
               <Typography variant="body1">{definition}</Typography>
               <Button variant="contained" color="primary" onClick={handleNavigate} style={{ marginTop: '10px' }}>
                 Learn More
@@ -85,7 +87,7 @@ const InfoPopup = ({ open, handleClose, info }) => {
           </Card>
         ) : (
           <>
-            <Typography variant="body1" className={helpMode ? 'highlight' : ''}>{info}</Typography>
+            <Typography variant="body1" className={helpMode ? 'highlight' : ''}>{isFinancialTerm ? standardizeTerm(info) : info}</Typography>
             <Button variant="contained" color="primary" onClick={handleReadMore} style={{ marginTop: '10px' }}>
               Read More
             </Button>
