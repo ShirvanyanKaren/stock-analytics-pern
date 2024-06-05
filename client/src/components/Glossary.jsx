@@ -1,6 +1,7 @@
+// src/components/Glossary.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { standardizeTerm } from '../utils/termFormatter';
+import { standardizeTerm } from '../utils/termFormatter'; // Import the standardizeTerm function
 import './Glossary.scss';
 
 const Glossary = () => {
@@ -21,7 +22,6 @@ const Glossary = () => {
         return response.json();
       })
       .then(data => {
-        // Standardize terms in the glossary data
         const standardizedData = {};
         for (const key in data) {
           standardizedData[standardizeTerm(key)] = data[key];

@@ -50,7 +50,7 @@ const router = createBrowserRouter([
         element: <Glossary />,
       },
       {
-        path: "/glossary/:term", // Add GlossaryTerm route
+        path: "/glossary/:term",
         element: <Glossary />,
       },
     ],

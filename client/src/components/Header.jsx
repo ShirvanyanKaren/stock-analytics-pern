@@ -10,9 +10,6 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import Auth from "../utils/auth";
 import SearchBar from "./SearchBar";
-import decode from "jwt-decode";
-import { useEffect } from "react";
-import { useQuery } from "@apollo/client";
 
 const Header = () => {
   const handleLogout = async () => {
@@ -52,10 +49,8 @@ const Header = () => {
                 <NavDropdown.Item href="/famafrench">
                   Expected Return
                 </NavDropdown.Item>
-                <NavDropdown.Item to="/glossary">
-                  Glossary
-                </NavDropdown.Item>
               </NavDropdown>
+              <Nav.Link as={Link} to="/glossary">Glossary</Nav.Link>
             </Nav>
           </div>
         </Container>

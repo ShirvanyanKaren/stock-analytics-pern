@@ -6,20 +6,21 @@ import {
   createHttpLink,
 } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { Provider } from "react-redux";
 import { StoreProvider } from "./utils/GlobalState";
 import Header from "./components/Header";
 import HelpButton from "./components/HelpButton";
 import InfoPopup from "./components/InfoPopup";
-import { HighlightProvider } from "./contexts/HighlightContext"; // Ensure correct import
+import IntroPopup from "./components/IntroPopup";
+import { HighlightProvider } from "./contexts/HighlightContext";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-bootstrap";
 import "animate.css";
 import "./App.scss";
 import store from "./utils/store";
 import AppPar from "./tsParticles/Particles";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const httpLink = createHttpLink({
   uri: "/graphql",
@@ -43,6 +44,8 @@ const client = new ApolloClient({
 function App() {
   const [helpMode, setHelpMode] = useState(false);
   const [popupInfo, setPopupInfo] = useState("");
+  const location = useLocation();
+  const [showIntroPopup, setShowIntroPopup] = useState(false);
 
   const toggleHelpMode = () => {
     setHelpMode(!helpMode);
@@ -53,6 +56,14 @@ function App() {
       setPopupInfo(info);
     }
   };
+
+  useEffect(() => {
+    if (location.pathname === "/") {
+      setShowIntroPopup(true);
+    } else {
+      setShowIntroPopup(false);
+    }
+  }, [location.pathname]);
 
   return (
     <ApolloProvider client={client}>
@@ -65,6 +76,7 @@ function App() {
               <Outlet context={{ helpMode, handleElementClick }} />
               <HelpButton toggleHelpMode={toggleHelpMode} />
               <InfoPopup open={Boolean(popupInfo)} handleClose={() => setPopupInfo("")} info={popupInfo} />
+              {showIntroPopup && <IntroPopup />}
             </div>
           </HighlightProvider>
         </Provider>

@@ -1,22 +1,23 @@
+// src/components/InfoPopup.jsx
 import React, { useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, Typography, Button, IconButton } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
 import { MainContainer, ChatContainer, MessageList, Message, MessageInput, TypingIndicator } from '@chatscope/chat-ui-kit-react';
-import { standardizeTerm } from '../utils/termFormatter';
+import { standardizeTerm } from '../utils/termFormatter'; // Import the standardizeTerm function
 import { useHighlight } from '../contexts/HighlightContext';
 
 const API_KEY = "your_openai_api_key"; // Replace with your OpenAI API key
 
-const InfoPopup = ({ open, handleClose, info }) => {
+const InfoPopup = ({ open, handleClose, info, definition }) => {
   const [isChatbot, setIsChatbot] = useState(false);
   const navigate = useNavigate();
   const { helpMode } = useHighlight();
 
   const handleNavigate = () => {
     handleClose();
-    navigate(`/glossary/${encodeURIComponent(standardizeTerm(info))}`);
+    navigate(`/glossary/${encodeURIComponent(standardizeTerm(info))}`); // Use standardized term
   };
 
   const handleChat = () => {
@@ -40,7 +41,7 @@ const InfoPopup = ({ open, handleClose, info }) => {
       <DialogContent>
         {!isChatbot ? (
           <>
-            <Typography variant="body1" className={helpMode ? 'highlight' : ''}>{info}</Typography>
+            <Typography variant="body1" className={helpMode ? 'highlight' : ''}>{info}</Typography> {/* Apply highlight class if helpMode is true */}
             <Button variant="contained" color="primary" onClick={handleNavigate} style={{ marginTop: '10px' }}>
               Read More
             </Button>
@@ -49,15 +50,15 @@ const InfoPopup = ({ open, handleClose, info }) => {
             </Button>
           </>
         ) : (
-          <Chatbot initialMessage={info} />
+          <Chatbot initialMessage={info} definition={definition} />
         )}
       </DialogContent>
     </Dialog>
   );
 };
 
-const Chatbot = ({ initialMessage }) => {
-  const [messages, setMessages] = useState([{ message: `Term: ${initialMessage}`, sender: "system", direction: "incoming" }]);
+const Chatbot = ({ initialMessage, definition }) => {
+  const [messages, setMessages] = useState([{ message: `${initialMessage}: ${definition}`, sender: "system", direction: "incoming" }]);
   const [typing, setTyping] = useState(false);
   const [input, setInput] = useState('');
 
@@ -83,7 +84,7 @@ const Chatbot = ({ initialMessage }) => {
 
     const apiRequestBody = {
       model: "gpt-4",
-      messages: [systemMessage, ...apiMessages, { role: "user", content: `Definition: ${initialMessage}` }]
+      messages: [systemMessage, ...apiMessages, { role: "user", content: userMessage }]
     };
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
