@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Form, Button, Dropdown, Card } from 'react-bootstrap';
+import './InvestmentTutorials.css'; // Import the CSS file for animations
 
 const InvestmentTutorials = () => {
   const [tutorials, setTutorials] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [expandedTutorial, setExpandedTutorial] = useState(null);
 
   useEffect(() => {
     fetch('/tutorials.json')
@@ -57,16 +59,18 @@ const InvestmentTutorials = () => {
       <Row className="mt-3">
         {filteredTutorials.map(tutorial => (
           <Col key={tutorial.id} md={4} className="mb-3">
-            <Card>
+            <Card className={`expandable-card ${expandedTutorial === tutorial.id ? 'expanded' : ''}`}>
               <Card.Body>
                 <Card.Title>{tutorial.title}</Card.Title>
                 <Card.Subtitle className="mb-2 text-muted">{tutorial.category}</Card.Subtitle>
-                <Card.Text>{tutorial.summary}</Card.Text>
+                <Card.Text>
+                  {expandedTutorial === tutorial.id ? tutorial.content : tutorial.summary}
+                </Card.Text>
                 <Button
                   variant="primary"
-                  onClick={() => alert(tutorial.content)}
+                  onClick={() => setExpandedTutorial(expandedTutorial === tutorial.id ? null : tutorial.id)}
                 >
-                  Read More
+                  {expandedTutorial === tutorial.id ? 'Show Less' : 'Read More'}
                 </Button>
               </Card.Body>
             </Card>

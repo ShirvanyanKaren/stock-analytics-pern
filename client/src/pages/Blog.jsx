@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Form, Button, Dropdown, Card } from 'react-bootstrap';
+import './Blog.css'; // Import the CSS file for animations
 
 const Blog = () => {
   const [articles, setArticles] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [expandedArticle, setExpandedArticle] = useState(null);
 
   useEffect(() => {
     fetch('/articles.json')
@@ -57,16 +59,18 @@ const Blog = () => {
       <Row className="mt-3">
         {filteredArticles.map(article => (
           <Col key={article.id} md={4} className="mb-3">
-            <Card>
+            <Card className={`expandable-card ${expandedArticle === article.id ? 'expanded' : ''}`}>
               <Card.Body>
                 <Card.Title>{article.title}</Card.Title>
                 <Card.Subtitle className="mb-2 text-muted">{article.category}</Card.Subtitle>
-                <Card.Text>{article.summary}</Card.Text>
+                <Card.Text>
+                  {expandedArticle === article.id ? article.content : article.summary}
+                </Card.Text>
                 <Button
                   variant="primary"
-                  onClick={() => alert(article.content)}
+                  onClick={() => setExpandedArticle(expandedArticle === article.id ? null : article.id)}
                 >
-                  Read More
+                  {expandedArticle === article.id ? 'Show Less' : 'Read More'}
                 </Button>
               </Card.Body>
             </Card>

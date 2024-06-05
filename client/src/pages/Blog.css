@@ -18,3 +18,13 @@
     padding: 10px;
   }
   
+  .expandable-card {
+    transition: max-height 0.3s ease-in-out;
+    overflow: hidden;
+    max-height: 200px; /* Set a default max-height */
+  }
+  
+  .expandable-card.expanded {
+    max-height: 1000px; /* Set an expanded max-height to accommodate content */
+  }
+  
