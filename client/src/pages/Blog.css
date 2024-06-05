@@ -1,0 +1,20 @@
+.blog-page {
+    display: flex;
+  }
+  
+  .blog-content {
+    margin-left: 300px; /* Adjust this based on the width of your hamburger menu */
+    padding: 20px;
+  }
+  
+  .menu-search {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .menu-categories {
+    width: 100%;
+    padding: 10px;
+  }
+  

@@ -1,0 +1,17 @@
+[
+    {
+      "id": 1,
+      "title": "Understanding Economics",
+      "category": "Economics",
+      "summary": "A brief introduction to economics.",
+      "content": "Economics is the social science that studies the production, distribution, and consumption of goods and services..."
+    },
+    {
+      "id": 2,
+      "title": "Basics of Finance",
+      "category": "Finance",
+      "summary": "Learn the basics of finance.",
+      "content": "Finance is the study of money and how it is used. This includes the dynamics of assets and liabilities over time under conditions of different degrees of uncertainty and risk..."
+    }
+  ]
+  

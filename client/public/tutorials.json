@@ -1,0 +1,17 @@
+[
+    {
+      "id": 1,
+      "title": "Investing in Stocks",
+      "category": "Stocks",
+      "summary": "An introduction to investing in stocks.",
+      "content": "Investing in stocks involves buying shares of a company with the expectation that the value of those shares will increase over time..."
+    },
+    {
+      "id": 2,
+      "title": "Understanding Options",
+      "category": "Options",
+      "summary": "Learn about options trading.",
+      "content": "Options are financial derivatives that give buyers the right, but not the obligation, to buy or sell an underlying asset at an agreed-upon price and date..."
+    }
+  ]
+  
