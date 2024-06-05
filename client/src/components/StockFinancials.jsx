@@ -1,12 +1,16 @@
+// src/components/StockFinancials.jsx
 import { getCompanyFinancials } from "../utils/helpers";
 import { useEffect, useState } from "react";
-import ToolTip from "./ToolTip"; // Import the ToolTip component
-
+import { useOutletContext } from "react-router-dom";
+import ToolTip from "./ToolTip";
+import { useHighlight } from '/src/contexts/HighlightContext'; // Correctly import useHighlight
 const StockFinancials = (props) => {
+  const { helpMode, handleElementClick } = useOutletContext();
+  const { addHighlight } = useHighlight();
   const [financials, setFinancials] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isQuarters, setIsQuarters] = useState(true);
-  const [statement, setStatement] = useState("income");
+  const [statement, statementType] = useState("income");
   const [symbol, setSymbol] = useState(props.symbol);
 
   useEffect(() => {
@@ -24,8 +28,7 @@ const StockFinancials = (props) => {
   }, [isQuarters, statement, symbol]);
 
   const formatDate = (date) => {
-    let newDate = new Date(date).toISOString().slice(0, 10);
-    return newDate;
+    return new Date(date).toISOString().slice(0, 10);
   };
 
   const titleCase = (str) => {
@@ -37,14 +40,14 @@ const StockFinancials = (props) => {
 
   const formatNumber = (num) => {
     if (num === null || num === undefined) {
-      return "------"; // or any default value for null or undefined
+      return "------";
     }
     if (Math.abs(num) > 1000000000) {
-      return (num / 1000000000).toFixed(2) + " B";
+      return (num / 1000000000).toFixed(2) + ' B';
     } else if (Math.abs(num) > 1000000) {
-      return (num / 1000000).toFixed(2) + " M";
+      return (num / 1000000).toFixed(2) + ' M';
     } else if (Math.abs(num) > 1000) {
-      return (num / 1000).toFixed(2) + " K";
+      return (num / 1000).toFixed(2) + ' K';
     } else {
       return num;
     }
@@ -54,20 +57,28 @@ const StockFinancials = (props) => {
     let metrics = Object.keys(financials[0]);
     metrics.shift();
     metrics.shift();
-    return metrics.map((metric, index) => (
-      <tr key={index}>
-        <td className="fw-bold">
-          <ToolTip info={titleCase(metric)} /> {/* Display the metric name only */}
-        </td>
-        {financials.map((fin, index) => (
-          <td key={index}>{formatNumber(fin[metric])}</td>
-        ))}
-      </tr>
-    ));
+    return metrics.map((metric, index) => {
+      return (
+        <tr key={index}>
+          <td
+            className={`fw-bold ${helpMode ? 'highlight' : ''}`}
+            onClick={() => {
+              handleElementClick(metric);
+              addHighlight(metric);
+            }}
+          >
+            <ToolTip info={titleCase(metric)}>{titleCase(metric)}</ToolTip>
+          </td>
+          {financials.map((fin, index) => (
+            <td key={index}>{formatNumber(fin[metric])}</td>
+          ))}
+        </tr>
+      );
+    });
   };
 
   const changeStatement = (statement) => {
-    setStatement(statement);
+    statementType(statement);
   };
 
   return (
@@ -113,7 +124,7 @@ const StockFinancials = (props) => {
             </div>
             <div className="row">
               <div className="col-12">
-                <table className="table table-hover">
+                <table className="table table-striped">
                   <thead>
                     <tr className="mt-2">
                       <th className="fs-6">Metrics</th>
@@ -123,8 +134,8 @@ const StockFinancials = (props) => {
                         </th>
                       ))}
                     </tr>
-                    {formatTable(financials)}
                   </thead>
+                  <tbody>{formatTable(financials)}</tbody>
                 </table>
               </div>
             </div>

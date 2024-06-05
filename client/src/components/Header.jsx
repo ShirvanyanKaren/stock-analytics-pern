@@ -52,8 +52,8 @@ const Header = () => {
                 <NavDropdown.Item href="/famafrench">
                   Expected Return
                 </NavDropdown.Item>
-                <NavDropdown.Item href="/chatbot">
-                  Chatbot
+                <NavDropdown.Item to="/glossary">
+                  Glossary
                 </NavDropdown.Item>
               </NavDropdown>
             </Nav>

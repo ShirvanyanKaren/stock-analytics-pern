@@ -1,3 +1,4 @@
+// src/main.jsx
 import "bootstrap/dist/css/bootstrap.min.css";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
@@ -7,7 +8,7 @@ import Login from "./pages/Login";
 import Home from "./pages/Home";
 import StockLinReg from "./pages/StockLinReg";
 import FamaFrench from "./pages/FamaFrench";
-import ChatbotPage from "./pages/ChatbotPage"; // Import the ChatbotPage component
+import Glossary from "./components/Glossary";
 import App from "./App";
 
 const router = createBrowserRouter([
@@ -45,8 +46,12 @@ const router = createBrowserRouter([
         element: <FamaFrench />,
       },
       {
-        path: "/chatbot",
-        element: <ChatbotPage />, // Add the ChatbotPage route
+        path: "/glossary",
+        element: <Glossary />,
+      },
+      {
+        path: "/glossary/:term", // Add GlossaryTerm route
+        element: <Glossary />,
       },
     ],
   },
