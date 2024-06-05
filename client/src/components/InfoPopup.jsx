@@ -1,19 +1,22 @@
 // src/components/InfoPopup.jsx
 import React, { useState } from 'react';
-import { Dialog, DialogTitle, DialogContent, Typography, Button, IconButton } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, Typography, Button, IconButton, Card, CardContent } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import CloseIcon from '@mui/icons-material/Close';
 import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
 import { MainContainer, ChatContainer, MessageList, Message, MessageInput, TypingIndicator } from '@chatscope/chat-ui-kit-react';
-import { standardizeTerm } from '../utils/termFormatter'; // Import the standardizeTerm function
+import { standardizeTerm } from '../utils/termFormatter';
 import { useHighlight } from '../contexts/HighlightContext';
 
 const API_KEY = "your_openai_api_key"; // Replace with your OpenAI API key
 
-const InfoPopup = ({ open, handleClose, info, definition }) => {
+const InfoPopup = ({ open, handleClose, info }) => {
   const [isChatbot, setIsChatbot] = useState(false);
+  const [showDefinition, setShowDefinition] = useState(false);
   const navigate = useNavigate();
   const { helpMode } = useHighlight();
+  const glossaryData = {}; // Replace this with actual glossary data fetching logic
 
   const handleNavigate = () => {
     handleClose();
@@ -28,37 +31,67 @@ const InfoPopup = ({ open, handleClose, info, definition }) => {
     setIsChatbot(false);
   };
 
+  const handleReadMore = () => {
+    setShowDefinition(true);
+  };
+
+  const handleGoBack = () => {
+    setShowDefinition(false);
+  };
+
+  const definition = glossaryData[standardizeTerm(info)] || 'Definition not found.';
+
   return (
     <Dialog open={open} onClose={handleClose}>
       <DialogTitle>
-        {isChatbot && (
+        {isChatbot ? (
           <IconButton onClick={handleBack}>
             <ArrowBackIcon />
           </IconButton>
+        ) : showDefinition ? (
+          <IconButton onClick={handleGoBack}>
+            <ArrowBackIcon />
+          </IconButton>
+        ) : (
+          <>
+            Information
+            <IconButton onClick={handleClose} style={{ float: 'right' }}>
+              <CloseIcon />
+            </IconButton>
+          </>
         )}
-        Information
       </DialogTitle>
       <DialogContent>
-        {!isChatbot ? (
+        {isChatbot ? (
+          <Chatbot initialMessage={info} />
+        ) : showDefinition ? (
+          <Card>
+            <CardContent>
+              <Typography variant="h6">{info}</Typography>
+              <Typography variant="body1">{definition}</Typography>
+              <Button variant="contained" color="primary" onClick={handleNavigate} style={{ marginTop: '10px' }}>
+                Learn More
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
           <>
-            <Typography variant="body1" className={helpMode ? 'highlight' : ''}>{info}</Typography> {/* Apply highlight class if helpMode is true */}
-            <Button variant="contained" color="primary" onClick={handleNavigate} style={{ marginTop: '10px' }}>
+            <Typography variant="body1" className={helpMode ? 'highlight' : ''}>{info}</Typography>
+            <Button variant="contained" color="primary" onClick={handleReadMore} style={{ marginTop: '10px' }}>
               Read More
             </Button>
             <Button variant="contained" color="secondary" onClick={handleChat} style={{ marginTop: '10px', marginLeft: '10px' }}>
               Ask Chatbot
             </Button>
           </>
-        ) : (
-          <Chatbot initialMessage={info} definition={definition} />
         )}
       </DialogContent>
     </Dialog>
   );
 };
 
-const Chatbot = ({ initialMessage, definition }) => {
-  const [messages, setMessages] = useState([{ message: `${initialMessage}: ${definition}`, sender: "system", direction: "incoming" }]);
+const Chatbot = ({ initialMessage }) => {
+  const [messages, setMessages] = useState([{ message: initialMessage, sender: "system", direction: "incoming" }]);
   const [typing, setTyping] = useState(false);
   const [input, setInput] = useState('');
 
