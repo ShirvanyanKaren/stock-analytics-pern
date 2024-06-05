@@ -1,7 +1,6 @@
-// src/components/Glossary.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { standardizeTerm } from '../utils/termFormatter'; // Import the standardizeTerm function
+import { standardizeTerm } from '../utils/termFormatter';
 import './Glossary.scss';
 
 const Glossary = () => {
@@ -14,7 +13,7 @@ const Glossary = () => {
   const [selectedTerm, setSelectedTerm] = useState('');
 
   useEffect(() => {
-    fetch('/src/data/glossary.json')
+    fetch('/glossary.json')
       .then(response => {
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
