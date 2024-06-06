@@ -48,10 +48,11 @@ const Header = () => {
                 <NavDropdown.Item href="/famafrench">
                   Expected Return
                 </NavDropdown.Item>
+                <NavDropdown.Divider />
+                <NavDropdown.Item href="/glossary">Glossary</NavDropdown.Item>
+                <NavDropdown.Item href="/blog">Blog</NavDropdown.Item>
+                <NavDropdown.Item href="/investment-tutorials">Investment Tutorials</NavDropdown.Item>
               </NavDropdown>
-              <Nav.Link as={Link} to="/glossary">Glossary</Nav.Link>
-              <Nav.Link as={Link} to="/blog">Blog</Nav.Link>
-              <Nav.Link as={Link} to="/investment-tutorials">Investment Tutorials</Nav.Link>
             </Nav>
           </div>
         </Container>
