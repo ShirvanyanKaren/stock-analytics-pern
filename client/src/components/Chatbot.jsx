@@ -1,12 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
 import { MainContainer, ChatContainer, MessageList, Message, MessageInput, TypingIndicator } from '@chatscope/chat-ui-kit-react';
+import axios from 'axios';
 
-const Chatbot = ({ initialMessage, definition, apiKey }) => {
+const pyBackEnd = "http://localhost:8000";  // Update this to your local backend URL
+
+const Chatbot = ({ initialMessage, definition }) => {
   const [messages, setMessages] = useState([
     { message: `Term: ${initialMessage}\nDefinition: ${definition}`, sender: "system", direction: "incoming" }
   ]);
   const [typing, setTyping] = useState(false);
+  const [apiKey, setApiKey] = useState("");
+
+  useEffect(() => {
+    const fetchApiKey = async () => {
+      try {
+        const response = await axios.get(`${pyBackEnd}/apikey`);
+        setApiKey(response.data.api_key);
+      } catch (error) {
+        console.error("Error fetching API key:", error);
+      }
+    };
+
+    fetchApiKey();
+  }, []);
 
   const handleSend = async (message) => {
     const newMessage = { message, sender: "User", direction: "outgoing" };
@@ -18,6 +35,12 @@ const Chatbot = ({ initialMessage, definition, apiKey }) => {
   };
 
   const processMessageToChatGPT = async (chatMessages, userMessage) => {
+    if (!apiKey) {
+      console.error("API key is not available.");
+      setTyping(false);
+      return;
+    }
+
     const apiMessages = chatMessages.map((msg) => {
       return { role: msg.sender === "ChatGPT" ? "assistant" : "user", content: msg.message };
     });

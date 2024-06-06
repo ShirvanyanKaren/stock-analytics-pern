@@ -17,20 +17,34 @@ const InfoPopup = ({ open, handleClose, info }) => {
   const { helpMode } = useHighlight();
 
   useEffect(() => {
-    fetch('/glossary.json')
-      .then(response => response.json())
-      .then(data => setGlossaryData(data))
-      .catch(error => console.error("Failed to fetch glossary data:", error));
-
-    fetch('/apikey')
-      .then(response => {
+    const fetchGlossaryData = async () => {
+      try {
+        const response = await fetch('/glossary.json');
         if (!response.ok) {
-          throw new Error('Failed to fetch API key');
+          throw new Error('Failed to fetch glossary data');
         }
-        return response.json();
-      })
-      .then(data => setApiKey(data.api_key))
-      .catch(error => console.error("Failed to fetch API key:", error));
+        const data = await response.json();
+        setGlossaryData(data);
+      } catch (error) {
+        console.error("Error fetching glossary data:", error);
+      }
+    };
+
+    const fetchApiKey = async () => {
+      try {
+        const response = await fetch('/apikey');
+        if (!response.ok) {
+          throw new Error(`Failed to fetch API key: ${response.statusText}`);
+        }
+        const data = await response.json();
+        setApiKey(data.api_key);
+      } catch (error) {
+        console.error("Error fetching API key:", error);
+      }
+    };
+
+    fetchGlossaryData();
+    fetchApiKey();
   }, []);
 
   const handleNavigate = () => {
@@ -109,3 +123,4 @@ const InfoPopup = ({ open, handleClose, info }) => {
 };
 
 export default InfoPopup;
+ 

@@ -7,11 +7,16 @@ import numpy as np
 import getFamaFrenchFactors as gff
 import pandas as pd
 import simplejson as json
-from yahooquery import Ticker 
+from yahooquery import Ticker
 import statsmodels.api as sma
 import uvicorn
 from dotenv import load_dotenv
 import os
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
@@ -31,23 +36,29 @@ app.add_middleware(
 async def get_api_key():
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
+        logger.error("API key not found")
         raise HTTPException(status_code=500, detail="API key not found")
     return {"api_key": api_key}
 
-
 @app.get("/stockinfo")
 async def stock_info(symbol: str):
-    symbol = process_symbol(symbol)
-    stock_info = fetch_stock_info(symbol)
-    return stock_info
+    try:
+        symbol = process_symbol(symbol)
+        stock_info = fetch_stock_info(symbol)
+        return stock_info
+    except Exception as e:
+        logger.error(f"Error fetching stock info for {symbol}: {e}")
+        raise HTTPException(status_code=500, detail="Error fetching stock info")
 
 @app.get("/stockgraph")
 async def stock_graph(symbol: str, start: str, end: str):
-    symbol = process_symbol(symbol)
-    stock = fetch_stock_graph(symbol, start, end)
-    return stock
-
-
+    try:
+        symbol = process_symbol(symbol)
+        stock = fetch_stock_graph(symbol, start, end)
+        return stock
+    except Exception as e:
+        logger.error(f"Error fetching stock graph for {symbol} from {start} to {end}: {e}")
+        raise HTTPException(status_code=500, detail="Error fetching stock graph")
 
 def process_symbol(symbol: str):
     symbol = symbol.upper()
@@ -76,16 +87,20 @@ def fetch_stock_graph(symbol: str, start: str, end: str):
 
 @app.get("/stockweights")
 async def stock_weights(stocks):
-    print(stocks)
-    print(type(stocks))
-    stocks = json.loads(stocks)
-    values = [Ticker(key).summary_detail[key]['open'] * value for key, value in stocks.items()]
-    total = sum(values)
-    for key, value in zip(stocks.keys(), values):
-        stocks[key] = value / total
-    print(stocks)
-    stocks = {key: value for key, value in stocks.items()}
-    return stocks
+    try:
+        print(stocks)
+        print(type(stocks))
+        stocks = json.loads(stocks)
+        values = [Ticker(key).summary_detail[key]['open'] * value for key, value in stocks.items()]
+        total = sum(values)
+        for key, value in zip(stocks.keys(), values):
+            stocks[key] = value / total
+        print(stocks)
+        stocks = {key: value for key, value in stocks.items()}
+        return stocks
+    except Exception as e:
+        logger.error(f"Error calculating stock weights: {e}")
+        raise HTTPException(status_code=500, detail="Error calculating stock weights")
 
 def lin_reg_data(symbols, start, end, index, stockWeights):
     start_date = dt.datetime.strptime(start, '%Y-%m-%d')
@@ -130,68 +145,76 @@ def lin_reg_data(symbols, start, end, index, stockWeights):
 
 @app.get("/linreg")
 async def lin_reg(stocks: str, index: str, start: str, end: str, stockWeights: str):
-    symbols = [index, stocks]
-    stocks_df, stock_data = lin_reg_data(symbols, start, end, index, stockWeights)
-    formula = 'Dependent ~ Independent'
-    model = sma.OLS.from_formula(formula, data=stocks_df).fit()
-    coef = model.params[1]
-    intercept = model.params[0]
-    r_squared = model.rsquared
-    values = {'coef': coef, 'intercept': intercept, 'r_squared': r_squared}
-    sorted_stocks = stock_data.sort_values(by=index, ascending=True)
-    json_data = sorted_stocks.reset_index(drop=True).to_json(date_format='iso', orient='values')
-    return json_data, values
+    try:
+        symbols = [index, stocks]
+        stocks_df, stock_data = lin_reg_data(symbols, start, end, index, stockWeights)
+        formula = 'Dependent ~ Independent'
+        model = sma.OLS.from_formula(formula, data=stocks_df).fit()
+        coef = model.params[1]
+        intercept = model.params[0]
+        r_squared = model.rsquared
+        values = {'coef': coef, 'intercept': intercept, 'r_squared': r_squared}
+        sorted_stocks = stock_data.sort_values(by=index, ascending=True)
+        json_data = sorted_stocks.reset_index(drop=True).to_json(date_format='iso', orient='values')
+        return json_data, values
+    except Exception as e:
+        logger.error(f"Error in linear regression calculation: {e}")
+        raise HTTPException(status_code=500, detail="Error in linear regression calculation")
 
 @app.get("/famafrench")
 async def fama_french(stockWeights: str, start: str, end: str):
-    stock_weights = json.loads(stockWeights)
-    ff3_monthly = pd.DataFrame(gff.famaFrench3Factor(frequency='m'))
-    ff3_monthly.rename(columns={'date_ff_factors':'Date'}, inplace=True)
-    ff3_monthly.set_index('Date', inplace=True)
-    market_premium = ff3_monthly['Mkt-RF'].mean()
-    size_premium = ff3_monthly['SMB'].mean()
-    value_premium = ff3_monthly['HML'].mean()
-    stocks = list(stock_weights.keys())
-    start = dt.datetime.strptime(start, '%Y-%m-%d')
-    end = dt.datetime.strptime(end, '%Y-%m-%d')
-    uw_portfolio = yf.download(stocks, start=start, end=end)['Adj Close'].pct_change()[1:]
-    if len(stocks) == 1:
-        weighted_returns = uw_portfolio * stock_weights[stocks[0]]
-        portfolio = pd.DataFrame({'Portfolio': weighted_returns})
-    else:
-        weighted_returns = uw_portfolio * pd.Series(stock_weights)
-        portfolio = pd.DataFrame({'Portfolio': weighted_returns.sum(axis=1)})
-    portfolio_mtl = portfolio.resample('M').agg(lambda x: (x + 1).prod() - 1)
-    factors = pdr.DataReader('F-F_Research_Data_Factors', 'famafrench', start, end)[0][1:]
+    try:
+        stock_weights = json.loads(stockWeights)
+        ff3_monthly = pd.DataFrame(gff.famaFrench3Factor(frequency='m'))
+        ff3_monthly.rename(columns={'date_ff_factors':'Date'}, inplace=True)
+        ff3_monthly.set_index('Date', inplace=True)
+        market_premium = ff3_monthly['Mkt-RF'].mean()
+        size_premium = ff3_monthly['SMB'].mean()
+        value_premium = ff3_monthly['HML'].mean()
+        stocks = list(stock_weights.keys())
+        start = dt.datetime.strptime(start, '%Y-%m-%d')
+        end = dt.datetime.strptime(end, '%Y-%m-%d')
+        uw_portfolio = yf.download(stocks, start=start, end=end)['Adj Close'].pct_change()[1:]
+        if len(stocks) == 1:
+            weighted_returns = uw_portfolio * stock_weights[stocks[0]]
+            portfolio = pd.DataFrame({'Portfolio': weighted_returns})
+        else:
+            weighted_returns = uw_portfolio * pd.Series(stock_weights)
+            portfolio = pd.DataFrame({'Portfolio': weighted_returns.sum(axis=1)})
+        portfolio_mtl = portfolio.resample('M').agg(lambda x: (x + 1).prod() - 1)
+        factors = pdr.DataReader('F-F_Research_Data_Factors', 'famafrench', start, end)[0][1:]
 
-    if len(portfolio_mtl) != len(factors):
-        min_length = min(len(portfolio_mtl), len(factors))
-        portfolio_mtl = portfolio_mtl[:min_length]
-        factors = factors[:min_length]
-        
-    portfolio_mtl.index = factors.index
-    merged_port = pd.merge(portfolio_mtl, factors, on='Date')
-    port_data = merged_port.copy()
-    merged_port[['Mkt-RF','SMB','HML','RF']] =  merged_port[['Mkt-RF','SMB','HML','RF']]/100
-    merged_port['Excess Portfolio'] = merged_port['Portfolio'] - merged_port['RF']
-    y = merged_port['Excess Portfolio']
-    x = merged_port[['Mkt-RF','SMB','HML']]
-    x = sma.add_constant(x)
-    model = sma.OLS(y, x).fit()
-    intercept, beta_m, beta_s, beta_v = model.params
-    pvalues = model.pvalues
-    risk_free = merged_port['RF'].mean()
-    expected_return = risk_free + beta_m * market_premium + beta_s * size_premium + beta_v * value_premium
-    expected_return = expected_return * 12
-    sharpe = (expected_return - risk_free) / merged_port['Excess Portfolio'].std()
-    results = {'rsquared': model.rsquared,
-               'params': model.params,
-               'expected_return': expected_return,
-               'pvalues': pvalues,
-               'sharpe': sharpe,}
-    port_data['Portfolio'] = port_data['Portfolio'] * 100
-    json_data = port_data.to_json(orient='index')
-    return json_data, results
+        if len(portfolio_mtl) != len(factors):
+            min_length = min(len(portfolio_mtl), len(factors))
+            portfolio_mtl = portfolio_mtl[:min_length]
+            factors = factors[:min_length]
+            
+        portfolio_mtl.index = factors.index
+        merged_port = pd.merge(portfolio_mtl, factors, on='Date')
+        port_data = merged_port.copy()
+        merged_port[['Mkt-RF','SMB','HML','RF']] =  merged_port[['Mkt-RF','SMB','HML','RF']]/100
+        merged_port['Excess Portfolio'] = merged_port['Portfolio'] - merged_port['RF']
+        y = merged_port['Excess Portfolio']
+        x = merged_port[['Mkt-RF','SMB','HML']]
+        x = sma.add_constant(x)
+        model = sma.OLS(y, x).fit()
+        intercept, beta_m, beta_s, beta_v = model.params
+        pvalues = model.pvalues
+        risk_free = merged_port['RF'].mean()
+        expected_return = risk_free + beta_m * market_premium + beta_s * size_premium + beta_v * value_premium
+        expected_return = expected_return * 12
+        sharpe = (expected_return - risk_free) / merged_port['Excess Portfolio'].std()
+        results = {'rsquared': model.rsquared,
+                   'params': model.params,
+                   'expected_return': expected_return,
+                   'pvalues': pvalues,
+                   'sharpe': sharpe,}
+        port_data['Portfolio'] = port_data['Portfolio'] * 100
+        json_data = port_data.to_json(orient='index')
+        return json_data, results
+    except Exception as e:
+        logger.error(f"Error in Fama French calculation: {e}")
+        raise HTTPException(status_code=500, detail="Error in Fama French calculation")
 
 if __name__ == "__main__":
     load_dotenv()
