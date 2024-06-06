@@ -1,0 +1,7 @@
+to get the api key for the chatbot to work:
+
+make sure your api key is valid
+
+make sure the constpyBackEnd = localhost if your local host testing 
+and heroku.com pern app url if you are pushing for prod. 
+

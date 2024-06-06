@@ -2,9 +2,9 @@ import axios from "axios";
 // const pyBackEnd = typeof process == 'object' ? process.env.BACK : "http://0.0.0.0:8000";
 import { SET_STOCK_WEIGHTS } from "./actions";
 import Auth from "../utils/auth";
-const pyBackEnd = "https://pern-portfolio-backend-805cd64a428d.herokuapp.com";
+// const pyBackEnd = "https://pern-portfolio-backend-805cd64a428d.herokuapp.com";
 
-// const pyBackEnd = "http://0.0.0.0:8000"
+const pyBackEnd = "http://0.0.0.0:8000"
 
 export const indexOptions = {
   "SP500": "^GSPC",
