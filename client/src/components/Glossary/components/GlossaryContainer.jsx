@@ -1,10 +1,15 @@
+// src/components/Glossary/components/GlossaryContainer.jsx
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Form, Button, Card } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Form } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
-import { standardizeTerm } from '../utils/termFormatter';
-import './Glossary.css';
+import { standardizeTerm } from '../../../utils/termFormatter'; // Corrected path
+import GlossaryHeader from './GlossaryHeader';
+import GlossarySearch from './GlossarySearch';
+import GlossaryFilter from './GlossaryFilter';
+import GlossaryTermCard from './GlossaryTermCard';
+import '../Glossary.css';
 
-const Glossary = () => {
+const GlossaryContainer = () => {
   const { term } = useParams();
   const navigate = useNavigate();
   const [terms, setTerms] = useState({});
@@ -81,41 +86,9 @@ const Glossary = () => {
         <Col>
           <Card className="glossary-card">
             <Card.Body>
-              <div className="glossary-header-container">
-                <h1>Glossary</h1>
-              </div>
-              <div className="glossary-search-container">
-                <Form className="d-flex">
-                  <Form.Control
-                    type="search"
-                    placeholder="Search terms"
-                    className="me-2"
-                    aria-label="Search"
-                    value={searchTerm}
-                    onChange={handleSearch}
-                  />
-                </Form>
-              </div>
-              <div className="glossary-filter-container">
-                <div className="glossary-filter">
-                  <Button
-                    className={`filter-button ${selectedLetter === '' ? 'active' : ''}`}
-                    onClick={handleAllClick}
-                  >
-                    All
-                  </Button>
-                  {'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(letter => (
-                    <Button
-                      key={letter}
-                      className={`filter-button ${selectedLetter === letter ? 'active' : ''}`}
-                      onClick={() => handleLetterClick(letter)}
-                      style={{ color: 'black' }} // Change font color to black
-                    >
-                      {letter}
-                    </Button>
-                  ))}
-                </div>
-              </div>
+              <GlossaryHeader />
+              <GlossarySearch searchTerm={searchTerm} handleSearch={handleSearch} />
+              <GlossaryFilter selectedLetter={selectedLetter} handleLetterClick={handleLetterClick} handleAllClick={handleAllClick} />
               {selectedTerm ? (
                 <Card className="mb-3">
                   <Card.Body>
@@ -128,12 +101,7 @@ const Glossary = () => {
                 <Row>
                   {Object.keys(filteredTerms).map((term, index) => (
                     <Col key={index} md={4} className="mb-3">
-                      <Card className="glossary-term-card" onClick={() => handleTermClick(term)}>
-                        <Card.Body>
-                          <Card.Title>{term}</Card.Title>
-                          <Card.Text>{filteredTerms[term]}</Card.Text>
-                        </Card.Body>
-                      </Card>
+                      <GlossaryTermCard term={term} definition={filteredTerms[term]} handleTermClick={handleTermClick} />
                     </Col>
                   ))}
                 </Row>
@@ -146,4 +114,4 @@ const Glossary = () => {
   );
 };
 
-export default Glossary;
+export default GlossaryContainer;

@@ -7,7 +7,7 @@ import Login from "./pages/Login";
 import Home from "./pages/Home";
 import StockLinReg from "./pages/StockLinReg";
 import FamaFrench from "./pages/FamaFrench";
-import Glossary from "./components/Glossary";
+import Glossary from "./pages/GlossaryPage";
 import Blog from "./pages/Blog";
 import InvestmentTutorials from "./pages/InvestmentTutorials";
 import App from "./App";
