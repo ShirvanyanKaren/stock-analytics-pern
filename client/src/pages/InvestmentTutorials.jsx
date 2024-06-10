@@ -13,7 +13,7 @@ import CategoryDropdown from '../components/Tutorials/options/components/Categor
 import TutorialCard from '../components/Tutorials/options/components/TutorialCard';
 import PaginationControls from '../components/Tutorials/options/components/PaginationControls';
 import SectionButtons from '../components/Tutorials/options/components/SectionButtons';
-import "./InvestmentTutorials.css";
+import "../components/Tutorials/InvestmentTutorials.css";
 
 const InvestmentTutorials = () => {
   const [tutorials, setTutorials] = useState([]);

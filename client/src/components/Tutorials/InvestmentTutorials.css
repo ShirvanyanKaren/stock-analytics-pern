@@ -1,0 +1,169 @@
+.tutorials-card {
+  padding: 20px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(203, 20, 20, 0.1);
+  min-height: 3500px; /* Extend background height */
+}
+
+.expandable-card {
+  transition: max-height 0.3s ease-in-out;
+  overflow: hidden;
+  max-height: 200px; /* Set a default max-height */
+}
+
+.expandable-card.expanded {
+  max-height: 3500px; /* Set an expanded max-height to accommodate content */
+}
+
+.full-article {
+  display: none;
+  margin-top: 20px;
+}
+
+.full-article.visible {
+  display: block;
+  margin-top: 40px; /* Add space for pagination controls */
+}
+
+.article-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.article-card {
+  flex: 1 1 calc(33.333% - 20px);
+  display: flex;
+  flex-direction: column;
+  min-height: 250px; /* Set a minimum height to ensure space for the button */
+}
+
+.article-card .card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.article-card .card-text {
+  flex: 1;
+}
+
+.section-header {
+  display: block;
+  font-size: 1em;
+  font-weight: bold;
+  margin-top: 10px;
+  padding: 10px;
+  color: white;
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+.section-header + .section-header {
+  margin-top: 10px;
+}
+
+.section-content {
+  display: none;
+  padding: 10px;
+  border-left: 2px solid #ddd;
+  margin-left: 10px;
+  transition: max-height 0.3s ease-in-out;
+}
+
+.section-content.visible {
+  display: block;
+  max-height: 1000px;
+}
+
+.section-content.collapsed {
+  max-height: 0;
+  overflow: hidden;
+  display: none;
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.pagination-controls button {
+  margin: 0 5px;
+}
+
+.section-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+/* Add this to improve the layout and spacing */
+
+.graph-controller-container {
+  margin: 20px 0;
+}
+
+.graph-controller-container h4 {
+  margin-bottom: 20px;
+}
+
+.graph-controller-container label {
+  display: block;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.graph-controller-container input[type="range"] {
+  width: 100%;
+}
+
+.graph-controller-container .form-group {
+  margin-bottom: 20px;
+}
+
+.graph-controller-container .form-check-inline {
+  margin-right: 20px;
+}
+
+.graph-controller-container .form-text {
+  margin-top: 5px;
+}
+
+.graph-controller-container .recharts-wrapper {
+  margin-top: 30px;
+}
+
+.graph-controller-container .recharts-cartesian-axis-label {
+  fill: #8884d8;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.card-text p {
+  margin-bottom: 10px; /* Add space between paragraphs */
+}
+
+.card-text ul {
+  margin-bottom: 10px; /* Add space between lists and other content */
+}
+
+.card-text ul li {
+  margin-left: 20px; /* Add indentation for list items */
+}
+
+.card-text strong {
+  font-weight: bold; /* Bold text */
+}
+
+.card-text em {
+  font-style: italic; /* Italic text */
+}

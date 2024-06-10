@@ -1,10 +1,10 @@
-.tutorials-card, .blog-card {
+/* Add this to your existing CSS file */
+.blog-card {
   padding: 20px;
   background-color: #fff;
   border: 1px solid #ddd;
   border-radius: 5px;
   box-shadow: 0 0 10px rgba(203, 20, 20, 0.1);
-  min-height: 3500px; /* Extend background height */
 }
 
 .expandable-card {
@@ -44,6 +44,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  justify-content: space-between; /* Ensure content and button are spaced */
 }
 
 .article-card .card-text {
@@ -166,4 +167,29 @@
 
 .card-text em {
   font-style: italic; /* Italic text */
+}
+
+/* Add responsive styling */
+@media (max-width: 768px) {
+  .article-card {
+    flex: 1 1 calc(50% - 20px); /* Two cards per row on medium screens */
+  }
+  .article-card .card-text {
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* Show only 3 lines of text */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+@media (max-width: 576px) {
+  .article-card {
+    flex: 1 1 calc(100% - 20px); /* One card per row on small screens */
+  }
+  .article-card .card-text {
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Show only 2 lines of text */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
 }
