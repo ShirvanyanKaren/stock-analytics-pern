@@ -1,9 +1,14 @@
 import { getCompanyFinancials } from "../utils/helpers";
 import { useEffect, useState } from "react";
-import { idbPromise } from "../utils/helpers";
+import { useOutletContext } from "react-router-dom";
+import ToolTip from "./ToolTip";
+import { useHighlight } from '/src/contexts/HighlightContext'; // Correctly import useHighlight
+import { standardizeTerm } from '../utils/termFormatter'; // Import termFormatter
 
 const StockFinancials = (props) => {
-  const [financials, setFinancials] = useState({});
+  const { helpMode, handleElementClick } = useOutletContext();
+  const { addHighlight } = useHighlight();
+  const [financials, setFinancials] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isQuarters, setIsQuarters] = useState(true);
   const [statement, setStatement] = useState("income");
@@ -34,8 +39,7 @@ const StockFinancials = (props) => {
   
 
   const formatDate = (date) => {
-    let newDate = new Date(date).toISOString().slice(0, 10);
-    return newDate;
+    return new Date(date).toISOString().slice(0, 10);
   };
 
   const titleCase = (str) => {
@@ -48,7 +52,7 @@ const StockFinancials = (props) => {
 
   const formatNumber = (num) => {
     if (num === null || num === undefined) {
-      return "------"; // or any default value for null or undefined
+      return "------";
     }
     if (Math.abs(num) > 1000000000) {
       return (num / 1000000000).toFixed(2) + ' B';
@@ -69,15 +73,25 @@ const StockFinancials = (props) => {
     metrics.shift();
     metrics.shift();
     return metrics.map((metric, index) => {
+      const standardizedMetric = standardizeTerm(metric);
       return (
         <tr key={index}>
-          <td className="fw-bold">{titleCase(metric)}</td>
-          {financials[statement].map((fin, index) => (
+          <td
+            className={`fw-bold ${helpMode ? 'highlight' : ''}`}
+            onClick={() => {
+              handleElementClick(standardizedMetric);
+              addHighlight(standardizedMetric);
+            }}
+          >
+            <ToolTip info={titleCase(metric)}>{titleCase(metric)}</ToolTip>
+          </td>
+          {financials.map((fin, index) => (
             <td key={index}>{formatNumber(fin[metric])}</td>
           ))}
         </tr>
       );
     });
+  };
   };
 
   const changeStatement = (statement) => {

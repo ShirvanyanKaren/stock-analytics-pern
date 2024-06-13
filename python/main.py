@@ -1,21 +1,16 @@
-# give me all the pip installs for this file
 from typing import Union
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 import pandas_datareader.data as pdr
 import datetime as dt
 import yfinance as yf
 import numpy as np
-# from sklearn.linear_model import LinearRegression
 import getFamaFrenchFactors as gff
 import pandas as pd
-import urllib3
-import json
-import requests
+import simplejson as json
 from yahooquery import Ticker 
 import statsmodels.api as sma
 import uvicorn
-import gunicorn
 from dotenv import load_dotenv
 import os
 from openai import OpenAI
@@ -27,14 +22,15 @@ load_dotenv()
 
 app = FastAPI()
 
-
-
+# Allow CORS for local development
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],  
-    allow_headers=["*"],  
+    allow_origins=["*"],  # Adjust this to your frontend URL in production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
+
 @app.get("/stockinfo")
 async def stock_info(symbol: str):
     symbol = process_symbol(symbol)
@@ -104,7 +100,6 @@ async def stock_weights(stocks):
     stocks = {key: value for key, value in stocks.items()}
     return stocks
 
-
 def lin_reg_data(symbols, start, end, index, stockWeights):
     start_date = dt.datetime.strptime(start, '%Y-%m-%d')
     end_date = dt.datetime.strptime(end, '%Y-%m-%d')
@@ -112,7 +107,7 @@ def lin_reg_data(symbols, start, end, index, stockWeights):
     if len(stockWeights) > 0 and stockWeights != '{}':
         using_weights = True
         stock_weights = json.loads(stockWeights)
-    if index == 'UNRATE' or index == 'CPIAUCSL' or index == 'PPIACO' or index == 'FEDFUNDS' or index == 'GDP' or index == 'USEPUINDXD' or index == 'VIXCLS':
+    if index in ['UNRATE', 'CPIAUCSL', 'PPIACO', 'FEDFUNDS', 'GDP', 'USEPUINDXD', 'VIXCLS']:
         index_data = pdr.DataReader(index, 'fred', start, end)
         index_data.index = index_data.index.rename('Date')
         if using_weights:
@@ -122,7 +117,7 @@ def lin_reg_data(symbols, start, end, index, stockWeights):
             stocks = stocks.sum(axis=1)
             stocks = pd.DataFrame({'Adj Close': stocks})
             index_data = index_data.pct_change()
-        else :
+        else:
             stocks = yf.download(stocks, start=start_date, end=end_date)['Adj Close']
         stock_data = pd.merge(stocks, index_data, on='Date')
     else:
@@ -135,18 +130,16 @@ def lin_reg_data(symbols, start, end, index, stockWeights):
             index_data = yf.download(index, start=start_date, end=end_date)['Adj Close']
             index_data = index_data.pct_change()
             stock_data[index] = index_data
-        else: 
+        else:
             stock_data = yf.download(symbols, start=start_date, end=end_date)['Adj Close']
             stock_data = stock_data.rename(columns={symbols[1]: 'Adj Close'})
     stock_data = stock_data.dropna()
-    print(stock_data.columns)
     stocks_df = pd.DataFrame({
             'Dependent': stock_data['Adj Close'],
             'Independent': stock_data[index]
         })
     if using_weights: stock_data = stock_data * 100
     return stocks_df, stock_data
-
 
 @app.get("/linreg")
 async def lin_reg(stocks: str, index: str, start: str, end: str, stockWeights: str):
@@ -162,12 +155,9 @@ async def lin_reg(stocks: str, index: str, start: str, end: str, stockWeights: s
     json_data = sorted_stocks.reset_index(drop=True).to_json(date_format='iso', orient='values')
     return json_data, values
 
-
 @app.get("/famafrench")
 async def fama_french(stockWeights: str, start: str, end: str):
-    print(start)
     stock_weights = json.loads(stockWeights)
-    print("stock weights", stock_weights)
     ff3_monthly = pd.DataFrame(gff.famaFrench3Factor(frequency='m'))
     ff3_monthly.rename(columns={'date_ff_factors':'Date'}, inplace=True)
     ff3_monthly.set_index('Date', inplace=True)
@@ -175,21 +165,15 @@ async def fama_french(stockWeights: str, start: str, end: str):
     size_premium = ff3_monthly['SMB'].mean()
     value_premium = ff3_monthly['HML'].mean()
     stocks = list(stock_weights.keys())
-    print("stock keys", stocks)
     start = dt.datetime.strptime(start, '%Y-%m-%d')
     end = dt.datetime.strptime(end, '%Y-%m-%d')
     uw_portfolio = yf.download(stocks, start=start, end=end)['Adj Close'].pct_change()[1:]
-    print("uw portfolio", uw_portfolio)
-    print("stock weights", stock_weights)
-    print("pd series", pd.Series(stock_weights))
     if len(stocks) == 1:
         weighted_returns = uw_portfolio * stock_weights[stocks[0]]
         portfolio = pd.DataFrame({'Portfolio': weighted_returns})
     else:
         weighted_returns = uw_portfolio * pd.Series(stock_weights)
         portfolio = pd.DataFrame({'Portfolio': weighted_returns.sum(axis=1)})
-    print("weighted returns", weighted_returns)
-    print("portfolio", portfolio)
     portfolio_mtl = portfolio.resample('M').agg(lambda x: (x + 1).prod() - 1)
     factors = pdr.DataReader('F-F_Research_Data_Factors', 'famafrench', start, end)[0][1:]
 
@@ -219,7 +203,7 @@ async def fama_french(stockWeights: str, start: str, end: str):
                'pvalues': pvalues,
                'sharpe': sharpe,}
     port_data['Portfolio'] = port_data['Portfolio'] * 100
-    json_data = port_data.to_json( orient='index')
+    json_data = port_data.to_json(orient='index')
     return json_data, results
 
 @app.get("/gpt-analysis")
@@ -251,8 +235,6 @@ async def gpt3():
 if __name__ == "__main__":
     load_dotenv()
     PORT = int(os.getenv("PORT", 8000))
-    print(os.environ.get('PORT'))
-    print(f"os.environ.get('PORT'): {os.environ.get('PORT')}")
     uvicorn.run(app, host="0.0.0.0", port=PORT)
     print(f"process id: {os.getpid()}")
 

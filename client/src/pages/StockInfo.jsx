@@ -1,10 +1,9 @@
+// src/components/StockInfo.jsx
 import { useEffect, useState } from "react";
 import CanvasJSReact from "@canvasjs/react-stockcharts";
-import { useParams } from "react-router-dom";
-import { useLocation } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import axios from "axios";
-import { stockData } from "../utils/helpers";
-import { stockInfo } from "../utils/helpers";
+import { stockData, stockInfo } from "../utils/helpers";
 import StockDetails from "../components/StockDetails";
 import { QUERY_ME } from "../utils/queries";
 import { useQuery } from "@apollo/client";
@@ -13,8 +12,7 @@ import Navbar from "react-bootstrap/Navbar";
 import { useSelector } from "react-redux";
 import StockFinancials from "../components/StockFinancials";
 import SideBar from "../components/SideBar";
-import { getCompanyFinancials } from "../utils/helpers";
-import ChatbotPage from "../components/ChatBot";
+import ReminderPopup from "../components/ReminderPopup"; // Import ReminderPopup
 
 const CanvasJS = CanvasJSReact.CanvasJS;
 const CanvasJSStockChart = CanvasJSReact.CanvasJSStockChart;
@@ -28,12 +26,11 @@ const StockInfo = () => {
   const [dataPoints2, setDataPoints2] = useState([]);
   const [dataPoints3, setDataPoints3] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [startDate, setStartDate] = useState(
-    new Date(new Date().getFullYear(), 0, 1).toISOString().slice(0, 10)
-  );
+  const [startDate, setStartDate] = useState(new Date(new Date().getFullYear(), 0, 1).toISOString().slice(0, 10));
   const [stockDetails, setStockDetails] = useState([]);
   const [endDate, setEndDate] = useState(new Date().toISOString().slice(0, 10));
   const [infoType, setInfoType] = useState("summary");
+  const [showReminderPopup, setShowReminderPopup] = useState(false); // Add state for ReminderPopup
 
   useEffect(() => {
     const getStockInfo = async () => {
@@ -50,12 +47,7 @@ const StockInfo = () => {
         for (var i = 0; i < dataArr.length; i++) {
           dps1.push({
             x: new Date(dataArr[i].Date),
-            y: [
-              Number(dataArr[i].Open),
-              Number(dataArr[i].High),
-              Number(dataArr[i].Low),
-              Number(dataArr[i].Close),
-            ],
+            y: [Number(dataArr[i].Open), Number(dataArr[i].High), Number(dataArr[i].Low), Number(dataArr[i].Close)],
           });
           dps2.push({
             x: new Date(dataArr[i].Date),
@@ -71,7 +63,12 @@ const StockInfo = () => {
         setDataPoints3(dps3);
         var endTime = performance.now();
         var functionTimeStart = endTime - startTime;
+        console.log("functionTime", functionTimeStart);
         setIsLoaded(true);
+        // Show the ReminderPopup after a delay
+        setTimeout(() => {
+          setShowReminderPopup(true);
+        }, 3000); // 3000 milliseconds = 3 seconds delay
       } catch (err) {
         console.log(err);
       }
@@ -80,7 +77,6 @@ const StockInfo = () => {
     getStockInfo();
   }, [stockSymbol, startDate, endDate]);
 
-  // on location change, set info type to summary
   useEffect(() => {
     setInfoType("summary");
   }, [location]);
@@ -90,24 +86,19 @@ console.log(stockSymbol)
   const options = {
     theme: "dark1",
     title: { text: `${stockDetails.longName} Stock Price and Volume` },
-
-    subtitles: [
-      {
-        text: "Price-Volume Trend",
-      },
-    ],
+    subtitles: [{ text: "Price-Volume Trend" }],
     charts: [
       {
         axisX: {
           lineThickness: 5,
           tickLength: 0,
-          labelFormatter: function (e) {
+          labelFormatter: function () {
             return "";
           },
           crosshair: {
             enabled: true,
             snapToDataPoint: true,
-            labelFormatter: function (e) {
+            labelFormatter: function () {
               return "";
             },
           },
@@ -177,7 +168,7 @@ console.log(stockSymbol)
     },
   };
   const containerProps = {
-    width: "%",
+    width: "100%",
     height: "450px",
     margin: "auto",
   };
@@ -249,9 +240,12 @@ console.log(stockSymbol)
 
          />
       </div>
-      <ChatbotPage />
+      {showReminderPopup && <ReminderPopup open={showReminderPopup} handleClose={() => setShowReminderPopup(false)} />}
     </div>
   );
 };
+
+export default StockInfo;
+
 
 export default StockInfo;

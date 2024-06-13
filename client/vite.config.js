@@ -1,16 +1,32 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'path';
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     react(),
-
   ],
+  resolve: {
+    alias: {
+      '@chatscope/chat-ui-kit-react': path.resolve(__dirname, 'node_modules/@chatscope/chat-ui-kit-react'),
+      '@chatscope/chat-ui-kit-styles': path.resolve(__dirname, 'node_modules/@chatscope/chat-ui-kit-styles'),
+      'react-table': path.resolve(__dirname, 'node_modules/react-table')
+    }
+  },
   build: {
     commonjsOptions: {
       transformMixedEsModules: true,
     },
+    rollupOptions: {
+      external: [],
+    }
+  },
+  optimizeDeps: {
+    include: [
+      "@chatscope/chat-ui-kit-react",
+      "@chatscope/chat-ui-kit-styles",
+      "react-table"
+    ]
   },
   server: {
     port: 3000,
@@ -23,5 +39,4 @@ export default defineConfig({
       }
     }
   }
-})
- 
+});

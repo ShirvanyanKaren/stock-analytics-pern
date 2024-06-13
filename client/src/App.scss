@@ -1,11 +1,7 @@
-
-
 // IMPORTS
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
 
-
 // VARIABLES
-
 $primary-color: #1a1a1a;
 $secondary-color: #4dffff;
 $tertiary-color: #ccc;
@@ -13,285 +9,343 @@ $quaternary-color: #000;
 $quinary-color: #fff;
 $senary-color: #e6e6e6;
 
-
-
 // STYLES
-
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Roboto', sans-serif;
-
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
 }
 
 html {
-    font-size: 80.5%;
-
+  font-size: 80.5%;
 }
-.logo-cinco{
-    color: $secondary-color
+.highlight {
+  background-color: yellow; /* or any color you prefer */
 }
 
-.home-card{
-    animation: fadeInUp 1s;
-    @keyframes fadeInUp {
-        0% {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        100% {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    } 
-    
+.logo-cinco {
+  color: $secondary-color;
+}
 
-    
+.home-card {
+  animation: fadeInUp 1s;
+  @keyframes fadeInUp {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 }
 
 a {
-    text-decoration: none;
-    color: $primary-color;
+  text-decoration: none;
+  color: $primary-color;
 }
 
 h1, h2, h3, h4, h5, h6 {
-    color: $primary-color;
+  color: $primary-color;
 }
 
-li{
-    font-size: 1.6rem;
+li {
+  font-size: 1.6rem;
 }
 
-
-#root{
-
-    background: cover;
-    background-size: cover;
-    background-color: index($list: 1, $value: -2);
-    
+#root {
+  background: cover;
+  background-size: cover;
+  background-color: #f1f1f1 !important; /* Ensure no transparency */
+  opacity: 1 !important; /* Ensure no transparency */
 }
 
-.nav-brand{
-    cursor: pointer;
-    &:hover{
-        color: #504dff;
-        animation: bounce 1s;  
-    }
+.nav-brand {
+  cursor: pointer;
+  &:hover {
+    color: #504dff;
+    animation: bounce 1s;
+  }
 }
-
-
-
 
 .search-bar {
-    width: 500px;
-    margin-right: 5px;
+  width: 500px;
+  margin-right: 5px;
 }
 
-
 .navbar-brand {
-    font-size: 2.5rem;
-    font-weight: bold;
-    margin-left: 10px;
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-left: 10px;
 }
 
 body {
-    background-color: #f1f1f1; /* Very light grey */
+  background-color: #f1f1f1 !important; /* Very light grey */
+  opacity: 1 !important; /* Ensure no transparency */
 }
 
 .dropdown-menu {
-    width: 300px;
-    margin-right: 5px;
-    max-height: 300px;
-    overflow-y: scroll;
+  width: 300px;
+  margin-right: 5px;
+  max-height: 300px;
+  overflow-y: scroll;
 
-    .search-list {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        padding: 20px;
-        img{
-            width: 50px;
-            height: 50px;
-            margin-right: 5px;
-        }
-        .search-items{
-           display: flex;
-           width: 100%;
-           justify-content: space-around;
-        }
+  .search-list {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 20px;
+    img {
+      width: 50px;
+      height: 50px;
+      margin-right: 5px;
     }
+    .search-items {
+      display: flex;
+      width: 100%;
+      justify-content: space-around;
+    }
+  }
 }
-.active-stat{
-    background-color: #f1f1f1;
-    color: #504dff;
-    text-decoration: underline;
-    text-decoration-thickness: 5px;
+
+.active-stat {
+  background-color: #f1f1f1;
+  color: #504dff;
+  text-decoration: underline;
+  text-decoration-thickness: 5px;
 }
+
 .sidebar {
-    background-color: #f1f1f1;
-    text-align: center;
-    width: fit-content; 
-    z-index: 100;
-    height: fit-content; 
-    padding: 25px;
-
+  background-color: #f1f1f1;
+  text-align: center;
+  width: fit-content;
+  z-index: 100;
+  height: fit-content;
+  padding: 25px;
 }
-
 
 #page-content-wrapper {
-    min-width: 0;
-    width: 100%;
+  min-width: 0;
+  width: 100%;
+  opacity: 1 !important; /* Ensure no transparency */
 }
+
 .inactive {
-    display: none;
+  display: none;
 }
 
-.stock-info{
-    h3{
-        cursor: pointer;
-    }
-}
-.disabled-input {
-    pointer-events: none;
-    background-color: #eee;
-    color: 'muted';
-
-}
-.tool-tip {
-    font-size: 20px;
-}
-.tool-tip-header {
-    font-size: 24px;
-    font-weight: bold;
-}
-.tool-tip:hover {
+.stock-info {
+  h3 {
     cursor: pointer;
+  }
 }
 
+.disabled-input {
+  pointer-events: none;
+  background-color: #eee;
+  color: 'muted';
+}
+
+.tool-tip {
+  font-size: 20px;
+}
+
+.tool-tip-header {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.tool-tip:hover {
+  cursor: pointer;
+}
 
 .input-bar {
-    width: 50%;
-    margin-right: 5px;
+  width: 50%;
+  margin-right: 5px;
 }
 
-.statement, .info{
-
-    font-size: 20px;
-    font-weight: bold;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    cursor: pointer;
-    &:hover {
-        color: #504dff;
-    }
-    &.active {
-        color: #504dff;
-    }
+.statement, .info {
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  &:hover {
+    color: #504dff;
+  }
+  &.active {
+    color: #504dff;
+  }
 }
-
 
 .spinner-border {
-    width: 10rem;
-    height: 10rem;
-    margin-top: 10px;
-    margin-right: 5px;
-    margin-left: 5px;
-    color: #f1f1f1;
+  width: 10rem;
+  height: 10rem;
+  margin-top: 10px;
+  margin-right: 5px;
+  margin-left: 5px;
+  color: #f1f1f1;
 }
+
 .particles {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    background-size: cover;
-    background-position: center;
-    opacity: 0.80; 
-  }
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.80;
+}
 
 .custom-card {
-    // add shadow
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-    // add a light grey  color
-    background-color: #f1f1f1;
-    .card-items-custom{
-    //   increase the border thickness
+  // add shadow
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+  // add a light grey color
+  background-color: #f1f1f1;
+  .card-items-custom {
+    // increase the border thickness
     border-top: 1px solid #ccc;
-    
- 
-
-    }
-    .list-group-item {
-        background: #f1f1f1;
-        // increase the bottom and top border thickness
-        border-top: 1px solid #ccc;
-        border-bottom: 1px solid #ccc;
-        }
-    
+  }
+  .list-group-item {
+    background: #f1f1f1;
+    // increase the bottom and top border thickness
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+  }
 }
 
-.stock-volume{
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-    border-radius: 4px;
-    .lin-reg-card{
-        width: fit-content;
-    }
-
+.stock-volume {
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+  border-radius: 4px;
+  .lin-reg-card {
+    width: fit-content;
+  }
 }
 
-
-
-.nav-bar-custom{
-    background: transparent;
-    box-shadow: 0 10px 12px 0 rgba(0,0,0,0.2);
-    // add heavy bottom box shadow
-    box-shadow: 0 15px 12px 0 rgba(0,0,0,0.2);
-    .nav-bar{
-        opacity: 1.8;
-        z-index: 2;
-    }
-
+.nav-bar-custom {
+  background: transparent;
+  box-shadow: 0 10px 12px 0 rgba(0,0,0,0.2);
+  // add heavy bottom box shadow
+  box-shadow: 0 15px 12px 0 rgba(0,0,0,0.2);
+  .nav-bar {
+    opacity: 1 !important; /* Ensure no transparency */
+    z-index: 2;
+  }
 }
 
 #tsparticles {
-    position: absolute;
-    overflow: hidden;
-    pointer-events: none;
-    z-index: -10;
-
+  position: absolute;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: -10;
 }
 
-#patricles{
-    background-image: url("./assets/city-background.jpeg");
-    // background-color: #1a1a1a;
+#patricles {
+  background-image: url("./assets/city-background.jpeg");
+  // background-color: #1a1a1a;
 }
 
-.add-portfolio-modal{
-
-    .modal-header{
-        background-color: #f1f1f1;
-        border-bottom: 1px solid #ccc;
-        .modal-title{
-            font-size: 25px;
-            font-weight: bold;
-        }
+.add-portfolio-modal {
+  .modal-header {
+    background-color: #f1f1f1;
+    border-bottom: 1px solid #ccc;
+    .modal-title {
+      font-size: 25px;
+      font-weight: bold;
     }
+  }
 }
 
-.drop-down-custom{
-    &.active{
-        input{
-        border-bottom: 1px solid #ccc;
-        width: 20vw;
-        }
+.drop-down-custom {
+  &.active {
+    input {
+      border-bottom: 1px solid #ccc;
+      width: 20vw;
     }
-
+  }
 }
 
-.fama-french-info{
-    li:hover{
-        background-color: #f1f1f1;
-        cursor: pointer;
-        
-    }
+/* Custom styles for the chatbot and data table */
+.form-container {
+  background-color: #fff !important;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  opacity: 1 !important; /* Ensure no transparency */
 }
 
+.input-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.input-form label {
+  flex: 1 1 150px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.input-form button {
+  background-color: #4dffff !important;
+  color: #fff !important;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  &:hover {
+    background-color: darken(#4dffff, 10%);
+  }
+}
+
+.content-container {
+  display: flex;
+  justify-content: center; /* Center the container */
+  align-items: center; /* Vertically align items */
+  gap: 10px;
+}
+
+.table-container {
+  flex: 0 0 60%; /* Take up 60% of the width */
+  max-height: 600px; 
+  overflow: auto; /* Enable both vertical and horizontal scrolling */
+  background-color: #fff !important; /* Add white background */
+  padding: 20px; /* Add some padding around the table */
+  border-radius: 10px; /* Optional: add some border radius */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: add a subtle shadow */
+  opacity: 1 !important; /* Ensure no transparency */
+}
+
+.chat-container {
+  flex: 0 0 35%; /* Take up 35% of the width */
+  max-height: 600px; 
+  overflow: auto; /* Enable both vertical and horizontal scrolling */
+  background-color: #fff !important; /* Add white background */
+  padding: 20px; /* Add some padding around the table */
+  border-radius: 10px; /* Optional: add some border radius */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: add a subtle shadow */
+  opacity: 1 !important; /* Ensure no transparency */
+}
+
+.financial-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff !important; /* Add white background to the table */
+  opacity: 1 !important; /* Ensure no transparency */
+}
+
+.financial-table th,
+.financial-table td {
+  border: 1px solid #e6e6e6;
+  padding: 8px;
+  text-align: left;
+  opacity: 1 !important; /* Ensure no transparency */
+}
+
+.financial-table th {
+  background-color: #ccc !important;
+  color: #fff !important;
+  opacity: 1 !important; /* Ensure no transparency */
+}
