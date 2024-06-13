@@ -14,8 +14,6 @@ import { idbPromise } from '../utils/helpers';
 import axios from 'axios';
 
 
-
-
 const Home = () => {
 const [decodedToken, setToken] = useState('');
 const dispatch = useDispatch();
@@ -92,9 +90,6 @@ useEffect(() => {
                 <div className='card-footer text-muted'>
                     <h2>Happy Investing!</h2>
                 </div>  
-            
-            
-            
         </div>
         )}
         </div>

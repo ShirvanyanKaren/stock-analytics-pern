@@ -1,41 +1,49 @@
 import { getCompanyFinancials } from "../utils/helpers";
 import { useEffect, useState } from "react";
+import { idbPromise } from "../utils/helpers";
 
 const StockFinancials = (props) => {
-  const [financials, setFinancials] = useState([]);
+  const [financials, setFinancials] = useState({});
   const [isLoaded, setIsLoaded] = useState(false);
   const [isQuarters, setIsQuarters] = useState(true);
-  const [statement, statementType] = useState("income");
+  const [statement, setStatement] = useState("income");
   const [symbol, setSymbol] = useState(props.symbol);
 
-
-  useEffect(() => {
+  useEffect(() => {   
     const getFinancials = async () => {
-      let data = await getCompanyFinancials(symbol, statement, isQuarters);
-      data = JSON.parse(data);
-      for (let row in data) {
-        if (data[row].asOfDate === data[row - 1]?.asOfDate) data.splice(row, 1);
-      }
-      data.sort((a, b) => new Date(b.asOfDate) - new Date(a.asOfDate));
-      setFinancials(data);
+      let data;
+      const cachedData = await idbPromise("financials", "get");
+  
+      const cachedFinancial = cachedData?.data?.symbol === symbol && cachedData?.data?.quarters === isQuarters ? cachedData : null;
+      if (cachedFinancial) {
+        console.log("No new data, using cached data");
+        data = cachedFinancial.data;
+      } else {
+        console.log("Fetching new data");
+        await idbPromise("financials", "delete");
+        data = await getCompanyFinancials(symbol, isQuarters);
+        console.log(data, symbol)
+        await idbPromise("financials", "put", { symbol, quarters: isQuarters, data });
+      }   
+      setFinancials(data); 
       setIsLoaded(true);
     };
-    getFinancials();
-  }, [isQuarters, statement, symbol]);
-
-  console.log(financials);
+   
+    getFinancials(); 
+  }, [isQuarters, symbol]);
+  
 
   const formatDate = (date) => {
     let newDate = new Date(date).toISOString().slice(0, 10);
     return newDate;
   };
 
-
   const titleCase = (str) => {
     return str
-        .split(/(?=[A-Z])/)
-        .join(" ")
-        .replace(/\b\w/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ')
+      .replace(/([a-z])([A-Z])/g, '$1 $2');
   };
 
   const formatNumber = (num) => {
@@ -49,85 +57,96 @@ const StockFinancials = (props) => {
     } else if (Math.abs(num) > 1000) {
       return (num / 1000).toFixed(2) + ' K';
     } else {
-      return num;
+      return typeof num === 'number' ? num.toFixed(2) : num;
     }
   };
 
   const formatTable = (financials) => {
-    let metrics = Object.keys(financials[0]);
+    if (!financials[statement] || financials[statement].length === 0) {
+      return null;
+    }
+    let metrics = Object.keys(financials[statement][0]);
     metrics.shift();
     metrics.shift();
     return metrics.map((metric, index) => {
       return (
         <tr key={index}>
           <td className="fw-bold">{titleCase(metric)}</td>
-          {financials.map((fin, index) => (
+          {financials[statement].map((fin, index) => (
             <td key={index}>{formatNumber(fin[metric])}</td>
           ))}
         </tr>
       );
     });
-  }
+  };
 
   const changeStatement = (statement) => {
-    statementType(statement);
-  }
-
-
-
-
+    setStatement(statement);
+  };
 
   return (
     <div className="container mt-5">
-        {(isLoaded) && (
-            
-      <div className="row card custom-card">
-        <div className="card-header d-flex flex-direction-row justify-content-around">
-          <h3 onClick={() => changeStatement("income")} className={statement === "income" ? "active-stat statement" : "statement"} >
-          Income Statement</h3>
-          <h3 onClick={() => changeStatement("balance")} className={statement === "balance" ? "active-stat statement" : "statement"}> Balance Sheet</h3>
-          <h3 onClick={() => changeStatement("cash")} className={statement === "cash" ? "active-stat statement" : "statement"}> Cash Flow Statement</h3>
-        </div>
-        <div className="card-body">
-          <div className="row">
-            <div className="d-flex flex-direction-row justify-content-center mb-2">
-              <h6
-                className={isQuarters ? "ms-3 fs-5 info" : "ms-3 fs-5 info active-stat "}
-                onClick={() => setIsQuarters(false)}
-              >
-                Annual
-              </h6>
-              <h6
-                className={isQuarters ? "ms-3 fs-5 info active-stat" : "ms-3 fs-5 info"}
-                onClick={() => setIsQuarters(true)}
-              >
-                Quarterly
-              </h6>
-            </div>
+      {isLoaded && (
+        <div className="row card custom-card">
+          <div className="card-header d-flex flex-direction-row justify-content-around">
+            <h3
+              onClick={() => changeStatement("income")}
+              className={statement === "income" ? "active-stat statement" : "statement"}
+            >
+              Income Statement
+            </h3>
+            <h3
+              onClick={() => changeStatement("balance")}
+              className={statement === "balance" ? "active-stat statement" : "statement"}
+            >
+              Balance Sheet
+            </h3>
+            <h3
+              onClick={() => changeStatement("cash")}
+              className={statement === "cash" ? "active-stat statement" : "statement"}
+            >
+              Cash Flow Statement
+            </h3>
           </div>
-          <div className="row">
-            <div className="col-12">
-              <table className="table table-striped">
-                <thead>
-                <tr className="mt-2">
-                    <th className="fs-6">Metrics</th>
-                    {financials.map((fin, index) => (
-                    <th key={index} className="fs-6">
-                        {formatDate(fin.asOfDate)}
+          <div className="card-body">
+            <div className="row">
+              <div className="d-flex flex-direction-row justify-content-center mb-2">
+                <h6
+                  className={isQuarters ? "ms-3 fs-5 info" : "ms-3 fs-5 info active-stat"}
+                  onClick={() => setIsQuarters(false)}
+                >
+                  Annual
+                </h6>
+                <h6
+                  className={isQuarters ? "ms-3 fs-5 info active-stat" : "ms-3 fs-5 info"}
+                  onClick={() => setIsQuarters(true)}
+                >
+                  Quarterly
+                </h6>
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-12">
+                <table className="table table-striped">
+                  <thead>
+                    <tr className="mt-2">
+                      <th className="fs-6">Metrics</th>
+                      {financials[statement].map((fin, index) => (
+                        <th key={index} className="fs-6">
+                          {formatDate(fin.asOfDate)}
                         </th>
-                    ))}
-                </tr>
-                        {formatTable(financials)}
-                </thead>
-              </table>
+                      ))}
+                    </tr>
+                    {formatTable(financials)}
+                  </thead>
+                </table>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-        )}
+      )}
     </div>
   );
-  // how to change text color with bootstrap
 };
 
 export default StockFinancials;

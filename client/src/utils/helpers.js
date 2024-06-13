@@ -2,9 +2,9 @@ import axios from "axios";
 // const pyBackEnd = typeof process == 'object' ? process.env.BACK : "http://0.0.0.0:8000";
 import { SET_STOCK_WEIGHTS } from "./actions";
 import Auth from "../utils/auth";
-const pyBackEnd = "https://pern-portfolio-backend-805cd64a428d.herokuapp.com";
+// const pyBackEnd = "https://pern-portfolio-backend-805cd64a428d.herokuapp.com";
 
-// const pyBackEnd = "http://0.0.0.0:8000"
+const pyBackEnd = "http://127.0.0.1:8000"
 
 export const indexOptions = {
   "SP500": "^GSPC",
@@ -29,10 +29,8 @@ export const indexOptions = {
   "Volatile Index": "VIXCLS",
   "Economic Policy Uncertainty Index": "USEPUINDXD",
 };
-console.log(indexOptions["SP500"]);
 
 export async function stockData(stockSymbol, startDate, endDate) {
-  console.log("stockSymbol", stockSymbol);
   const response = await axios.get(
     `${pyBackEnd}/stockgraph`,
 
@@ -91,15 +89,19 @@ export async function getStockWeightsIdb() {
   return response;
 }
 
-export async function getCompanyFinancials(stockSymbol, statement, quarterly) {
+export async function getCompanyFinancials(stockSymbol, quarterly) {
   const response = await axios.get(`${pyBackEnd}/financials`, {
     params: {
       symbol: stockSymbol,
-      statement: statement,
       quarterly: quarterly,
     },
   });
-  return response.data;
+  let data = response.data;
+  for (let key in data) {
+    data[key] = JSON.parse(data[key]);
+    data[key].sort((a, b) => new Date(b.asOfDate) - new Date(a.asOfDate));
+  }
+  return data;
 }
 
 export async function getFamaFrenchData(startDate, endDate, stockWeights) {
@@ -114,48 +116,55 @@ export async function getFamaFrenchData(startDate, endDate, stockWeights) {
   return response.data;
 }
 
-export function idbPromise(stockWeights, method, object) {
+export function idbPromise(storeName, method, object) {
   return new Promise((resolve, reject) => {
-    const request = window.indexedDB.open("stockWeights", 1);
+    const request = window.indexedDB.open(storeName, 1);
 
     let db, tx, store;
 
     request.onupgradeneeded = function (e) {
       const db = request.result;
-      db.createObjectStore("stockWeights", { keyPath: "portfolio_id" });
+      if (storeName === "stockWeights") {
+        db.createObjectStore("stockWeights", { keyPath: "portfolio_id" });
+      } else if (storeName === "financials") {
+        db.createObjectStore("financials", { keyPath: "symbol" });
+      }
+
     };
 
     request.onerror = function (e) {
       console.log("There was an error");
     };
-
     request.onsuccess = function (e) {
       db = request.result;
-      tx = db.transaction("stockWeights", "readwrite");
-      store = tx.objectStore("stockWeights");
+      tx = db.transaction(storeName, "readwrite");
+      store = tx.objectStore(storeName);
 
       db.onerror = function (e) {
         console.log("error", e);
       };
+
       if (method === "put") {
         store.put(object);
-      }
-      if (method === "get") {
+        resolve(object);
+      } else if (method === "get") {
         const all = store.getAll();
         all.onsuccess = function () {
           resolve(all.result);
         };
+      } else if (method === "delete") {
+        store.clear();
+        console.log("deleted");
+        resolve();
       }
-      if (method === "delete") {
-        console.log("delete object", object.toString());
-        store.delete(object.toString());
-      }
+
       tx.oncomplete = function () {
         db.close();
       };
     };
   });
 }
+
 export async function getStockObject(
   userData,
   stockData,
@@ -181,8 +190,6 @@ export async function getStockObject(
         ...stockWeights,
         portfolio_id: userData?.user?.id,
       });
-  
-
       dispatch({
         type: SET_STOCK_WEIGHTS,
         payload: stockWeights,

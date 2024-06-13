@@ -18,9 +18,9 @@ import uvicorn
 import gunicorn
 from dotenv import load_dotenv
 import os
+from openai import OpenAI
 
-
-
+load_dotenv()
 
 
 # run this script with uvicorn main:app --reload to start the server
@@ -48,16 +48,23 @@ async def stock_graph(symbol: str, start: str, end: str):
     return stock
 
 @app.get("/financials")
-def income_statement(symbol: str, statement: str, quarterly: bool):
-    quarterly = True if quarterly else False
-    if statement == 'income':
-        stock = Ticker(symbol).income_statement('q' if quarterly else 'a')
-    elif statement == 'balance':
-        stock = Ticker(symbol).balance_sheet('q' if quarterly else 'a')
-    elif statement == 'cash':
-        stock = Ticker(symbol).cash_flow('q' if quarterly else 'a')
-    stock.reset_index(inplace=True)
-    return stock.to_json(orient='records')
+def all_statements(symbol: str, quarterly: bool):
+    quarterly = 'q' if quarterly else 'a'
+    stock = Ticker(symbol)
+    income = stock.income_statement(quarterly)
+    balance = stock.balance_sheet(quarterly)
+    cash = stock.cash_flow(quarterly)
+
+    income.reset_index(inplace=True)
+    balance.reset_index(inplace=True)
+    cash.reset_index(inplace=True)
+
+    return {
+        'income': income.dropna(thresh=len(income.columns) / 2).to_json(orient='records'),
+        'balance': balance.dropna(thresh=len(balance.columns) / 2).to_json(orient='records'),
+        'cash': cash.dropna(thresh=len(cash.columns) / 2).to_json(orient='records')
+    }
+
 
 def process_symbol(symbol: str):
     symbol = symbol.upper()
@@ -215,6 +222,28 @@ async def fama_french(stockWeights: str, start: str, end: str):
     json_data = port_data.to_json( orient='index')
     return json_data, results
 
+@app.get("/gpt-analysis")
+async def gpt3():
+    print(os.getenv("OPENAI_API_KEY"))
+    client = OpenAI(
+        api_key=os.getenv("OPENAI_API_KEY")
+    )
+    completion = await client.chat.completions.create(model="gpt-3.5-turbo", messages=[{"role": "user", "content": "hello"}])
+    return completion.choices[0].message['content']
+
+    
+
+
+    # stream = client.chat.completions.create(
+    #     model="gpt-4",
+    #     messages=[{"role": "user", "content": "Say this is a test"}],
+    #     stream=True,
+    # )
+    # for chunk in stream:
+    #     if chunk.choices[0].delta.content is not None:
+    #         print(chunk.choices[0].delta.content, end="")
+
+
 
 
 
@@ -230,7 +259,7 @@ if __name__ == "__main__":
 
 
     
-
+   
 
 
 
