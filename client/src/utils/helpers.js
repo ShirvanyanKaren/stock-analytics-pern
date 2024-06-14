@@ -1,5 +1,4 @@
 import axios from "axios";
-// const pyBackEnd = typeof process == 'object' ? process.env.BACK : "http://0.0.0.0:8000";
 import { SET_STOCK_WEIGHTS } from "./actions";
 import Auth from "../utils/auth";
 // const pyBackEnd = "https://pern-portfolio-backend-805cd64a428d.herokuapp.com";
@@ -70,8 +69,14 @@ export async function linReg(stockSymbol, searchIndex, startDate, endDate, weigh
 
 export async function stockSearch(query) {
   const response = await axios.get(
-    `https://eodhd.com/api/query-search-extended/?q=${query}&api_token=65431c249ef2b9.93958016`
-  );
+    `https://eodhd.com/api/query-search-extended/`, {
+    params : {
+      q: query,
+      api_token: "65431c249ef2b9.93958016",
+    }
+});
+
+
   return response.data;
 }
 
@@ -202,3 +207,127 @@ export async function getStockObject(
   setStockWeights(stockWeights);
 
 }
+
+export async function setStockGraph(data)
+{
+  const dataPoints = [];
+  for (var i = 0; i < data.length; i++) {
+    dataPoints.push({
+      x: new Date(data[i].Date),
+      y: {"open": Number(data[i].Open), "high": Number(data[i].High), "low": Number(data[i].Low), "close": Number(data[i].Close), "volume": Number(data[i].Volume)}
+    });
+  }
+  return dataPoints; 
+}
+
+
+export async function setGraphOptions(theme, stockName, data, stockSymbol) {
+  const options = {
+    theme: theme,
+    title: { text: `${stockName} Stock Price and Volume` },
+    subtitles: [{ text: "Price-Volume Trend" }],
+    charts: [
+      {
+        axisX: {
+          lineThickness: 5,
+          tickLength: 0,
+          labelFormatter: function () {
+            return "";
+          },
+          crosshair: {
+            enabled: true,
+            snapToDataPoint: true,
+            labelFormatter: function () {
+              return "";
+            },
+          },
+        },
+        axisY: {
+          title: "Stock Price",
+          prefix: "$",
+          tickLength: 0,
+        },
+        toolTip: {
+          shared: true,
+        },
+        data: [
+          {
+            name: "Price (in USD)",
+            yValueFormatString: "$#,###.##",
+            type: "candlestick",
+            color: "#049C",
+            dataPoints: data.map((point) => {
+              return {
+                x: new Date(point.Date),
+                y: [point.Open, point.High, point.Low, point.Close],
+              };
+            }
+            ),
+
+          },
+        ],
+      },
+      {
+        height: 100,
+        axisX: {
+          crosshair: {
+            enabled: true,
+            snapToDataPoint: true,
+          },
+        },
+        axisY: {
+          title: "Volume",
+          prefix: "$",
+          tickLength: 0,
+        },
+        toolTip: {
+          shared: true,
+        },
+        data: [
+          {
+            color: "#049C",
+            name: "Volume",
+            yValueFormatString: "$#,###.##",
+            type: "column",
+
+            dataPoints: data.map((point) => {
+              return {
+                x: new Date(point.Date),
+                y: point.Volume,
+              };
+            }
+            ),
+          },
+        ],
+      },
+    ],
+    navigator: {
+      data: [
+        {
+          color: "white",
+          fillOpacity: 0.4,
+          indexLabel: "",
+          dataPoints: data.map((point) => {
+            return {
+              x: new Date(point.Date),
+              y: point.Close,
+            };
+          }
+          ),
+          type: "area",
+        },
+      ],
+      slider: {
+        minimum: new Date("2022-05-01"),
+        maximum: new Date("2022-07-01"),
+        fontColor: "white",
+        indexLabelFontColor: "white",
+        //
+      },
+    },
+  };
+return options;
+}
+  
+
+

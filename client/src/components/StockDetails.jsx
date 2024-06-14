@@ -9,8 +9,10 @@ const isNullOrUndefined = (value) => {
   const formatNum = (num) => {
     if (isNullOrUndefined(num)) {
       return "-"; // or any default value for null or undefined
+    } else {
+      num = Number(num);
     }
-  
+
     if (num > 1000000000) {
       return (num / 1000000000).toFixed(2) + ' B';
     } else if (num > 1000000) {
@@ -18,7 +20,7 @@ const isNullOrUndefined = (value) => {
     } else if (num > 1000) {
       return (num / 1000).toFixed(2) + ' K';
     } else {
-      return num;
+      return num < 1 ? num.toFixed(5) : num.toFixed(2);
     }
   };
 
@@ -50,17 +52,17 @@ const StockDetails = (props) => {
                     <ul className="list-group list-group-flush col-6">
                         <li className="list-group-item">Previous Close: <span className="float-end fw-bold">{formatNum(props.previousClose)}</span></li>
                         <li className="list-group-item">Volume: <span className="float-end fw-bold">{formatNum(props.volume)}</span></li>
-                        <li className="list-group-item">Low: <span className="float-end fw-bold">{formatNum(props.low)}</span></li>
-                        <li className="list-group-item">52 Week High: <span className="float-end fw-bold">{props.week52High}</span></li>
+                        <li className="list-group-item">Low: <span className="float-end fw-bold">{formatNum(props.dayLow)}</span></li>
+                        <li className="list-group-item">52 Week High: <span className="float-end fw-bold">{props.fiftyTwoWeekHigh}</span></li>
                         <li className="list-group-item">Market Cap: <span className="float-end fw-bold">{formatNum(props.marketCap)}</span></li>
                         <li className="list-group-item">Shares Outstanding: <span className="float-end fw-bold">{formatNum(props.sharesOutstanding)}</span></li>
                         <li className="list-group-item">Beta: <span className="float-end fw-bold">{formatNum(props.beta)}</span></li>
                     </ul>
                     <ul className="list-group list-group-flush col-6">
                         <li className="list-group-item">Open: <span className="float-end fw-bold">{formatNum(props.open)}</span></li>
-                        <li className="list-group-item">High: <span className="float-end fw-bold">{formatNum(props.high)}</span></li>
+                        <li className="list-group-item">High: <span className="float-end fw-bold">{formatNum(props.dayHigh)}</span></li>
                         <li className="list-group-item">Forward PE: <span className="float-end fw-bold">{formatNum(props.forwardPE)}</span></li>
-                        <li className="list-group-item">52 Week Low: <span className="float-end fw-bold">{formatNum(props.week52Low)}</span></li>
+                        <li className="list-group-item">52 Week Low: <span className="float-end fw-bold">{formatNum(props.fiftyTwoWeekLow)}</span></li>
                         <li className="list-group-item">Dividend Rate: <span className="float-end fw-bold">{formatNum(props.dividendRate)}</span></li>
                         <li className="list-group-item">Dividend Yield: <span className="float-end fw-bold">{formatNum(props.dividendYield)}</span></li>
                     </ul>

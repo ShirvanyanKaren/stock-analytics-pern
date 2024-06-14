@@ -12,7 +12,6 @@ import { StoreProvider } from "./utils/GlobalState";
 import Header from "./components/Header";
 import HelpButton from "./components/HelpButton";
 import InfoPopup from "./components/InfoPopup";
-import IntroPopup from "./components/IntroPopup";
 import { HighlightProvider } from "./contexts/HighlightContext";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-bootstrap";
@@ -45,7 +44,6 @@ function App() {
   const [helpMode, setHelpMode] = useState(false);
   const [popupInfo, setPopupInfo] = useState("");
   const location = useLocation();
-  const [showIntroPopup, setShowIntroPopup] = useState(false);
 
   const toggleHelpMode = () => {
     setHelpMode(!helpMode);
@@ -57,13 +55,6 @@ function App() {
     }
   };
 
-  useEffect(() => {
-    if (location.pathname === "/") {
-      setShowIntroPopup(true);
-    } else {
-      setShowIntroPopup(false);
-    }
-  }, [location.pathname]);
 
   return (
     <ApolloProvider client={client}>
@@ -75,8 +66,6 @@ function App() {
             <div className="App">
               <Outlet context={{ helpMode, handleElementClick }} />
               <HelpButton toggleHelpMode={toggleHelpMode} />
-              <InfoPopup open={Boolean(popupInfo)} handleClose={() => setPopupInfo("")} info={popupInfo} />
-              {showIntroPopup && <IntroPopup />}
             </div>
           </HighlightProvider>
         </Provider>

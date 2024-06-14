@@ -82,7 +82,7 @@ const Glossary = () => {
   };
 
   return (
-    <div className="glossary-wrapper">
+    <div className="glossary-wrapper container bg-light card mt-2">
       <div className="glossary-container">
         {selectedTerm ? (
           <div className="glossary-term-container">
@@ -92,7 +92,7 @@ const Glossary = () => {
           </div>
         ) : (
           <>
-            <div className="glossary-header">
+            <div className="glossary-header d-flex w-100 justify-content-center">
               <input
                 type="text"
                 placeholder="Search terms..."

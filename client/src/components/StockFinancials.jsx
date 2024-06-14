@@ -4,6 +4,7 @@ import { useOutletContext } from "react-router-dom";
 import ToolTip from "./ToolTip";
 import { useHighlight } from '/src/contexts/HighlightContext'; // Correctly import useHighlight
 import { standardizeTerm } from '../utils/termFormatter'; // Import termFormatter
+import { idbPromise } from '../utils/helpers'; // Import idbPromise
 
 const StockFinancials = (props) => {
   const { helpMode, handleElementClick } = useOutletContext();
@@ -85,18 +86,23 @@ const StockFinancials = (props) => {
           >
             <ToolTip info={titleCase(metric)}>{titleCase(metric)}</ToolTip>
           </td>
-          {financials.map((fin, index) => (
+          {(financials[statement] || []).map((fin, index) => (
             <td key={index}>{formatNumber(fin[metric])}</td>
           ))}
         </tr>
+          // {financials.map((fin, index) => (
+          //   <td key={index}>{formatNumber(fin[metric])}</td>
+          // ))}
+        // </tr>
       );
     });
   };
-  };
+  
 
   const changeStatement = (statement) => {
     setStatement(statement);
   };
+
 
   return (
     <div className="container mt-5">
@@ -162,5 +168,7 @@ const StockFinancials = (props) => {
     </div>
   );
 };
+
+
 
 export default StockFinancials;

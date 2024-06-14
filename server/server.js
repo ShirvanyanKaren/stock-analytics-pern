@@ -17,7 +17,7 @@ const server = new ApolloServer({
   typeDefs,
   resolvers,
 });
-
+console.log(process.env.DB_PW, process.env.DB_NAME, process.env.DB_USER, process.env.DATABASE_URL)
 
 const startApolloServer = async () => {
   await server.start();
@@ -58,6 +58,8 @@ const startApolloServer = async () => {
     }
     );
   }
+  //npx kill port 3000
+  //
 
 
     await sequelize.sync({ force: false });

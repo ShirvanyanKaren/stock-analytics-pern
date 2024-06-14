@@ -44,7 +44,6 @@ const ToolTip = (props) => {
             "Interest Income": "The income a company earns from its cash holdings And marketable securities.",
             "Interest Income Non Operating": "Interest income that is not generated from the principal operations Of the business.",
             "Minority Interests": "The portion Of subsidiary companies' equity that is not owned by the parent corporation.",
-            "Net Income": "The total profit Of a company after all expenses And taxes have been deducted.",
             "Net Income Common Stockholders": "Net income that is available to common stockholders.",
             "Net Income Continuous Operations": "The income attributable to the ongoing, regular business activities.",
             "Net Income From Continuing And Discontinued Operation": "Total earnings that include both continuing operations And those that have been or are to be discontinued.",
