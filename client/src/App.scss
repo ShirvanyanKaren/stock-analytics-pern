@@ -19,6 +19,8 @@ $senary-color: #e6e6e6;
 
 html {
   font-size: 80.5%;
+  height: 100%;
+  width: 100%;
 }
 .highlight {
   background-color: yellow; /* or any color you prefer */
@@ -349,3 +351,67 @@ body {
   color: #fff !important;
   opacity: 1 !important; /* Ensure no transparency */
 }
+
+
+.glossary-container {
+  padding: 20px;
+  position: relative;
+}
+
+.glossary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.glossary-header input {
+  padding: 10px;
+  width: 300px;
+  font-size: 16px;
+}
+
+.glossary-filter {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.filter-button {
+  padding: 10px;
+  margin: 0 5px;
+  cursor: pointer;
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.filter-button.active {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.glossary-terms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.glossary-term-card {
+  background-color: #fff;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: calc(33.333% - 20px);
+  box-sizing: border-box;
+}
+
+.glossary-term-card h3 {
+  margin-top: 0;
+}
+
+.glossary-term-card p {
+  margin-top: 10px;
+}
+
