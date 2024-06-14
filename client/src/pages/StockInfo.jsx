@@ -1,4 +1,3 @@
-// src/components/StockInfo.jsx
 import { useEffect, useState } from "react";
 import CanvasJSReact from "@canvasjs/react-stockcharts";
 import { useParams, useLocation } from "react-router-dom";
@@ -62,7 +61,6 @@ const StockInfo = () => {
     height: "450px",
     margin: "auto",
   };
-
   return (
     <div>
       <Navbar

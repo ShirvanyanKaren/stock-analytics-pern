@@ -3,6 +3,7 @@ import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
 import { MainContainer, ChatContainer, MessageList, Message, MessageInput, TypingIndicator } from '@chatscope/chat-ui-kit-react';
 import UserInput from './UserInput';
 import { useTable } from 'react-table';
+
 const API_KEY = "your_openai_api_key"; // Replace with your OpenAI API key
 
 async function fetchFinancialStatement(ticker, statementType, frequency) {
