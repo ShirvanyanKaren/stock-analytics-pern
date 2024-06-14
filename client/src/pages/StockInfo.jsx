@@ -26,8 +26,11 @@ const StockInfo = () => {
   const [startDate, setStartDate] = useState(new Date(new Date().getFullYear(), 0, 1).toISOString().slice(0, 10));
   const [stockDetails, setStockDetails] = useState({});
   const [endDate, setEndDate] = useState(new Date().toISOString().slice(0, 10));
-  const [infoType, setInfoType] = useState("summary");
+  const [infoType, setInfoType] = useState("Summary");
   const [showReminderPopup, setShowReminderPopup] = useState(false);
+  const categories = ["Summary", "Financials", "Linear Regression", "Analysis"];
+
+
 
   useEffect(() => {
     const getStockInfo = async () => {
@@ -37,7 +40,6 @@ const StockInfo = () => {
         const dataArr = JSON.parse(data);
 
         setStockDetails(stockDeets[stockSymbol] || {});
-        console.log(stockDetails);
         // stockDetails['stockSymbol'] = stockSymbol;
         setDataPoints(dataArr);
         const options = await setGraphOptions("dark1", stockDeets[stockSymbol].longName, dataArr, stockSymbol);
@@ -52,7 +54,7 @@ const StockInfo = () => {
   }, [stockSymbol, startDate, endDate]);
 
   useEffect(() => {
-    setInfoType("summary");
+    setInfoType("Summary");
   }, [location]);
 
   const containerProps = {
@@ -70,19 +72,19 @@ const StockInfo = () => {
         className="nav-bar nav-bar-custom justify-content-center"
       >
         <Nav className="d-flex justify-content-around w-100 stock-info">
-          {["summary", "financials", "linreg", "analytics"].map((type) => (
+          {categories.map((type) => (
             <h3
               key={type}
               onClick={() => setInfoType(type)}
               className={infoType === type ? "active-stat info" : "info"}
             >
-              {`${type.charAt(0).toUpperCase() + type.slice(1)}`}
+              {type}
             </h3>
           ))}
         </Nav>
       </Navbar>
 
-      {isLoaded && infoType === "summary" && (
+      {isLoaded && infoType === "Summary" && (
         <div className="col-10 m-auto justify-center stock-volume mt-5">
           <CanvasJSStockChart
             containerProps={containerProps}
@@ -90,27 +92,29 @@ const StockInfo = () => {
           />
           <StockDetails
             {...stockDetails}
-            date={new Date().toISOString().slice(0, 10)}
             stockInfo={true}
           />
         </div>
       )}
 
-      {infoType === "financials" && (
+      {infoType === "Financials" && (
         <StockFinancials symbol={stockSymbol} />
       )}
+      
 
       {showReminderPopup && (
         <ReminderPopup open={showReminderPopup} handleClose={() => setShowReminderPopup(false)} />
       )}
 
-      {infoType === "linear regression" && (
+      {infoType === "Linear Regression" && (
         <div className="container">
+          <h2>Linear Regression</h2>
           <SideBar />
         </div>
       )}
     </div>
   );
 };
+
 
 export default StockInfo;

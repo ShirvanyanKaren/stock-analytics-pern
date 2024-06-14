@@ -49,9 +49,6 @@ const AddPortfolio = (props) => {
     skip: !decodedToken?.data?.username, 
   });
 
-  if (userData) {
-  console.log(userData);
-  }
 
 
   const [stockState, setStockState] = useState({});
@@ -117,7 +114,6 @@ const handleInputChange = (event) => {
   };
   };
 
-  console.log("portfolio id", userData?.user.id)
 
 
 

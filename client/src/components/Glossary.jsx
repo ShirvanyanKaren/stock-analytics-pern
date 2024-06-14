@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { standardizeTerm } from '../utils/termFormatter';
-import './Glossary.scss';
 
 const Glossary = () => {
   const { term } = useParams();
