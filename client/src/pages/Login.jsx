@@ -23,14 +23,13 @@ import { useLocation } from 'react-router-dom';
 
 const Login = () => {
 
-  const [justifyActive, setJustifyActive] = useState('tab1');;
+  const [justifyActive, setJustifyActive] = useState('tab1');
   const [login] = useMutation(LOGIN_USER);
   const [addUser, { error }] = useMutation(ADD_USER);
   const [apollErrorText, setApolloErrorText] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const location = useLocation(); 
 
   console.log(location);
