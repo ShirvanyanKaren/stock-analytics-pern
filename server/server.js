@@ -44,11 +44,8 @@ const startApolloServer = async () => {
       res.sendFile(path.join(__dirname, "../client/dist/index.html"));
     });
   } else {
-    const childPython = spawn("python", ["../python/main.py"]);
-    childPython.stdout.on("data", (data) => {
-      console.log(`stdout: ${data}`);
-    }
-    );
+    const childPython = spawn("uvicorn", ["main:app", "--reload"], {cwd: "../python"});
+    childPython
     childPython.stderr.on("data", (data) => {
       console.error(`stderr: ${data}`);
     }

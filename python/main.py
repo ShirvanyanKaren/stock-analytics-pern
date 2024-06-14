@@ -68,6 +68,7 @@ def process_symbol(symbol: str):
         symbol = symbol.replace("-", ".")
     return symbol
 
+# make a set with all the keys like previous close, open, etc
 def fetch_stock_info(symbol: str):
     stock_info = Ticker(symbol).summary_detail
     stock_key_stats = Ticker(symbol).key_stats
@@ -76,6 +77,9 @@ def fetch_stock_info(symbol: str):
         if key not in stock_info[symbol]:
             stock_info[symbol][key] = value
     stock_info[symbol]['longName'] = long_name
+    stock_info[symbol]['52WeekHigh'] = stock_info[symbol].pop('fiftyTwoWeekHigh')
+    stock_info[symbol]['52WeekLow'] = stock_info[symbol].pop('fiftyTwoWeekLow')
+    stock_info[symbol]['stockSymbol'] = symbol
     return stock_info
 
 def fetch_stock_graph(symbol: str, start: str, end: str):
@@ -197,11 +201,18 @@ async def fama_french(stockWeights: str, start: str, end: str):
     expected_return = risk_free + beta_m * market_premium + beta_s * size_premium + beta_v * value_premium
     expected_return = expected_return * 12
     sharpe = (expected_return - risk_free) / merged_port['Excess Portfolio'].std()
-    results = {'rsquared': model.rsquared,
-               'params': model.params,
-               'expected_return': expected_return,
-               'pvalues': pvalues,
-               'sharpe': sharpe,}
+    results = {'R-Squared': model.rsquared,
+               'HML Beta': model.params['HML'],
+                'SMB Beta': model.params['SMB'],
+                'Mkt-RF': model.params['Mkt-RF'],
+                'intercept': model.params['const'],
+               'Expected Return': expected_return * 100,
+               'Mkt-RF P-Value': pvalues['Mkt-RF'],
+                'SMB P-Value': pvalues['SMB'],
+                'HML P-Value': pvalues['HML'],
+               'Sharpe Ratio': sharpe,
+               'Portfolio Beta': beta_m + beta_s + beta_v,
+               }
     port_data['Portfolio'] = port_data['Portfolio'] * 100
     json_data = port_data.to_json(orient='index')
     return json_data, results

@@ -1,24 +1,22 @@
 import { useEffect, useState } from "react";
-import CanvasJSReact from "@canvasjs/react-stockcharts";
 import { useParams, useLocation } from "react-router-dom";
 import { useQuery } from "@apollo/client";
-import Nav from "react-bootstrap/Nav";
-import Navbar from "react-bootstrap/Navbar";
 import { useSelector } from "react-redux";
 import { setGraphOptions, stockData, stockInfo } from "../utils/helpers";
+import { QUERY_ME } from "../utils/queries";
 import StockDetails from "../components/StockDetails";
 import StockFinancials from "../components/StockFinancials";
 import SideBar from "../components/SideBar";
 import ReminderPopup from "../components/ReminderPopup";
-import { QUERY_ME } from "../utils/queries";
+import Nav from "react-bootstrap/Nav";
+import Navbar from "react-bootstrap/Navbar";
+import CanvasJSReact from "@canvasjs/react-stockcharts";
 
 const CanvasJSStockChart = CanvasJSReact.CanvasJSStockChart;
 
 const StockInfo = () => {
   const { data } = useQuery(QUERY_ME); 
   const { symbol } = useParams();
-  const location = useLocation();
-  const stockSymbol = symbol;
   const [dataPoints, setDataPoints] =  useState([]);
   const [options, setOptions] = useState({});
   const [isLoaded, setIsLoaded] = useState(false);
@@ -28,7 +26,8 @@ const StockInfo = () => {
   const [infoType, setInfoType] = useState("Summary");
   const [showReminderPopup, setShowReminderPopup] = useState(false);
   const categories = ["Summary", "Financials", "Linear Regression", "Analysis"];
-
+  const location = useLocation();
+  const stockSymbol = symbol;
 
 
   useEffect(() => {
@@ -36,13 +35,12 @@ const StockInfo = () => {
       try {
         const data = await stockData(stockSymbol, startDate, endDate);
         const stockDeets = await stockInfo(stockSymbol);
+        console.log("🚀 ~ getStockInfo ~ stockDeets:", stockDeets)
         const dataArr = JSON.parse(data);
-
-        setStockDetails(stockDeets[stockSymbol] || {});
-        // stockDetails['stockSymbol'] = stockSymbol;
-        setDataPoints(dataArr);
         const options = await setGraphOptions("dark1", stockDeets[stockSymbol].longName, dataArr, stockSymbol);
         setOptions(options);
+        setStockDetails(stockDeets[stockSymbol] || {});
+        setDataPoints(dataArr);
         setIsLoaded(true);
       } catch (err) {
         console.log(err);
@@ -89,7 +87,7 @@ const StockInfo = () => {
             options={options}
           />
           <StockDetails
-            {...stockDetails}
+            stockStats={stockDetails}
             stockInfo={true}
           />
         </div>

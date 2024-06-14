@@ -28,10 +28,8 @@ const StockLinReg = () => {
   );
   const [useWeights, setUseWeights] = useState(false);
   const [stockWeights, setStockWeights] = useState({});
-
   const [searchSymbol, setSearchSymbol] = useState();
   const [searchIndex, setSearchIndex] = useState("^GSPC");
- 
   const [endDate, setEndDate] = useState(new Date().toISOString().slice(0, 10));
 
   const [searchParams, setSearchParams] = useState({
