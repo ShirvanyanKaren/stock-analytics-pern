@@ -220,11 +220,11 @@ body {
 .stock-volume {
   box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
   border-radius: 4px;
-  .lin-reg-card {
-    width: fit-content;
-  }
 }
-
+.lin-reg-card {
+  display: flex;
+  flex-direction: row;
+}
 .nav-bar-custom {
   background: transparent;
   box-shadow: 0 10px 12px 0 rgba(0,0,0,0.2);

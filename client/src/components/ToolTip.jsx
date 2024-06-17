@@ -12,7 +12,7 @@ const ToolTip = (props) => {
       backgroundColor: "rgba(0, 0, 0, 0.85)",
       color: "#fff",
       maxWidth: 220,
-      fontSize: theme.typography.pxToRem(12),
+      fontSize: theme.typography.pxToRem(20),
       border: "1px solid #dadde9",
       borderRadius: "4px",
       padding: "8px",

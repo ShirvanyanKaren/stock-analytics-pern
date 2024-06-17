@@ -1,311 +1,253 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import CanvasJSReact from "@canvasjs/react-stockcharts";
-import { useRef } from "react";
-import { useNavigate } from "react-router-dom";
 import { Dropdown } from "react-bootstrap";
-import { linReg } from "../utils/helpers";
-import { indexOptions } from "../utils/helpers";
+import {
+  linReg,
+  generateScatterLineGraphOptions,
+  idbPromise,
+  indexOptions,
+} from "../utils/helpers";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faLineChart, faRssSquare } from "@fortawesome/free-solid-svg-icons";
-import { idbPromise } from "../utils/helpers";
-import RegressionTool from "../components/RegressionTool";
+import { faLineChart } from "@fortawesome/free-solid-svg-icons";
+import StockDetails from "../components/StockDetails";
 
 const CanvasJS = CanvasJSReact.CanvasJS;
-
 const CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
 const StockLinReg = () => {
   const { symbol } = useParams();
   const navigate = useNavigate();
-  const [index, setIndex] = useState([]);
-  const [stockSymbol, setStockSymbol] = useState();
-  const [formulaB, setFormulaB] = useState();
-  const [formulaY, setFormulaY] = useState();
+  const location = useLocation();
+  const [dataPoints, setDataPoints] = useState([]);
+  const [stockSymbol, setStockSymbol] = useState(symbol || "");
   const [isLoaded, setIsLoaded] = useState(false);
-  const [startDate, setStartDate] = useState(
-    new Date(new Date().getFullYear(), 0, 1).toISOString().slice(0, 10)
-  );
   const [useWeights, setUseWeights] = useState(false);
   const [stockWeights, setStockWeights] = useState({});
-  const [searchSymbol, setSearchSymbol] = useState();
-  const [searchIndex, setSearchIndex] = useState("^GSPC");
-  const [endDate, setEndDate] = useState(new Date().toISOString().slice(0, 10));
-
   const [searchParams, setSearchParams] = useState({
     symbol: "",
-    index: "",
+    index: "^GSPC",
+  });
+  const [options, setChartOptions] = useState({});
+  const [regressionInfo, setRegressionInfo] = useState({});
+  const [formula, setFormula] = useState({ coef: null, intercept: null });
+  const [dates, setDates] = useState({
+    startDate: new Date(new Date().getFullYear(), 0, 1)
+      .toISOString()
+      .slice(0, 10),
+    endDate: new Date().toISOString().slice(0, 10),
   });
 
+  useEffect(() => {
+    if (!symbol) return;
+    const fetchAndSetData = async () => {
+      const params = symbol.split("-");
+      if (params[0] === "Portfolio") setUseWeights(true);
+      const weights = await idbPromise("stockWeights", "get");
+      const filteredWeights = weights.map(({ portfolio_id, ...rest }) => rest);
+      setStockWeights(filteredWeights[0]);
+      setSearchParams({ symbol: params[0], index: params[1] });
+      await fetchLinRegData(params[0], params[1], filteredWeights[0]);
+    };
+    fetchAndSetData();
+    setIsLoaded(true);
+  }, []);
 
-
-  const getLinReg = async (stockSymbol) => {
-
-    if (startDate > endDate) {
+  const fetchLinRegData = async (symbol, index, weightsObject) => {
+    if (dates.startDate > dates.endDate) {
       alert("Start date must be before end date");
       return;
-    } else if (startDate === endDate) {
+    } else if (dates.startDate === dates.endDate) {
       alert("Start date cannot be the same as end date");
       return;
-    } 
-    else {
-    let weights = ""
-    if (useWeights){
-      weights = JSON.stringify(stockWeights);
-      setStockSymbol("Portfolio");
-    } 
-
-    const data = await linReg(stockSymbol, searchIndex, startDate, endDate, weights);
-    const dataArray = JSON.parse(data[0]);
-        var dps = [];
-        for (var i = 0; i < dataArray.length; i++) {
-          dps.push({
-            x: Number(dataArray[i][1]),
-            y: Number(dataArray[i][0]),
-          });
-        }
-
-        setFormulaB(data[1]['coef']);
-        setFormulaY(data[1]['intercept']);
-        setIndex(dps);
-
-    setIsLoaded(true);
     }
-
-  }
-  useEffect(() => {
-    var symbol = location.pathname.split("/")[2];
-
-    setStockSymbol(symbol);
-  }, [stockSymbol]);
-
-
-
+    weightsObject = symbol === "Portfolio" ? JSON.stringify(weightsObject) : "";
+    const data = await linReg(
+      { symbol, index },
+      dates.startDate,
+      dates.endDate,
+      weightsObject
+    );
+    const dataArray = JSON.parse(data[0]);
+    const dps = dataArray.map((item) => ({
+      x: Number(item[1]),
+      y: Number(item[0]),
+    }));
+    const formula = { coef: data[1]["coef"], intercept: data[1]["intercept"] };
+    setRegressionInfo(data[1]["model"]);
+    setFormula(formula);
+    setDataPoints(dps);
+    const options = await generateScatterLineGraphOptions(
+      "dark1",
+      { symbol, index },
+      dps,
+      formula
+    );
+    setChartOptions(options);
+  };
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
-    setSearchParams({
-      ...searchParams,
-      [name]: value,
-    });
+    setSearchParams((prevParams) => ({ ...prevParams, [name]: value }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log(searchSymbol);
-    try {
-      let symbol
-      if (!useWeights) {
-       symbol  = searchParams.symbol;
-      } else {
-        symbol = "Portfolio";
-        setSearchSymbol("Portfolio");
-      }
-    if (symbol === "" && !useWeights) {
+    const symbol = useWeights ? "Portfolio" : searchParams.symbol;
+    const transformedIndex = searchParams.index.replace(" ", "-");
+    navigate(`/stocklinreg/${symbol}-${transformedIndex}`);
+    if (!symbol && !useWeights) {
       alert("Please enter a stock symbol");
       return;
-    } else if (searchIndex === "") {
+    } else if (!searchParams.index) {
       alert("Please select an index");
       return;
     }
-    searchParams.index = searchIndex
-    setStockSymbol(symbol);
-
-  getLinReg(searchParams.symbol);
-
-    navigate(`/stocklinreg/${symbol}`);
-  }
-  catch (err) {
-    console.log(err);
-  }
+    setSearchParams({ symbol, index: searchParams.index });
+    await fetchLinRegData(symbol, searchParams.index, stockWeights);
   };
 
-
-
-  const regressionLine = index.map((point) => {
-    return {
-      x: point.x,
-      y: formulaY + formulaB * point.x,
-    };
-  });
-  
-  const findIndexName = (index) => {
-    for (const [key, value] of Object.entries(indexOptions)) {
-      if (value === index) {
-        return key;
-      }
-    }
-  };
-
-  const options = {
-    theme: "dark1",
-    title: {
-      text: `${stockSymbol} vs ${findIndexName(searchParams.index)} Linear Regression`,
-    },
-    axisX: {
-      title: `${searchParams.index}`,
-    },
-    axisY: {
-      title: `${stockSymbol}`,
-      margin: 0,
-    },
-
-    data: [
-      {
-        type: "scatter",
-        showInLegend: true,
-        legendText: `${stockSymbol}`,
-        dataPoints: index.map((point) => ({
-          x: point.x,
-          y: point.y,
-          toolTipContent: `${searchIndex}: ${point.x}, ${stockSymbol}: ${point.y}`,
-        })),
-        label: "Data Points",
-      },
-      {
-        type: "line",
-        showInLegend: true,
-        legendText: `${searchIndex}`,
-      //  center the legend
-        margin: 10,
-        padding: 10,
-        legendMarkerType: "none",
-        dataPoints: regressionLine.map((point) => ({
-          x: point.x,
-          y: point.y,
-          toolTipContent: `${searchIndex}: ${point.x}, ${stockSymbol}: ${point.y}`,
-        })),
-      },
-    ],
-  };
   const handleCheckbox = async (event) => {
-    let weights = await idbPromise("stockWeights", "get");
-    weights = weights.map(({ portfolio_id, ...rest }) => rest);
-    setStockWeights(weights[0]);
     setUseWeights(event.target.checked);
-
-  }
-
-
+    setSearchParams((prevParams) => ({ ...prevParams, symbol: "Portfolio" }));
+  };
 
   return (
-    <div className="linear-reg mt-3 ">
-      <div className="container">
-        <div className="row w-100 card">
-          <div className="row text-center">
-            <h1 className="mt-3 card-header">Linear Regression</h1>
-            <form
-              onSubmit={handleSubmit}
-              useref={searchParams}
-              className="row justify-content-center"
-            >
-              <label htmlFor="symbol">Symbol</label>
-              <div className=" d-flex flex-column justify-content-center">
-                <div>
-              
-              <input
-                type="search-bar"
-                name="symbol"
-                className={useWeights ? "disabled-input input-bar" : "input-bar"}
-                onChange={handleInputChange}
-              />
-              </div>
-              <div className="form-check form-switch d-flex justify-content-center align-items-center mt-2 mb-2">
-                <div className="">
-                <input className="form-check-input" type="checkbox" id="flexSwitchCheckDefault" onChange={handleCheckbox}/>
-                <label className="form-check-label align-items-center" for="flexSwitchCheckDefault">Compare Portfolio</label>
+      <div className="linear-reg mt-3">
+          <main>
+            <div className="chart mt-4">
+              <div className="d-flex justify-content-center">
+                <div className="card lin-reg-card w-75 p-4">
+                  <div className="container w-50 d-flex">
+                    <div className="card p-4 w-100">
+                      <h1 className="text-center card-header">
+                        Linear Regression
+                      </h1>
+                      <form onSubmit={handleSubmit} className="form-container">
+                        <div className="form-group text-center">
+                          <label htmlFor="symbol">Symbol</label>
+                          <div className="input-group mb-3 text-center w-100 d-flex justify-content-center">
+                            <input
+                              type="text"
+                              name="symbol"
+                              className={`form-control text-center ${
+                                useWeights ? "disabled-input" : ""
+                              }`}
+                              value={searchParams.symbol}
+                              onChange={handleInputChange}
+                              disabled={useWeights}
+                            />
+                          </div>
+                        </div>
+                        <div className="form-group text-center">
+                          <label htmlFor="index">Index</label>
+                          <Dropdown
+                            onSelect={(eventKey) =>
+                              setSearchParams((prev) => ({
+                                ...prev,
+                                index: eventKey,
+                              }))
+                            }
+                          >
+                            <Dropdown.Toggle
+                              className="w-75"
+                              id="dropdown-index"
+                            >
+                              {searchParams.index}
+                            </Dropdown.Toggle>
+                            <Dropdown.Menu className="w-75 text-center">
+                              {Object.keys(indexOptions).map((option) => (
+                                <Dropdown.Item key={option} eventKey={option}>
+                                  {option}
+                                </Dropdown.Item>
+                              ))}
+                            </Dropdown.Menu>
+                          </Dropdown>
+                        </div>
+                        <div className="form-group form-check form-switch mt-3 d-flex justify-content-center">
+                          <input
+                            className="form-check-input me-2"
+                            type="checkbox"
+                            defaultChecked={useWeights}
+                            id="flexSwitchCheckDefault"
+                            onChange={handleCheckbox}
+                          />
+                          <label
+                            className="form-check-label"
+                            htmlFor="flexSwitchCheckDefault"
+                          >
+                            Compare Portfolio
+                          </label>
+                        </div>
+                        <div className="form-group d-flex justify-content-center">
+                          <button
+                            type="submit"
+                            className="btn btn-primary w-50 mt-4"
+                          >
+                            Submit
+                          </button>
+                        </div>
+                      </form>
+                      <div className="date-range mt-5">
+                        <div className="row">
+                          <div className="col-lg-6 mb-3">
+                            <div className="form-group">
+                              <label>Start Date</label>
+                              <input
+                                type="date"
+                                className="form-control"
+                                value={dates.startDate}
+                                onChange={(e) =>
+                                  setDates({
+                                    ...dates,
+                                    startDate: e.target.value,
+                                  })
+                                }
+                              />
+                            </div>
+                          </div>
+                          <div className="col-lg-6 mb-3">
+                            <div className="form-group">
+                              <label>End Date</label>
+                              <input
+                                type="date"
+                                className="form-control"
+                                value={dates.endDate}
+                                onChange={(e) =>
+                                  setDates({
+                                    ...dates,
+                                    endDate: e.target.value,
+                                  })
+                                }
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {(dataPoints.length > 0) && (
+                  <div className="lin-reg-graph container card p-4 w-100">
+                    <div className="card-header text-center">
+                      <FontAwesomeIcon icon={faLineChart} size="3x" />
+                    </div>
+                    <div className="stock-volume mt-3 mb-3">
+                      <CanvasJSChart options={options} />
+                    </div>
+                  </div>
+                  )}
                 </div>
               </div>
-              </div>
-              <label htmlFor="symbol">Index</label>
-              <Dropdown>
-              <Dropdown.Toggle className="w-50" id="dropdown-index">
-                Select Index
-              </Dropdown.Toggle>
-
-              <Dropdown.Menu className="w-50 text-center dropdown-menu">
-                {Object.keys(indexOptions).map((option) => (
-                  <Dropdown.Item
-                    key={option}
-                    name="index"
-                    className={searchIndex === indexOptions[option] ? "active fw-bold" : ""}
-                    onClick={() => setSearchIndex(indexOptions[option])}
-                  >
-                    {option}
-                  </Dropdown.Item>
-
-                ))}
-              </Dropdown.Menu>
-             
-              </Dropdown>
-              <div>
-                <button type="submit" className="btn w-50 mt-5 btn-primary">
-                  Submit
-                </button>
-              </div>
-            </form>
-          </div>
-          <div className="row text-center mt-5">
-            <div className="col-lg d-flex justify-content-center">
-              <div className="form-group text-center w-50">
-                <label>Start Date</label>
-                <input
-                  type="date"
-                  className="form-control text-center"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                />
-              </div>
+              { (dataPoints.length > 0) && (
+              <StockDetails
+                stockStats={regressionInfo}
+                stockInfo={false}
+                longName="Linear Regression"
+              />
+              )}
             </div>
-            <div className="col-lg d-flex justify-content-center">
-              <div className="form-group text-center w-50">
-                <label>End Date</label>
-                <input
-                  type="date"
-                  className="form-control text-center"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
+          </main>
       </div>
-
-      <div className="chart mt-2">
-        {isLoaded && index.length === 0 ? (
-          <div className="text-center">
-            <h1 className="text-center">No Data Found</h1>
-          </div>
-        ) : (
-          <div></div>
-        )}
-        {isLoaded && index.length !== 0 ? (
-          <div className="d-flex justify-content-center">
-            <div className="card lin-reg-card w-50 ">
-            <div className="col-10 m-auto justify-center stock-volume mt-5">
-          <RegressionTool stockSymbol={stockSymbol} searchParams={searchParams} index={index} formulaB={formulaB} formulaY={formulaY} indexName={findIndexName(searchParams.index)} searchIndex={searchIndex}/>
-          </div>
-          <div className="col-lg d-flex justify-content-center">
-              <div className="form-group inline text-center w-50">
-                <FontAwesomeIcon icon={faLineChart} size="1x" />
-                <input
-                  type="text"
-                  className="form-control text-center"
-                  value={`y = ${(formulaY).toFixed(2)} + ${(formulaB.toFixed(4))}x`}
-                  readOnly
-                />
-
-              </div>
-              </div>
-          </div>
-          </div>
-
-        ) : (
-          <div></div>
-        )}
-      </div>
-    </div>
   );
 };
 

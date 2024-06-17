@@ -6,9 +6,9 @@ import Auth from "../utils/auth";
 const pyBackEnd = "http://127.0.0.1:8000";
 
 export const indexOptions = {
-  SP500: "^GSPC",
+  "SP500": "^GSPC",
   "Dow Jones": "^DJI",
-  Nasdaq: "^IXIC",
+  "Nasdaq": "^IXIC",
   "Russell 2000": "^RUT",
   "S&P 400 Mid Cap": "^MID",
   "S&P 600 Small Cap": "^SML",
@@ -53,17 +53,15 @@ export async function stockInfo(stockSymbol) {
 }
 
 export async function linReg(
-  stockSymbol,
-  searchIndex,
+  searchParams,
   startDate,
   endDate,
   weights
 ) {
-  console.log(stockSymbol, searchIndex, startDate, endDate, weights);
   const response = await axios.get(`${pyBackEnd}/linreg`, {
     params: {
-      stocks: stockSymbol,
-      index: searchIndex,
+      stocks: searchParams.symbol,
+      index: indexOptions[searchParams.index],
       start: startDate,
       end: endDate,
       stockWeights: weights,
@@ -116,7 +114,6 @@ export async function getCompanyFinancials(stockSymbol, quarterly) {
 }
 
 export async function getFamaFrenchData(startDate, endDate, stockWeights) {
-  console.log("stockWeights", stockWeights, startDate, endDate);
   const response = await axios.get(`${pyBackEnd}/famafrench`, {
     params: {
       stockWeights: stockWeights,
@@ -191,7 +188,6 @@ export async function getStockObject(
   const stockNumbersArray = await Promise.all(promises);
   let stockNumbers = Object.assign({}, ...stockNumbersArray);
   stockNumbers = JSON.stringify(stockNumbers);
-  console.log("stockNumbers", stockNumbers);
   const stockWeights = await getStockWeights(stockNumbers);
   if (stockWeights && Auth.loggedIn()) {
     try {
@@ -229,7 +225,7 @@ export async function setStockGraph(data) {
 }
 
 export async function setGraphOptions(theme, stockName, data, stockSymbol) {
-  const options = {
+  return {
     theme: theme,
     title: { text: `${stockName} Stock Price and Volume` },
     subtitles: [{ text: "Price-Volume Trend" }],
@@ -328,8 +324,54 @@ export async function setGraphOptions(theme, stockName, data, stockSymbol) {
       },
     },
   };
-  return options;
+
 }
+
+
+export async function generateScatterLineGraphOptions (theme, searchParams, index, formula) {
+  const searchIndex = indexOptions[searchParams.index];
+  return {
+    theme: theme,
+    title: {
+      text: `${searchParams.symbol} vs ${searchIndex} Linear Regression`,
+    },
+    axisX: {
+      title: `${searchParams.index}`,
+    },
+    axisY: {
+      title: `${searchParams.symbol}`,
+      margin: 0,
+    },
+
+    data: [
+      {
+        type: "scatter",
+        showInLegend: true,
+        legendText: `${searchParams.symbol}`,
+        dataPoints: index.map((point) => ({
+          x: point.x,
+          y: point.y,
+          toolTipContent: `${searchIndex}: ${point.x}, ${searchParams.symbol}: ${point.y}`,
+        })),
+        label: "Data Points",
+      },
+      {
+        type: "line",
+        showInLegend: true,
+        legendText: `${searchIndex}`,
+        margin: 10,
+        padding: 10,
+        legendMarkerType: "none",
+        dataPoints: index.map((point) => ({
+          x: point.x,
+          y: formula.intercept + formula.coef * point.x,
+          toolTipContent: `${searchIndex}: ${point.x}, ${searchParams.symbol}: ${point.y}`,
+        })),
+      },
+    ],
+  };
+};
+
 
 export const formatDate = (date) => {
   return new Date(date).toISOString().slice(0, 10);
@@ -761,6 +803,37 @@ export const returnInfo = {
   "Dividend Rate": "The annual dividend payment.",
   "Mkt-RF": "The excess return of the market over the risk-free rate.",
   "Mkt-RF P-Value": "The probability Of observing a value as extreme or more extreme than the observed value by chance, assuming the null hypothesis is true. A p-value Of 0.05 or less is considered statistically significant.",
+  "Adj. R-Squared": "The percentage Of a portfolio's excess returns that can be explained by the returns Of the Mkt-RF factor. A value Of 1.0 indicates perfect correlation, 0.0 indicates no correlation, And negative values indicate an inverse correlation.",
+  "F-statistic": "A measure Of the overall significance Of the regression model.",
+  "Prob (F-statistic)": "The probability Of observing an F-statistic as extreme or more extreme than the observed value by chance, assuming the null hypothesis is true. A p-value Of 0.05 or less is considered statistically significant.",
+  "Covariance Type": "The type Of covariance used In the regression model.",
+  "No. Observations": "The number of observations used In the regression model.",
+  "AIC": "Akaike Information Criterion; a measure Of the relative quality Of a statistical model.",
+  "BIC": "Bayesian Information Criterion; a measure Of the relative quality Of a statistical model.",
+  "Log-Likelihood": "The log-likelihood Of the regression model.",
+  "R-squared": "The percentage Of a portfolio's excess returns that can be explained by the returns Of the SMB And HML factors. A value Of 1.0 indicates perfect correlation, 0.0 indicates no correlation, And negative values indicate an inverse correlation.",
+  "Method": "The method used to calculate the regression model. Least Squares is the most common method.",
+  "Model": "The type Of regression model used. OLS is Ordinary Least Squares and it is the most common type of regression model.",
+  "Df Residuals": "The degrees of freedom Of the residuals.",
+  "Df Model": "The degrees of freedom Of the model.",
 }
-
+export const commonQuestions = [
+  {
+    question: "What is this page about?",
+    answer: "This page provides detailed financial information about the selected stock, including historical data, financial statements, and analytics."
+  },
+  {
+    question: "How can I view financial statements?",
+    answer: "You can click on the 'Financials' tab to view the income statement, balance sheet, and cash flow statement of the selected stock."
+  },
+  {
+    question: "What is the significance of the charts?",
+    answer: "The charts show historical price and volume data, which can help you understand the stock's performance over time."
+  },
+  {
+    question: "How do I use the Knowledge Mode?",
+    answer: "In Knowledge Mode, you can click on financial terms to get detailed explanations and definitions."
+  }
+  // Add more questions as needed
+];
 

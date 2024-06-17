@@ -34,12 +34,11 @@ const StockInfo = () => {
     const getStockInfo = async () => {
       try {
         const data = await stockData(stockSymbol, startDate, endDate);
-        const stockDeets = await stockInfo(stockSymbol);
-        console.log("🚀 ~ getStockInfo ~ stockDeets:", stockDeets)
+        const stockInfo = await stockInfo(stockSymbol);
         const dataArr = JSON.parse(data);
-        const options = await setGraphOptions("dark1", stockDeets[stockSymbol].longName, dataArr, stockSymbol);
+        const options = await setGraphOptions("dark1", stockInfo[stockSymbol].longName, dataArr, stockSymbol);
         setOptions(options);
-        setStockDetails(stockDeets[stockSymbol] || {});
+        setStockDetails(stockInfo[stockSymbol] || {});
         setDataPoints(dataArr);
         setIsLoaded(true);
       } catch (err) {

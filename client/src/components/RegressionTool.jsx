@@ -1,8 +1,8 @@
 import CanvasJSReact from "@canvasjs/react-stockcharts";
 
 const RegressionTool = ({ stockSymbol, searchParams, index, formulaY, formulaB, indexName, searchIndex }) => {
-    const CanvasJS = CanvasJSReact.CanvasJS;
-    const CanvasJSChart = CanvasJSReact.CanvasJSChart;
+  const CanvasJS = CanvasJSReact.CanvasJS;
+  const CanvasJSChart = CanvasJSReact.CanvasJSChart;
   const regressionLine = index.map((point) => {
     return {
       x: point.x,

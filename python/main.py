@@ -147,6 +147,7 @@ def lin_reg_data(symbols, start, end, index, stockWeights):
 
 @app.get("/linreg")
 async def lin_reg(stocks: str, index: str, start: str, end: str, stockWeights: str):
+    print(stocks)
     symbols = [index, stocks]
     stocks_df, stock_data = lin_reg_data(symbols, start, end, index, stockWeights)
     formula = 'Dependent ~ Independent'
@@ -154,7 +155,14 @@ async def lin_reg(stocks: str, index: str, start: str, end: str, stockWeights: s
     coef = model.params[1]
     intercept = model.params[0]
     r_squared = model.rsquared
-    values = {'coef': coef, 'intercept': intercept, 'r_squared': r_squared}
+    model_html = model.summary().as_html().replace('\n', '')
+    model_summary = pd.read_html(model_html)[0].to_json(orient='values')
+    model_summary = json.loads(model_summary)
+    model_obj = {}
+    for arr in model_summary:
+        for i in range(0, len(arr), 2):
+            if arr[i] : model_obj[arr[i].replace(':', '')] = arr[i+1]
+    values = {'coef': coef, 'intercept': intercept, 'r_squared': r_squared, 'model': model_obj}
     sorted_stocks = stock_data.sort_values(by=index, ascending=True)
     json_data = sorted_stocks.reset_index(drop=True).to_json(date_format='iso', orient='values')
     return json_data, values

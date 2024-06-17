@@ -2,26 +2,10 @@
 import React from 'react';
 import { Card, CardContent, Typography, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import { commonQuestions } from '../utils/helpers';
 
-const commonQuestions = [
-  {
-    question: "What is this page about?",
-    answer: "This page provides detailed financial information about the selected stock, including historical data, financial statements, and analytics."
-  },
-  {
-    question: "How can I view financial statements?",
-    answer: "You can click on the 'Financials' tab to view the income statement, balance sheet, and cash flow statement of the selected stock."
-  },
-  {
-    question: "What is the significance of the charts?",
-    answer: "The charts show historical price and volume data, which can help you understand the stock's performance over time."
-  },
-  {
-    question: "How do I use the Knowledge Mode?",
-    answer: "In Knowledge Mode, you can click on financial terms to get detailed explanations and definitions."
-  }
-  // Add more questions as needed
-];
+
+
 
 const CommonQuestions = ({ handleClose }) => {
   return (

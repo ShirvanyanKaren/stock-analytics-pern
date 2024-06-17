@@ -1,16 +1,12 @@
-import React from 'react'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useReducer } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@apollo/client'
 import {useDispatch, useSelector} from "react-redux";
-import { useReducer } from 'react';
-import { QUERY_USER } from '../utils/queries'
+import { QUERY_USER, QUERY_STOCK } from '../utils/queries'
+import { getStockWeights, getStockObject, idbPromise } from '../utils/helpers';
+import { SET_STOCK_WEIGHTS } from '../utils/actions';
 import Auth  from '../utils/auth'
 import decode from 'jwt-decode';
-import { QUERY_STOCK } from '../utils/queries'
-import { getStockWeights, getStockObject } from '../utils/helpers';
-import { SET_STOCK_WEIGHTS } from '../utils/actions';
-import { idbPromise } from '../utils/helpers';
 import axios from 'axios';
 
 
@@ -19,7 +15,6 @@ const [decodedToken, setToken] = useState('');
 const dispatch = useDispatch();
 const [stockWeights, setStockWeights] = useState({});
 const [loading, setLoading] = useState(true);
-
 const CheckStockWeights = useSelector((state) => state.stockWeights);
 
 
@@ -44,7 +39,10 @@ const { data: stockData } = useQuery(QUERY_STOCK, {
   variables: { portfolioId: userData?.user?.id },
   skip: !userData?.user?.id, 
 });
+
+
 useEffect(() => {
+  
   idbPromise('stockWeights', 'get').then(result => result.length === 0 ? setLoading(true) : setLoading(false));
 }, [stockWeights]);
 
