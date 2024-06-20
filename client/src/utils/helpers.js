@@ -443,9 +443,9 @@ export const returnInfo = {
     "Earnings per share calculated using the diluted number Of shares outstanding.",
   "Diluted NI Available to Com Stockholders":
     "Net income available to common stockholders, adjusted for dilutive effects.",
-  "E B I T":
+  "EBIT":
     "Earnings Before Interest And Taxes; a measure Of a firm's profit that includes all expenses except interest And income tax expenses.",
-  "E B I T D A":
+  "EBITDA":
     "Earnings Before Interest, Taxes, Depreciation, And Amortization; an indicator Of a company's financial performance.",
   "Gross Profit":
     "The profit a company makes after deducting the costs associated with making And selling its products.",

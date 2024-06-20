@@ -2,12 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import CanvasJSReact from "@canvasjs/react-stockcharts";
 import { Dropdown } from "react-bootstrap";
-import {
-  linReg,
-  generateScatterLineGraphOptions,
-  idbPromise,
-  indexOptions,
-} from "../utils/helpers";
+import { linReg, generateScatterLineGraphOptions, idbPromise, indexOptions, } from "../utils/helpers";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLineChart } from "@fortawesome/free-solid-svg-icons";
 import StockDetails from "../components/StockDetails";
@@ -20,21 +15,15 @@ const StockLinReg = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [dataPoints, setDataPoints] = useState([]);
-  const [stockSymbol, setStockSymbol] = useState(symbol || "");
   const [isLoaded, setIsLoaded] = useState(false);
   const [useWeights, setUseWeights] = useState(false);
   const [stockWeights, setStockWeights] = useState({});
-  const [searchParams, setSearchParams] = useState({
-    symbol: "",
-    index: "^GSPC",
-  });
+  const [searchParams, setSearchParams] = useState({symbol: "", index: "SP500",});
   const [options, setChartOptions] = useState({});
   const [regressionInfo, setRegressionInfo] = useState({});
   const [formula, setFormula] = useState({ coef: null, intercept: null });
   const [dates, setDates] = useState({
-    startDate: new Date(new Date().getFullYear(), 0, 1)
-      .toISOString()
-      .slice(0, 10),
+    startDate: new Date(new Date().getFullYear(), 0, 1).toISOString().slice(0, 10),
     endDate: new Date().toISOString().slice(0, 10),
   });
 
@@ -42,18 +31,26 @@ const StockLinReg = () => {
     if (!symbol) return;
     const fetchAndSetData = async () => {
       const params = symbol.split("-");
-      if (params[0] === "Portfolio") setUseWeights(true);
-      const weights = await idbPromise("stockWeights", "get");
-      const filteredWeights = weights.map(({ portfolio_id, ...rest }) => rest);
-      setStockWeights(filteredWeights[0]);
+      params[1] = params[1].replace("_", " ");
       setSearchParams({ symbol: params[0], index: params[1] });
-      await fetchLinRegData(params[0], params[1], filteredWeights[0]);
+      await fetchLinRegData(params[0], params[1]);
     };
     fetchAndSetData();
     setIsLoaded(true);
   }, []);
 
-  const fetchLinRegData = async (symbol, index, weightsObject) => {
+  const fetchStockWeights = async () => {
+    if(Object.keys(stockWeights).length === 0 || !stockWeights){
+      const weights = await idbPromise("stockWeights", "get");
+      const weightsObject = await weights.map(({ portfolio_id, ...rest }) => rest)[0];
+      setStockWeights(weightsObject);
+      return weightsObject;
+    } else {
+      return stockWeights;
+    }
+  }
+
+  const fetchLinRegData = async (symbol, index) => {
     if (dates.startDate > dates.endDate) {
       alert("Start date must be before end date");
       return;
@@ -61,41 +58,25 @@ const StockLinReg = () => {
       alert("Start date cannot be the same as end date");
       return;
     }
-    weightsObject = symbol === "Portfolio" ? JSON.stringify(weightsObject) : "";
-    const data = await linReg(
-      { symbol, index },
-      dates.startDate,
-      dates.endDate,
-      weightsObject
-    );
+    let weightsObject = await fetchStockWeights();
+    weightsObject = useWeights || symbol === "Portfolio" ? JSON.stringify(weightsObject) : "";
+    const data = await linReg({ symbol, index }, dates.startDate, dates.endDate, weightsObject);
     const dataArray = JSON.parse(data[0]);
-    const dps = dataArray.map((item) => ({
-      x: Number(item[1]),
-      y: Number(item[0]),
-    }));
+    const dps = dataArray.map((item) => ({ x: Number(item[1]), y: Number(item[0])}));
     const formula = { coef: data[1]["coef"], intercept: data[1]["intercept"] };
     setRegressionInfo(data[1]["model"]);
     setFormula(formula);
     setDataPoints(dps);
-    const options = await generateScatterLineGraphOptions(
-      "dark1",
-      { symbol, index },
-      dps,
-      formula
-    );
+    const options = await generateScatterLineGraphOptions("dark1", { symbol, index }, dps, formula);
     setChartOptions(options);
   };
 
-  const handleInputChange = (event) => {
-    const { name, value } = event.target;
-    setSearchParams((prevParams) => ({ ...prevParams, [name]: value }));
-  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     const symbol = useWeights ? "Portfolio" : searchParams.symbol;
-    const transformedIndex = searchParams.index.replace(" ", "-");
-    navigate(`/stocklinreg/${symbol}-${transformedIndex}`);
+    const transformedIndex = searchParams.index.replace(" ", "_");
+    navigate(`/linear-regression/${symbol}-${transformedIndex}`);
     if (!symbol && !useWeights) {
       alert("Please enter a stock symbol");
       return;
@@ -104,12 +85,17 @@ const StockLinReg = () => {
       return;
     }
     setSearchParams({ symbol, index: searchParams.index });
-    await fetchLinRegData(symbol, searchParams.index, stockWeights);
+    await fetchLinRegData(symbol, searchParams.index);
   };
 
   const handleCheckbox = async (event) => {
     setUseWeights(event.target.checked);
-    setSearchParams((prevParams) => ({ ...prevParams, symbol: "Portfolio" }));
+    setSearchParams((prevParams) => ({ ...prevParams, symbol: event.target.checked ? "Portfolio" : "" }));
+  };
+
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setSearchParams((prevParams) => ({ ...prevParams, [name]: value }));
   };
 
   return (
@@ -117,20 +103,20 @@ const StockLinReg = () => {
           <main>
             <div className="chart mt-4">
               <div className="d-flex justify-content-center">
-                <div className="card lin-reg-card w-75 p-4">
-                  <div className="container w-50 d-flex">
-                    <div className="card p-4 w-100">
-                      <h1 className="text-center card-header">
+                <div className="card w-75 align-items-center lin-reg-card">
+                  <div className="container w-75 d-flex">
+                    <div className="w-100 m-3">
+                      <h1 className="text-center">
                         Linear Regression
                       </h1>
                       <form onSubmit={handleSubmit} className="form-container">
                         <div className="form-group text-center">
+                        <div className="input-group mb-3 text-center w-100 d-flex flex-column align-items-center">
                           <label htmlFor="symbol">Symbol</label>
-                          <div className="input-group mb-3 text-center w-100 d-flex justify-content-center">
                             <input
                               type="text"
                               name="symbol"
-                              className={`form-control text-center ${
+                              className={`form-control text-center w-25 mt-2 ${
                                 useWeights ? "disabled-input" : ""
                               }`}
                               value={searchParams.symbol}
@@ -188,46 +174,32 @@ const StockLinReg = () => {
                           </button>
                         </div>
                       </form>
-                      <div className="date-range mt-5">
-                        <div className="row">
-                          <div className="col-lg-6 mb-3">
-                            <div className="form-group">
-                              <label>Start Date</label>
+                      <div className="date-range mt-5 text-center d-flex flex-direction-row justify-content-around">
+                        {
+                          Object.keys(dates).map((date, index) => (
+                            <div key={index} className="form-group">
+                              <label>{date === "startDate" ? "Start Date" : "End Date"}</label>
                               <input
                                 type="date"
-                                className="form-control"
-                                value={dates.startDate}
+                                className="form-control text-center"
+                                value={dates[date]}
+                                max={new Date().toISOString().slice(0, 10)}
+                                min={date === "startDate" ? "2010-01-01" : dates.startDate}
                                 onChange={(e) =>
                                   setDates({
                                     ...dates,
-                                    startDate: e.target.value,
+                                    [date]: e.target.value,
                                   })
                                 }
                               />
                             </div>
-                          </div>
-                          <div className="col-lg-6 mb-3">
-                            <div className="form-group">
-                              <label>End Date</label>
-                              <input
-                                type="date"
-                                className="form-control"
-                                value={dates.endDate}
-                                onChange={(e) =>
-                                  setDates({
-                                    ...dates,
-                                    endDate: e.target.value,
-                                  })
-                                }
-                              />
-                            </div>
-                          </div>
-                        </div>
+                          ))
+                        }
                       </div>
                     </div>
                   </div>
                   {(dataPoints.length > 0) && (
-                  <div className="lin-reg-graph container card p-4 w-100">
+                  <div className="lin-reg-graph container card w-100">
                     <div className="card-header text-center">
                       <FontAwesomeIcon icon={faLineChart} size="3x" />
                     </div>

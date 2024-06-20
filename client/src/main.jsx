@@ -34,11 +34,11 @@ const router = createBrowserRouter([
         element: <StockInfo />,
       },
       {
-        path: "/stocklinreg/:symbol",
+        path: "/linear-regression/:symbol",
         element: <StockLinReg />,
       },
       {
-        path: "/stocklinreg",
+        path: "/linear-regression",
         element: <StockLinReg />,
       },
       {

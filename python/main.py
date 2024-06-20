@@ -108,7 +108,7 @@ def lin_reg_data(symbols, start, end, index, stockWeights):
     start_date = dt.datetime.strptime(start, '%Y-%m-%d')
     end_date = dt.datetime.strptime(end, '%Y-%m-%d')
     using_weights = False
-    if len(stockWeights) > 0 and stockWeights != '{}':
+    if symbols == 'Portfolio' or stockWeights != '':
         using_weights = True
         stock_weights = json.loads(stockWeights)
     if index in ['UNRATE', 'CPIAUCSL', 'PPIACO', 'FEDFUNDS', 'GDP', 'USEPUINDXD', 'VIXCLS']:

@@ -49,6 +49,9 @@ const Header = () => {
                 <NavDropdown.Item href="/famafrench">
                   Expected Return
                 </NavDropdown.Item>
+                <NavDropdown.Item href="/linear-regression"> 
+                  Linear Regression
+                </NavDropdown.Item>
               </NavDropdown>
               <Nav.Link as={Link} to="/glossary">Glossary</Nav.Link>
             </Nav>

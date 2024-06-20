@@ -6,7 +6,6 @@ import ToolTip from "./ToolTip";
 
 const StockDetails = (props) => {
   const { stockStats, stockInfo, longName } = props;
-  console.log("🚀 ~ StockDetails ~ stockStats:", stockStats)
   const entries = useMemo(() => {
     return Object.entries(stockStats).filter(([key]) => returnInfo[titleCase(key)]);
   }, [stockStats]);
@@ -25,7 +24,7 @@ const StockDetails = (props) => {
       <div className="row card custom-card">
         <div className="card-header">
           <h3 className="text-left ms-2 mt-3">
-            {props.longName} Overview
+            {props.name} Overview
           </h3>
         </div>
           <div className="col-12 card-items-custom d-flex">

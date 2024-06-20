@@ -72,7 +72,7 @@ const StockFinancials = ({ symbol: initialSymbol }) => {
             {categories.map((type) => (
               <h6
                 key={type}
-                onClick={() => changeStatement(type.split(" ")[0].toLowerCase())}
+                onClick={() => changeStatement(type)}
                 className={statement === type ? "info active-stat" : "info"}
               >
                 {type}

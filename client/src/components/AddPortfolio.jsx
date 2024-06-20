@@ -71,6 +71,8 @@ const AddPortfolio = ({ stockSymbol, longName, open, page }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    event.stopPropagation();
+    console.log("clicked")
     if (!stockState.shares) return;
 
     try {

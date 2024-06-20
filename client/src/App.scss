@@ -201,37 +201,34 @@ body {
 }
 
 .custom-card {
-  // add shadow
   box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-  // add a light grey color
   background-color: #f1f1f1;
   .card-items-custom {
-    // increase the border thickness
     border-top: 1px solid #ccc;
   }
   .list-group-item {
     background: #f1f1f1;
-    // increase the bottom and top border thickness
     border-top: 1px solid #ccc;
     border-bottom: 1px solid #ccc;
   }
 }
 
-.stock-volume {
-  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-  border-radius: 4px;
-}
+
 .lin-reg-card {
   display: flex;
   flex-direction: row;
+  // for card in lin-reg-card, add border and border-radius
+  .card {
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+  }
 }
+
 .nav-bar-custom {
   background: transparent;
   box-shadow: 0 10px 12px 0 rgba(0,0,0,0.2);
-  // add heavy bottom box shadow
-  box-shadow: 0 15px 12px 0 rgba(0,0,0,0.2);
   .nav-bar {
-    opacity: 1 !important; /* Ensure no transparency */
+    opacity: 1 !important; 
     z-index: 2;
   }
 }

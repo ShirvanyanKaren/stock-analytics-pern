@@ -70,7 +70,7 @@ const FamaFrench = () => {
       try {
         const weights = await idbPromise("stockWeights", "get");
         var { portfolio_id, ...weightsStorage } = weights[0];
-        weightsStorage = await JSON.stringify(weightsStorage);
+        weightsStorage = JSON.stringify(weightsStorage);
         const response = await getFamaFrenchData(
           startDate,
           endDate,
@@ -84,31 +84,7 @@ const FamaFrench = () => {
             [key]: convertToScientific(stats[key])
           }));
         }  
-        console.log(dataArray, "dataArray")
-        // for (const key in stats) {
-        //   if (key == "params") {
-        //     setStats((prevStats) => ({
-        //       ...prevStats,
-        //       hml: stats[key]["HML"].toFixed(4),
-        //       mktRf: stats[key]["Mkt-RF"].toFixed(4),
-        //       smb: stats[key]["SMB"].toFixed(4),
-        //     }));
-        //   } else if (key == "pvalues") {
-        //     setStats((prevStats) => ({
-        //       ...prevStats,
-        //       hmlPval: convertToScientific(stats[key]["HML"]),
-        //       mktRfPval: convertToScientific(stats[key]["Mkt-RF"]),
-        //       smbPval: convertToScientific(stats[key]["SMB"]),
-        //     }));
-        //   } else {
-        //     setStats((prevStats) => ({
-        //       ...prevStats,
-        //       rSquared: stats["rsquared"].toFixed(4),
-        //       expectedReturn: (stats["expected_return"] * 100).toFixed(2),
-        //       sharpe: stats["sharpe"].toFixed(4),
-        //     }));
-        //   }
-        // }
+        console.log(dataArray, "dataArray");
         for (const key in dataArray) {
           let MktRf = "Mkt-RF";
           setDates((prevDates) => [...prevDates, key]);
@@ -128,7 +104,6 @@ const FamaFrench = () => {
     getFamaFrench();
   }, []);
 
-  console.log(stats, "stats");
 
   const options = {
     animdationEnabled: true,
@@ -265,6 +240,7 @@ const FamaFrench = () => {
         <StockDetails
           stockStats={stats}
           stockInfo={Boolean(false)}
+          name="Fama French Model"
         />
       </div>
     </>
