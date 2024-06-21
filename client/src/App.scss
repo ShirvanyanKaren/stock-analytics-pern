@@ -84,8 +84,8 @@ li {
 }
 
 body {
-  background-color: #f1f1f1 !important; /* Very light grey */
-  opacity: 1 !important; /* Ensure no transparency */
+  background-color: #f1f1f1 !important; 
+  opacity: 1 !important; 
 }
 
 .dropdown-menu {
@@ -255,8 +255,9 @@ body {
     }
   }
 }
-
+ 
 .drop-down-custom {
+  width: 25%;
   &.active {
     input {
       border-bottom: 1px solid #ccc;
@@ -415,5 +416,9 @@ body {
 .stock-details-info{
   font-weight: bold;
   font-size: 20px;
+
+}
+
+.drop-down-custom{
 
 }

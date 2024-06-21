@@ -5,6 +5,7 @@ import { faPlus, faCircleDollarToSlot } from "@fortawesome/free-solid-svg-icons"
 import { useMutation, useQuery } from "@apollo/client";
 import { ADD_STOCK } from "../utils/mutations";
 import { QUERY_USER } from "../utils/queries";
+import auth from "../utils/auth";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import decode from "jwt-decode";
@@ -12,13 +13,14 @@ import decode from "jwt-decode";
 const AddPortfolio = ({ stockSymbol, longName, open, page }) => {
   const location = useLocation();
   const [show, setShow] = useState(false);
+  
   const [decodedToken, setDecodedToken] = useState(null);
   const [success, setSuccess] = useState(false);
   const [stockState, setStockState] = useState({
-    symbol: stockSymbol,
-    stock_name: longName,
-    shares: 0,
-    purchase_date: new Date().toISOString().slice(0, 10),
+    stockSymbol: stockSymbol,
+    stockName: longName,
+    stockQuantity: 0,
+    stockPurchaseDate: new Date().toISOString().slice(0, 10),
     totalAmount: 0,
   });
 
@@ -40,15 +42,16 @@ const AddPortfolio = ({ stockSymbol, longName, open, page }) => {
     if (stockSymbol && longName) {
       setStockState((prevState) => ({
         ...prevState,
-        symbol: stockSymbol,
-        stock_name: longName,
+        stockSymbol: stockSymbol,
+        stockName: longName,
       }));
     }
   }, [stockSymbol, longName]);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
-    const shares = name === "shares" ? Math.max(0, parseInt(value, 10)) : value;
+    const shares = name === "stockQuantity" ? Math.max(0, parseInt(value, 10)) : value;
+    console.log(typeof shares)
     setStockState((prevState) => ({
       ...prevState,
       [name]: shares,
@@ -60,11 +63,12 @@ const AddPortfolio = ({ stockSymbol, longName, open, page }) => {
   const handleClose = () => {
     setShow(false);
     setSuccess(false);
+    error.message = "";
     setStockState({
-      symbol: stockSymbol,
-      stock_name: longName,
-      shares: 0,
-      purchase_date: new Date().toISOString().slice(0, 10),
+      stockSymbol: stockSymbol,
+      stockName: longName,
+      stockQuantity: 0,
+      stockPurchaseDate: new Date().toISOString().slice(0, 10),
       totalAmount: 0,
     });
   };
@@ -72,25 +76,28 @@ const AddPortfolio = ({ stockSymbol, longName, open, page }) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     event.stopPropagation();
-    console.log("clicked")
-    if (!stockState.shares) return;
-
+    if (!stockState.stockQuantity || !userData) return;
     try {
+      console.log(typeof stockState.stockQuantity)
       const mutation = await addStock({
         variables: {
           portfolioId: userData.user.id,
-          stockQuantity: stockState.shares,
-          stockPurchaseDate: stockState.purchase_date,
-          stockName: stockState.stock_name,
-          stockSymbol: stockState.symbol,
+          ...stockState,
         },
       });
-      console.log(mutation);
       setSuccess(true);
     } catch (e) {
+      error.message = e.message;
       console.error(e);
     }
   };
+
+  const redirectUserLogin = async () => {
+    localStorage.removeItem("redirect");
+    localStorage.setItem("redirect", location.pathname);
+    window.location.assign("/login");
+    console.log(location)
+  }
 
   return (
     <>
@@ -122,19 +129,27 @@ const AddPortfolio = ({ stockSymbol, longName, open, page }) => {
                 className="form-control"
                 type="number"
                 placeholder="Number of Shares"
-                name="shares"
-                value={stockState.shares}
-                onChange={(e) => setStockState({ ...stockState, shares: e.target.value })}
+                name="stockQuantity"
+                value={stockState.stockQuantity}
+                onChange={(e) => setStockState({ ...stockState, stockQuantity: Number(e.target.value) })}
               />
               <label className="text-muted mt-3 f-4">
                 Total Investment: ${isNaN(stockState.totalAmount) ? 0 : stockState.totalAmount}
               </label>
             </div>
-            <button type="submit" className="btn btn-primary mt-4 w-100 mb-2">
-              Add
-            </button>
+            { auth.loggedIn() ? (
+              <button type="submit" className="btn btn-primary mt-4 w-100 mb-2">
+                Add
+                </button>
+                ) : (
+                  <div className="d-flex justify-content-center">
+                    <button type="submit" onClick={redirectUserLogin} className="btn btn-primary mt-4 w-100 mb-2">
+                      Login to add
+                    </button> 
+                  </div>
+                )}
           </form>
-          {error && <span className="text-danger">Something went wrong!</span>}
+          {error && <span className="text-danger">{error.message}</span>}
           {success && <span className="text-success">Stock added successfully!</span>}
         </Modal.Body>
       </Modal>

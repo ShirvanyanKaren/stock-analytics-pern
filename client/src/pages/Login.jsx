@@ -16,25 +16,24 @@ import { LOGIN_USER } from "../utils/mutations";
 import { ADD_USER } from "../utils/mutations";
 import { SAVE_USER } from "../utils/actions";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Auth from "../utils/auth";
 
 const Login = () => {
   const [justifyActive, setJustifyActive] = useState("tab1");
   const [login] = useMutation(LOGIN_USER);
   const [addUser, { error }] = useMutation(ADD_USER);
-  const [apollErrorText, setApolloErrorText] = useState("");
+  const [apolloErrorText, setApolloErrorText] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
 
-  console.log(location);
 
   useEffect(() => {
+    location.state = localStorage.getItem("redirect") || "/";
     if (Auth.loggedIn()) {
-      navigate("/");
+      navigate(location.state);
     }
   }, []);
 
@@ -70,7 +69,6 @@ const Login = () => {
   const handleLoginSubmit = async (event) => {
     event.preventDefault();
     setSubmitted(true);
-    console.log(formState);
 
     try {
       const mutationResponse = await login({
@@ -81,14 +79,19 @@ const Login = () => {
       });
       const token = mutationResponse.data.login.token;
       const userId = mutationResponse.data.login.user.id;
-      console.log(userId);
-
       dispatch({
         type: SAVE_USER,
         payload: userId,
       });
       Auth.login(token);
+      console.log(location.state);
+      navigate(location.state);
     } catch (e) {
+      if (e.graphQLErrors && e.graphQLErrors.length > 0) {
+        const errorMessages = e.graphQLErrors.map((error) => error.message);
+        let apolloErrorText = "An error occurred while signing in. Please try again.";
+        
+      }
       console.log(e);
     }
   };
@@ -96,8 +99,6 @@ const Login = () => {
   const handleFormSubmit = async (event) => {
     event.preventDefault();
     setSubmitted(true);
-
-    console.log(formState);
     try {
       console.log(formState);
       const mutationResponse = await addUser({
@@ -116,16 +117,14 @@ const Login = () => {
           type: LOGIN,
           payload: data.data,
         });
-        // navigate("/");
+        
       });
     } catch (e) {
       if (e.graphQLErrors && e.graphQLErrors.length > 0) {
         const errorMessages = e.graphQLErrors.map((error) => error.message);
-        console.log(errorMessages);
 
         let apolloErrorText =
           "An error occurred while signing up. Please try again.";
-
         errorMessages.forEach((msg) => {
           if (msg.includes("E11000 duplicate key error")) {
             if (msg.includes("email")) {
@@ -258,9 +257,14 @@ const Login = () => {
               />
             </div>
 
-            <MDBBtn type="submit" className="mb-4 w-100">
+            <MDBBtn type="submit"  className="mb-4 w-100">
               Sign up
             </MDBBtn>
+            {apolloErrorText && (
+              <div className="alert alert-danger" role="alert">
+                {apolloErrorText}
+              </div>
+            )}
           </form>
         </MDBTabsPane>
       </MDBTabsContent>

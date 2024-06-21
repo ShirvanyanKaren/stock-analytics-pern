@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import CanvasJSReact from "@canvasjs/react-stockcharts";
 import { Dropdown } from "react-bootstrap";
-import { linReg, generateScatterLineGraphOptions, idbPromise, indexOptions, } from "../utils/helpers";
+import { linReg, idbPromise, indexOptions, generateChartOptions, } from "../utils/helpers";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLineChart } from "@fortawesome/free-solid-svg-icons";
 import StockDetails from "../components/StockDetails";
@@ -20,7 +20,9 @@ const StockLinReg = () => {
   const [stockWeights, setStockWeights] = useState({});
   const [searchParams, setSearchParams] = useState({symbol: "", index: "SP500",});
   const [options, setChartOptions] = useState({});
-  const [regressionInfo, setRegressionInfo] = useState({});
+  const [regressionInfo, setRegressionInfo] = useState({
+    longName: "Linear Regression",
+  });
   const [formula, setFormula] = useState({ coef: null, intercept: null });
   const [dates, setDates] = useState({
     startDate: new Date(new Date().getFullYear(), 0, 1).toISOString().slice(0, 10),
@@ -67,7 +69,12 @@ const StockLinReg = () => {
     setRegressionInfo(data[1]["model"]);
     setFormula(formula);
     setDataPoints(dps);
-    const options = await generateScatterLineGraphOptions("dark1", { symbol, index }, dps, formula);
+    const options = generateChartOptions("regression", {
+      theme: "dark1",
+      index: dps,
+      searchParams: { symbol, index },
+      formula: formula,
+    });
     setChartOptions(options);
   };
 
@@ -214,7 +221,7 @@ const StockLinReg = () => {
               <StockDetails
                 stockStats={regressionInfo}
                 stockInfo={false}
-                longName="Linear Regression"
+                longName="Linear Regression" 
               />
               )}
             </div>

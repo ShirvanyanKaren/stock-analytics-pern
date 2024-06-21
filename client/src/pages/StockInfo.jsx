@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 import { useSelector } from "react-redux";
-import { setGraphOptions, stockData, stockInfo } from "../utils/helpers";
+import { stockData, stockInfo, generateChartOptions, } from "../utils/helpers";
 import { QUERY_ME } from "../utils/queries";
 import StockDetails from "../components/StockDetails";
 import StockFinancials from "../components/StockFinancials";
@@ -36,7 +36,12 @@ const StockInfo = () => {
         const data = await stockData(stockSymbol, startDate, endDate);
         const stockInf = await stockInfo(stockSymbol);
         const dataArr = JSON.parse(data);
-        const options = await setGraphOptions("dark1", stockInf[stockSymbol].longName, dataArr, stockSymbol);
+        const options = generateChartOptions("stock", {
+          theme: "dark1",
+          stockName: stockInf[stockSymbol].longName,
+          data : dataArr,
+          stockSymbol: stockSymbol
+        });
         setOptions(options);
         setStockDetails(stockInf[stockSymbol] || {});
         setDataPoints(dataArr);
