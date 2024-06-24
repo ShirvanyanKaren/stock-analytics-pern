@@ -60,26 +60,32 @@ const Home = () => {
       ) : (
         <>
           <section className="hero">
-            <h1>Using data to help you trade smarter</h1>
-            <p>CincoData is built by retail investors for retail investors. Learn how to invest and use financial data all in one place.</p>
+            <div className="hero-content">
+              <h2>Using data to help you trade smarter</h2>
+              <p>CincoData is built by retail investors for retail investors. Learn how to invest and use financial data all in one place.</p>
+            </div>
           </section>
           <section className="features">
             <div className="feature-card">
-              <img src="/icons/financial-data.svg" alt="Financial Data" />
-              <h3>Financial Data</h3>
+              <img src="src/assets/Financial_Data.png" alt="Financial Data" />
+              <span>Financial Data</span>
             </div>
             <div className="feature-card">
-              <img src="/icons/analysis-tools.svg" alt="Analysis Tools" />
-              <h3>Analysis Tools</h3>
+              <img src="src/assets/Analysis_Tools.png" alt="Analysis Tools" />
+              <span>Analysis Tools</span>
             </div>
             <div className="feature-card">
-              <img src="/icons/learning.svg" alt="Learning" />
-              <h3>Learning</h3>
+              <img src="src/assets/Learning : AI.png" alt="Learning" />
+              <span>Learning</span>
             </div>
             <div className="feature-card">
-              <img src="/icons/cincodata-plus.svg" alt="CincoData+" />
-              <h3>CincoData+</h3>
+              <img src="src/assets/CincoData_+.png" alt="CincoData+" />
+              <span>CincoData+</span>
             </div>
+          </section>
+          <section className="newsletter">
+            <input type="email" placeholder="your email@domain.com" />
+            <button type="submit">Subscribe</button>
           </section>
         </>
       )}

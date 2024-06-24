@@ -81,7 +81,7 @@ body {
   text-align: center;
   padding: 5rem 1rem;
 
-  h1 {
+  h2 {
     font-size: 3rem;
     margin-bottom: 1rem;
   }
@@ -95,26 +95,54 @@ body {
   display: flex;
   justify-content: space-around;
   padding: 2rem 1rem;
+
+  .feature-card {
+    background-color: #fff;
+    color: $text-color;
+    padding: 2rem;
+    border-radius: 10px;
+    width: 20%;
+    text-align: center;
+    border: 2px solid $secondary-color; /* Add border to match blue boxes */
+
+    img {
+      width: 50px;
+      height: 50px;
+      margin-bottom: 1rem;
+    }
+
+    span {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+  }
 }
 
-.feature-card {
-  background-color: $primary-color;
-  color: $text-color;
-  padding: 2rem;
-  border-radius: 10px;
-  width: 20%;
-  text-align: center;
-}
+.newsletter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #eef4f9;
+  padding: 20px;
+  border-radius: 30px;
 
-.feature-card img {
-  width: 50px;
-  height: 50px;
-  margin-bottom: 1rem;
-}
+  input[type="email"] {
+    width: 250px;
+    padding: 10px;
+    border: 2px solid $secondary-color;
+    border-radius: 30px;
+    margin-right: 10px;
+  }
 
-.feature-card h3 {
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
+  button {
+    background: $secondary-color;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    padding: 10px 20px;
+    cursor: pointer;
+  }
 }
 
 .footer {
