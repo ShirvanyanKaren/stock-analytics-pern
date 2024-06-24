@@ -238,11 +238,11 @@ export function generateChartOptions(type, config) {
               {
                 name: "Price (in USD)",
                 yValueFormatString: "$#,###.##",
-                type: "candlestick",
-                color: "#049C",
+                type: "line", // Change this from "candlestick" to "line"
+                color: "#2BB148",
                 dataPoints: data.map((point) => ({
                   x: new Date(point.Date),
-                  y: [point.Open, point.High, point.Low, point.Close],
+                  y: point.Close, // Use point.Close for the y value in line graph
                 })),
               },
             ],
@@ -298,6 +298,7 @@ export function generateChartOptions(type, config) {
           },
         },
       };
+  
 
     case "regression":
       const { theme: scatterTheme, searchParams, index, formula } = config;

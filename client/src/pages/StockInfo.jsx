@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useParams, useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
 import { stockData, stockInfo, generateChartOptions } from "../utils/helpers";
 import StockDetails from "../components/StockDetails";
 import StockFinancials from "../components/StockFinancials";
@@ -14,7 +13,7 @@ const CanvasJSStockChart = CanvasJSReact.CanvasJSStockChart;
 
 const StockInfo = () => {
   const { symbol } = useParams();
-  const [dataPoints, setDataPoints] =  useState([]);
+  const [dataPoints, setDataPoints] = useState([]);
   const [options, setOptions] = useState({});
   const [isLoaded, setIsLoaded] = useState(false);
   const [startDate, setStartDate] = useState(new Date(new Date().getFullYear(), 0, 1).toISOString().slice(0, 10));
@@ -35,8 +34,8 @@ const StockInfo = () => {
         const options = generateChartOptions("stock", {
           theme: "dark1",
           stockName: stockInf[stockSymbol].longName,
-          data : dataArr,
-          stockSymbol: stockSymbol
+          data: dataArr,
+          stockSymbol: stockSymbol,
         });
         setOptions(options);
         setStockDetails(stockInf[stockSymbol] || {});
@@ -96,9 +95,15 @@ const StockInfo = () => {
       )}
 
       {infoType === "Financials" && (
-        <StockFinancials symbol={stockSymbol} />
+        <div className="col-10 m-auto justify-center stock-volume mt-5">
+          <CanvasJSStockChart
+            containerProps={containerProps}
+            options={options}
+          />
+          <StockFinancials symbol={stockSymbol} />
+        </div>
       )}
-      
+
       {showReminderPopup && (
         <ReminderPopup open={showReminderPopup} handleClose={() => setShowReminderPopup(false)} />
       )}
