@@ -5,29 +5,6 @@ import Auth from "../utils/auth";
 
 const pyBackEnd = "http://127.0.0.1:8000";
 
-export const indexOptions = {
-  "SP500": "^GSPC",
-  "Dow Jones": "^DJI",
-  "Nasdaq": "^IXIC",
-  "Russell 2000": "^RUT",
-  "S&P 400 Mid Cap": "^MID",
-  "S&P 600 Small Cap": "^SML",
-  "S&P 100": "^OEX",
-  "S&P 500 Growth": "^SGX",
-  "S&P 500 Value": "^SVX",
-  "S&P 500 High Beta": "^SPHB",
-  "S&P 500 Low Volatility": "^SPLV",
-  "S&P 500 High Quality": "^SPHQ",
-  "Wilshire 5000": "^W5000",
-  "NYSE Composite": "^NYA",
-  "NYSE American Composite": "^XAX",
-  "Unemployment Rate": "UNRATE",
-  "Consumer Price Index": "CPIAUCSL",
-  "Producer Price Index": "PPIACO",
-  "Federal Funds Rate": "FEDFUNDS",
-  "Volatile Index": "VIXCLS",
-  "Economic Policy Uncertainty Index": "USEPUINDXD",
-};
 
 export async function stockData(stockSymbol, startDate, endDate) {
   const response = await axios.get(
@@ -152,6 +129,7 @@ export function idbPromise(storeName, method, object) {
       };
 
       if (method === "put") {
+        console.log("putting", object);
         store.put(object);
         resolve(object);
       } else if (method === "get") {
@@ -224,190 +202,221 @@ export async function setStockGraph(data) {
   return dataPoints;
 }
 
-export async function setGraphOptions(theme, stockName, data, stockSymbol) {
-  return {
-    theme: theme,
-    title: { text: `${stockName} Stock Price and Volume` },
-    subtitles: [{ text: "Price-Volume Trend" }],
-    charts: [
-      {
-        axisX: {
-          lineThickness: 5,
-          tickLength: 0,
-          labelFormatter: function () {
-            return "";
-          },
-          crosshair: {
-            enabled: true,
-            snapToDataPoint: true,
-            labelFormatter: function () {
-              return "";
+export function generateChartOptions(type, config) {
+  switch (type) {
+    case "stock":
+      const { theme, stockName, data, stockSymbol } = config;
+      return {
+        theme: theme,
+        title: { text: `${stockName} Stock Price and Volume` },
+        subtitles: [{ text: "Price-Volume Trend" }],
+        charts: [
+          {
+            axisX: {
+              lineThickness: 5,
+              tickLength: 0,
+              labelFormatter: function () {
+                return "";
+              },
+              crosshair: {
+                enabled: true,
+                snapToDataPoint: true,
+                labelFormatter: function () {
+                  return "";
+                },
+              },
             },
+            axisY: {
+              title: "Stock Price",
+              prefix: "$",
+              tickLength: 0,
+            },
+            toolTip: {
+              shared: true,
+            },
+            data: [
+              {
+                name: "Price (in USD)",
+                yValueFormatString: "$#,###.##",
+                type: "candlestick",
+                color: "#049C",
+                dataPoints: data.map((point) => ({
+                  x: new Date(point.Date),
+                  y: [point.Open, point.High, point.Low, point.Close],
+                })),
+              },
+            ],
+          },
+          {
+            height: 100,
+            axisX: {
+              crosshair: {
+                enabled: true,
+                snapToDataPoint: true,
+              },
+            },
+            axisY: {
+              title: "Volume",
+              prefix: "$",
+              tickLength: 0,
+            },
+            toolTip: {
+              shared: true,
+            },
+            data: [
+              {
+                color: "#049C",
+                name: "Volume",
+                yValueFormatString: "$#,###.##",
+                type: "column",
+                dataPoints: data.map((point) => ({
+                  x: new Date(point.Date),
+                  y: point.Volume,
+                })),
+              },
+            ],
+          },
+        ],
+        navigator: {
+          data: [
+            {
+              color: "white",
+              fillOpacity: 0.4,
+              indexLabel: "",
+              dataPoints: data.map((point) => ({
+                x: new Date(point.Date),
+                y: point.Close,
+              })),
+              type: "area",
+            },
+          ],
+          slider: {
+            minimum: new Date("2022-05-01"),
+            maximum: new Date("2022-07-01"),
+            fontColor: "white",
+            indexLabelFontColor: "white",
           },
         },
-        axisY: {
-          title: "Stock Price",
-          prefix: "$",
-          tickLength: 0,
+      };
+
+    case "regression":
+      const { theme: scatterTheme, searchParams, index, formula } = config;
+      const searchIndex = indexOptions[searchParams.index];
+      return {
+        theme: scatterTheme,
+        title: {
+          text: `${searchParams.symbol} vs ${searchIndex} Linear Regression`,
         },
-        toolTip: {
-          shared: true,
+        axisX: {
+          title: `${searchParams.index}`,
+        },
+        axisY: {
+          title: `${searchParams.symbol}`,
+          margin: 0,
         },
         data: [
           {
-            name: "Price (in USD)",
-            yValueFormatString: "$#,###.##",
-            type: "candlestick",
-            color: "#049C",
-            dataPoints: data.map((point) => {
-              return {
-                x: new Date(point.Date),
-                y: [point.Open, point.High, point.Low, point.Close],
-              };
-            }),
+            type: "scatter",
+            showInLegend: true,
+            legendText: `${searchParams.symbol}`,
+            dataPoints: index.map((point) => ({
+              x: point.x,
+              y: point.y,
+              toolTipContent: `${searchIndex}: ${point.x}, ${searchParams.symbol}: ${point.y}`,
+            })),
+            label: "Data Points",
+          },
+          {
+            type: "line",
+            showInLegend: true,
+            legendText: `${searchIndex}`,
+            margin: 10,
+            padding: 10,
+            legendMarkerType: "none",
+            dataPoints: index.map((point) => ({
+              x: point.x,
+              y: formula.intercept + formula.coef * point.x,
+              toolTipContent: `${searchIndex}: ${point.x}, ${searchParams.symbol}: ${point.y}`,
+            })),
           },
         ],
-      },
-      {
-        height: 100,
+      };
+
+    case "famaFrench":
+      const { dates, portfolio, mktRf, smb, hml, graphParams } = config;
+      return {
+        animationEnabled: true,
+        exportEnabled: true,
+        theme: "dark1",
+        title: {
+          text: "Fama French Model",
+        },
         axisX: {
+          title: "Date",
+          labelFontSize: 12,
+          valueFormatString: "MMM YYYY",
           crosshair: {
             enabled: true,
             snapToDataPoint: true,
           },
+          minimum: new Date(dates[0]),
+          maximum: new Date(dates[dates.length - 1]),
         },
         axisY: {
-          title: "Volume",
-          prefix: "$",
-          tickLength: 0,
-        },
-        toolTip: {
-          shared: true,
+          title: "Percent",
         },
         data: [
           {
-            color: "#049C",
-            name: "Volume",
-            yValueFormatString: "$#,###.##",
-            type: "column",
-
-            dataPoints: data.map((point) => {
-              return {
-                x: new Date(point.Date),
-                y: point.Volume,
-              };
-            }),
+            type: "spline",
+            name: "Portfolio",
+            toolTipContent: `Date: {x}<br />Portfolio: {y}%`,
+            showInLegend: true,
+            legendText: "Portfolio",
+            dataPoints: portfolio.map((point, index) => ({
+              x: new Date(dates[index]),
+              y: point,
+            })),
           },
-        ],
-      },
-    ],
-    navigator: {
-      data: [
-        {
-          color: "white",
-          fillOpacity: 0.4,
-          indexLabel: "",
-          dataPoints: data.map((point) => {
-            return {
-              x: new Date(point.Date),
-              y: point.Close,
-            };
-          }),
-          type: "area",
-        },
-      ],
-      slider: {
-        minimum: new Date("2022-05-01"),
-        maximum: new Date("2022-07-01"),
-        fontColor: "white",
-        indexLabelFontColor: "white",
-      },
-    },
-  };
+          graphParams.mktRf && {
+            type: "spline",
+            name: "Mkt-Rf",
+            toolTipContent: "Date: {x}<br />Mkt-Rf: {y}",
+            showInLegend: true,
+            legendText: "Mkt-RF",
+            dataPoints: mktRf.map((point, index) => ({
+              x: new Date(dates[index]),
+              y: point,
+            })),
+          },
+          graphParams.smb && {
+            type: "spline",
+            name: "SMB",
+            toolTipContent: "Date: {x}<br />SMB: {y}",
+            showInLegend: true,
+            legendText: "SMB",
+            dataPoints: smb.map((point, index) => ({
+              x: new Date(dates[index]),
+              y: point,
+            })),
+          },
+          graphParams.hml && {
+            type: "spline",
+            name: "HML",
+            toolTipContent: "Date: {x}<br />HML: {y}",
+            showInLegend: true,
+            legendText: "HML",
+            dataPoints: hml.map((point, index) => ({
+              x: new Date(dates[index]),
+              y: point,
+            })),
+          },
+        ].filter(Boolean), 
+      };
 
+    default:
+      throw new Error("Unknown chart type");
+  }
 }
-
-
-export async function generateScatterLineGraphOptions (theme, searchParams, index, formula) {
-  const searchIndex = indexOptions[searchParams.index];
-  return {
-    theme: theme,
-    title: {
-      text: `${searchParams.symbol} vs ${searchIndex} Linear Regression`,
-    },
-    axisX: {
-      title: `${searchParams.index}`,
-    },
-    axisY: {
-      title: `${searchParams.symbol}`,
-      margin: 0,
-    },
-
-    data: [
-      {
-        type: "scatter",
-        showInLegend: true,
-        legendText: `${searchParams.symbol}`,
-        dataPoints: index.map((point) => ({
-          x: point.x,
-          y: point.y,
-          toolTipContent: `${searchIndex}: ${point.x}, ${searchParams.symbol}: ${point.y}`,
-        })),
-        label: "Data Points",
-      },
-      {
-        type: "line",
-        showInLegend: true,
-        legendText: `${searchIndex}`,
-        margin: 10,
-        padding: 10,
-        legendMarkerType: "none",
-        dataPoints: index.map((point) => ({
-          x: point.x,
-          y: formula.intercept + formula.coef * point.x,
-          toolTipContent: `${searchIndex}: ${point.x}, ${searchParams.symbol}: ${point.y}`,
-        })),
-      },
-    ],
-  };
-};
-
-
-export const formatDate = (date) => {
-  return new Date(date).toISOString().slice(0, 10);
-};
-
-export const titleCase = (str) => {
-  return str
-    .split(" ")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ")
-    .replace(/([a-z])([A-Z])/g, "$1 $2");
-};
-
-export const formatNumber = (num) => {
-  if (num === null || num === undefined) {
-    return "----";
-  }
-  if (Math.abs(num) > 1000000000) {
-    return (num / 1000000000).toFixed(2) + " B";
-  } else if (Math.abs(num) > 1000000) {
-    return (num / 1000000).toFixed(2) + " M";
-  } else if (Math.abs(num) > 1000) {
-    return (num / 1000).toFixed(2) + " K";
-  } else {
-    return typeof num === "number" ? num.toFixed(2) : num;
-  }
-};
-
-export const convertToScientific = (num) => {
-  if (Math.abs(num) < 0.00001) {
-    num = num.toExponential(2);
-    return num;
-  } else {
-    return num.toFixed(4);
-  }
-};
 
 export const returnInfo = {
   "SMB Beta":
@@ -814,8 +823,8 @@ export const returnInfo = {
   "R-squared": "The percentage Of a portfolio's excess returns that can be explained by the returns Of the SMB And HML factors. A value Of 1.0 indicates perfect correlation, 0.0 indicates no correlation, And negative values indicate an inverse correlation.",
   "Method": "The method used to calculate the regression model. Least Squares is the most common method.",
   "Model": "The type Of regression model used. OLS is Ordinary Least Squares and it is the most common type of regression model.",
-  "Df Residuals": "The degrees of freedom Of the residuals.",
-  "Df Model": "The degrees of freedom Of the model.",
+  "Df Residuals": "The degrees of freedom of the residuals.",
+  "Df Model": "The degrees of freedom of the model.",
 }
 export const commonQuestions = [
   {
@@ -834,6 +843,28 @@ export const commonQuestions = [
     question: "How do I use the Knowledge Mode?",
     answer: "In Knowledge Mode, you can click on financial terms to get detailed explanations and definitions."
   }
-  // Add more questions as needed
 ];
 
+export const indexOptions = {
+  "SP500": "^GSPC",
+  "Dow Jones": "^DJI",
+  "Nasdaq": "^IXIC",
+  "Russell 2000": "^RUT",
+  "S&P 400 Mid Cap": "^MID",
+  "S&P 600 Small Cap": "^SML",
+  "S&P 100": "^OEX",
+  "S&P 500 Growth": "^SGX",
+  "S&P 500 Value": "^SVX",
+  "S&P 500 High Beta": "^SPHB",
+  "S&P 500 Low Volatility": "^SPLV",
+  "S&P 500 High Quality": "^SPHQ",
+  "Wilshire 5000": "^W5000",
+  "NYSE Composite": "^NYA",
+  "NYSE American Composite": "^XAX",
+  "Unemployment Rate": "UNRATE",
+  "Consumer Price Index": "CPIAUCSL",
+  "Producer Price Index": "PPIACO",
+  "Federal Funds Rate": "FEDFUNDS",
+  "Volatile Index": "VIXCLS",
+  "Economic Policy Uncertainty Index": "USEPUINDXD",
+};

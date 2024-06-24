@@ -1,5 +1,6 @@
 import { useMemo } from "react";
-import { formatNumber, returnInfo, titleCase } from "../utils/helpers";
+import { returnInfo } from "../utils/helpers";
+import { formatNumber, titleCase  } from "../utils/format";
 import AddPortfolio from "./AddPortfolio";
 import ToolTip from "./ToolTip";
 
@@ -24,7 +25,7 @@ const StockDetails = (props) => {
       <div className="row card custom-card">
         <div className="card-header">
           <h3 className="text-left ms-2 mt-3">
-            {props.name} Overview
+            {longName} Overview
           </h3>
         </div>
           <div className="col-12 card-items-custom d-flex">

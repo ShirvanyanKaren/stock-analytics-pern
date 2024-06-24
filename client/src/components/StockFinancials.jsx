@@ -1,9 +1,10 @@
-import { getCompanyFinancials, idbPromise, formatDate, formatNumber, titleCase } from "../utils/helpers";
+import { getCompanyFinancials, idbPromise, } from "../utils/helpers";
+import { formatDate, formatNumber, titleCase, } from "../utils/format";
 import { useEffect, useState, useCallback } from "react";
 import { useOutletContext } from "react-router-dom";
 import ToolTip from "./ToolTip";
 import { useHighlight } from "/src/contexts/HighlightContext";
-import { standardizeTerm } from "../utils/termFormatter";
+import { standardizeTerm } from "../utils/format";
 
 const StockFinancials = ({ symbol: initialSymbol }) => {
   const { helpMode, handleElementClick } = useOutletContext();

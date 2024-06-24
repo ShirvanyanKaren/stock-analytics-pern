@@ -93,16 +93,16 @@ def fetch_stock_graph(symbol: str, start: str, end: str):
 
 @app.get("/stockweights")
 async def stock_weights(stocks):
-    print(stocks)
-    print(type(stocks))
     stocks = json.loads(stocks)
-    values = [Ticker(key).summary_detail[key]['open'] * value for key, value in stocks.items()]
-    total = sum(values)
-    for key, value in zip(stocks.keys(), values):
-        stocks[key] = value / total
-    print(stocks)
-    stocks = {key: value for key, value in stocks.items()}
-    return stocks
+    total_value = 0
+    weighted_portfolio = {}
+    for stock in stocks:
+        value = yf.Ticker(stock).history(period='1d')['Close'][0]
+        stocks[stock] = value * stocks[stock]
+        total_value += stocks[stock]
+    for stock in stocks:
+        weighted_portfolio[stock] = stocks[stock] / total_value
+    return weighted_portfolio
 
 def lin_reg_data(symbols, start, end, index, stockWeights):
     start_date = dt.datetime.strptime(start, '%Y-%m-%d')
@@ -169,22 +169,22 @@ async def lin_reg(stocks: str, index: str, start: str, end: str, stockWeights: s
 
 @app.get("/famafrench")
 async def fama_french(stockWeights: str, start: str, end: str):
-    stock_weights = json.loads(stockWeights)
+    weighted_portfolio = await stock_weights(stockWeights)
     ff3_monthly = pd.DataFrame(gff.famaFrench3Factor(frequency='m'))
     ff3_monthly.rename(columns={'date_ff_factors':'Date'}, inplace=True)
     ff3_monthly.set_index('Date', inplace=True)
     market_premium = ff3_monthly['Mkt-RF'].mean()
     size_premium = ff3_monthly['SMB'].mean()
     value_premium = ff3_monthly['HML'].mean()
-    stocks = list(stock_weights.keys())
+    stocks = list(weighted_portfolio.keys())
     start = dt.datetime.strptime(start, '%Y-%m-%d')
     end = dt.datetime.strptime(end, '%Y-%m-%d')
     uw_portfolio = yf.download(stocks, start=start, end=end)['Adj Close'].pct_change()[1:]
     if len(stocks) == 1:
-        weighted_returns = uw_portfolio * stock_weights[stocks[0]]
+        weighted_returns = uw_portfolio * weighted_portfolio[stocks[0]]
         portfolio = pd.DataFrame({'Portfolio': weighted_returns})
     else:
-        weighted_returns = uw_portfolio * pd.Series(stock_weights)
+        weighted_returns = uw_portfolio * pd.Series(weighted_portfolio)
         portfolio = pd.DataFrame({'Portfolio': weighted_returns.sum(axis=1)})
     portfolio_mtl = portfolio.resample('M').agg(lambda x: (x + 1).prod() - 1)
     factors = pdr.DataReader('F-F_Research_Data_Factors', 'famafrench', start, end)[0][1:]

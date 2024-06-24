@@ -1,11 +1,3 @@
-// src/App.jsx
-import {
-  ApolloClient,
-  InMemoryCache,
-  ApolloProvider,
-  createHttpLink,
-} from "@apollo/client";
-import { setContext } from "@apollo/client/link/context";
 import { Outlet, useLocation } from "react-router-dom";
 import { Provider } from "react-redux";
 import { StoreProvider } from "./utils/GlobalState";
@@ -22,24 +14,9 @@ import store from "./utils/store";
 import AppPar from "./tsParticles/Particles";
 import { useState, useEffect } from "react";
 
-const httpLink = createHttpLink({
-  uri: "/graphql",
-});
 
-const authLink = setContext((_, { headers }) => {
-  const token = localStorage.getItem("jwtToken");
-  return {
-    headers: {
-      ...headers,
-      authorization: token ? `Bearer ${token}` : "",
-    },
-  };
-});
 
-const client = new ApolloClient({
-  link: authLink.concat(httpLink),
-  cache: new InMemoryCache(),
-});
+
 
 function App() {
   const [helpMode, setHelpMode] = useState(false);
@@ -57,7 +34,6 @@ function App() {
   };
 
   return (
-    <ApolloProvider client={client}>
       <StoreProvider>
         <Provider store={store}>
           <HighlightProvider>
@@ -109,7 +85,6 @@ function App() {
           </HighlightProvider>
         </Provider>
       </StoreProvider>
-    </ApolloProvider>
   );
 }
 

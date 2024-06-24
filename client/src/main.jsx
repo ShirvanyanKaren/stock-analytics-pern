@@ -8,7 +8,7 @@ import Login from "./pages/Login";
 import Home from "./pages/Home";
 import StockLinReg from "./pages/StockLinReg";
 import FamaFrench from "./pages/FamaFrench";
-import Glossary from "./components/Glossary";
+import Glossary from "./pages/Glossary";
 import App from "./App";
 
 const router = createBrowserRouter([

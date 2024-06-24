@@ -20,32 +20,21 @@ const Header = () => {
   return (
     <>
       <Navbar expand="xxl" bg="light" data-bs-theme="light" className="nav-bar nav-bar-custom theme">
-        <Container expand="xxl" className="justify-content-between navbar">
+        <div expand="xxl" className="justify-content-around navbar w-100">
           <Navbar.Brand className="ms-0" to="/home">
             <FontAwesomeIcon icon={faDatabase} className="nav-brand" color="blue" />
             <Link to="/" className="navbar-brand">
               CincoData
             </Link>
           </Navbar.Brand>
-          <div className="nav">
-            <SearchBar />
-            <Nav className="align-items-center ">
+          <SearchBar className="" />
+          <Nav className="d-flex justify-content-between ms-3 fs-5">
+              <Nav.Link as={Link} to="/">Dashboard</Nav.Link>
+              <Nav.Link as={Link} to="/">Portfolio</Nav.Link>
+              <Nav.Link as={Link} to="/glossary">Glossary</Nav.Link>
               {Auth.loggedIn() ? (
-                <Nav.Link to="/" onClick={handleLogout}>
-                  Logout
-                </Nav.Link>
-              ) : (
-                <Nav.Link href="/login">Login/Signup</Nav.Link>
-              )}
-              <Nav.Link to="/features">Dashboard</Nav.Link>
-              <Nav.Link to="/pricing">Create Portfolio</Nav.Link>
-              <NavDropdown title="Features" id="collapsible-nav-dropdown">
-                <NavDropdown.Item href="/stocklinreg">
-                  Compare Portfolio
-                </NavDropdown.Item>
-                <NavDropdown.Item to="/action/3.2">
-                  Edit Portfolio
-                </NavDropdown.Item>
+                <>
+                <NavDropdown title="Features" id="collapsible-nav-dropdown">
                 <NavDropdown.Item href="/famafrench">
                   Expected Return
                 </NavDropdown.Item>
@@ -53,10 +42,17 @@ const Header = () => {
                   Linear Regression
                 </NavDropdown.Item>
               </NavDropdown>
-              <Nav.Link as={Link} to="/glossary">Glossary</Nav.Link>
+              <Nav.Link onClick={handleLogout}>
+                  Logout
+                </Nav.Link>
+                </>
+              ) : (
+                <> 
+              <Nav.Link href="/login">Login</Nav.Link>
+                </>
+              )}
             </Nav>
-          </div>
-        </Container>
+        </div>
       </Navbar>
     </>
   );

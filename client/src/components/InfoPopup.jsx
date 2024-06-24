@@ -5,7 +5,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CloseIcon from '@mui/icons-material/Close';
 import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
 import { MainContainer, ChatContainer, MessageList, Message, MessageInput, TypingIndicator } from '@chatscope/chat-ui-kit-react';
-import { standardizeTerm } from '../utils/termFormatter';
+import { standardizeTerm } from '../utils/format';
 import { useHighlight } from '../contexts/HighlightContext';
 
 const API_KEY = "your_openai_api_key"; // Replace with your OpenAI API key

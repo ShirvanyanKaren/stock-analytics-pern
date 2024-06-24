@@ -3,23 +3,16 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useRef } from "react";
 import { useSelector } from "react-redux";
 import { QUERY_STOCK, QUERY_USER } from "../utils/queries";
-import {
-  getFamaFrenchData,
-  convertToScientific,
-  getStockWeights,
-  idbPromise
-} from "../utils/helpers";
+import { getFamaFrenchData, getStockWeights, idbPromise, generateChartOptions, } from "../utils/helpers";
+import { convertToScientific } from "../utils/format";
 import Auth from "../utils/auth";
 import decode from "jwt-decode";
-import axios from "axios";
 import ToolTip from "../components/ToolTip";
 import StockDetails from "../components/StockDetails";
 import CanvasJSReact from "@canvasjs/react-stockcharts";
+
 const CanvasJS = CanvasJSReact.CanvasJS;
-
 const CanvasJSChart = CanvasJSReact.CanvasJSChart;
-
-// const port = process.env.PORT || 8000;
 
 const FamaFrench = () => {
   const [dates, setDates] = useState([]);
@@ -27,71 +20,39 @@ const FamaFrench = () => {
   const [mktRf, setMktRf] = useState([]);
   const [smb, setSmb] = useState([]);
   const [hml, setHml] = useState([]);
-  const expReturnValues = useState({}); 
-  const stockWeights = useState({});
   const [isLoaded, setIsLoaded] = useState(false);
   const [stats, setStats] = useState({});
+  const stockWeights = useSelector((state) => state.stockWeights);
 
-  const endDate = new Date(
-    new Date().getFullYear(),
-    new Date().getMonth() - 1,
-    0
-  )
-    .toISOString()
-    .slice(0, 10);
+  const endDate = new Date(new Date().getFullYear(), new Date().getMonth() - 1, 0)
+  .toISOString()
+  .slice(0, 10);
 
+  const startDate = new Date( new Date().getFullYear() - 5, new Date().getMonth() - 1,0)
+  .toISOString()
+  .slice(0, 10);
 
-  const startDate = new Date(
-    new Date().getFullYear() - 5,
-    new Date().getMonth() - 1,
-    0
-  )
-    .toISOString()
-    .slice(0, 10);
-
-
-  const [graphParams, setGraphParams] = useState({
-    hml: true,
-    smb: true,
-    mktRf: true,
-  });
-
-  const graphSettingsChange = (event) => {
-    event.preventDefault();
-    console.log(event.target.name);
-    setGraphParams({
-      ...graphParams,
-      [event.target.name]: !graphParams[event.target.name],
-    });
-  };
-
+  const [graphParams, setGraphParams] = useState({hml: true, smb: true, mktRf: true,});
   useEffect(() => {
     const getFamaFrench = async () => {
       try {
         const weights = await idbPromise("stockWeights", "get");
-        var { portfolio_id, ...weightsStorage } = weights[0];
+        let { portfolio_id, ...weightsStorage } = weights[0];
         weightsStorage = JSON.stringify(weightsStorage);
-        const response = await getFamaFrenchData(
-          startDate,
-          endDate,
-          weightsStorage
-        );
-        var stats = response[1];
-        var dataArray = JSON.parse(response[0]);
+        const response = await getFamaFrenchData(startDate, endDate, weightsStorage);
+        const stats = response[1];
+        const dataArray = JSON.parse(response[0]);
+        console.log(dataArray)
         for(const key in stats){
           setStats((prevStats) => ({
             ...prevStats,
             [key]: convertToScientific(stats[key])
           }));
         }  
-        console.log(dataArray, "dataArray");
         for (const key in dataArray) {
           let MktRf = "Mkt-RF";
           setDates((prevDates) => [...prevDates, key]);
-          setPortfolio((prevPortfolio) => [
-            ...prevPortfolio,
-            dataArray[key].Portfolio,
-          ]);
+          setPortfolio((prevPortfolio) => [...prevPortfolio, dataArray[key].Portfolio]);
           setMktRf((prevMktRf) => [...prevMktRf, dataArray[key][MktRf]]);
           setSmb((prevSmb) => [...prevSmb, dataArray[key].SMB]);
           setHml((prevHml) => [...prevHml, dataArray[key].HML]);
@@ -104,75 +65,22 @@ const FamaFrench = () => {
     getFamaFrench();
   }, []);
 
-
-  const options = {
-    animdationEnabled: true,
-    exportEnabled: true,
-    theme: "dark1",
-    title: {
-      text: "Fama French Model",
-    },
-    axisX: {
-      title: "Date",
-      labelFontSize: 12,
-      valueFormatString: "MMM YYYY",
-      crosshair: {
-        enabled: true,
-        snapToDataPoint: true,
-      },
-      minimum: new Date(dates[0]),
-      maximum: new Date(dates[dates.length - 1]),
-    },
-    axisY: {
-      title: "Percent",
-    },
-    data: [
-      {
-        type: "spline",
-        name: "Portfolio",
-        toolTipContent: `Date: {x}<br />Portfolio: {y}%`,
-        showInLegend: true,
-        legendText: "Portfolio",
-        dataPoints: portfolio.map((point, index) => ({
-          x: new Date(dates[index]),
-          y: point,
-        })),
-      },
-      graphParams.mktRf && {
-        type: "spline",
-        name: "Mkt-Rf",
-        toolTipContent: "Date: {x}<br />Mkt-Rf: {y}",
-        showInLegend: true,
-        legendText: "Mkt-RF",
-        dataPoints: mktRf.map((point, index) => ({
-          x: new Date(dates[index]),
-          y: point,
-        })),
-      },
-      graphParams.smb && {
-        type: "spline",
-        name: "SMB",
-        toolTipContent: "Date: {x}<br />SMB: {y}",
-        showInLegend: true,
-        legendText: "SMB",
-        dataPoints: smb.map((point, index) => ({
-          x: new Date(dates[index]),
-          y: point,
-        })),
-      },
-      graphParams.hml && {
-        type: "spline",
-        name: "HML",
-        toolTipContent: "Date: {x}<br />HML: {y}",
-        showInLegend: true,
-        legendText: "HML",
-        dataPoints: hml.map((point, index) => ({
-          x: new Date(dates[index]),
-          y: point,
-        })),
-      },
-    ],
+  const graphSettingsChange = (event) => {
+    event.preventDefault();
+    setGraphParams({
+      ...graphParams,
+      [event.target.name]: !graphParams[event.target.name],
+    });
   };
+
+ const options = generateChartOptions("famaFrench", {
+  dates: dates,
+  portfolio: portfolio,
+  mktRf: mktRf,
+  smb: smb,
+  hml: hml,
+  graphParams: graphParams,
+ });
 
   return (
     <>
@@ -183,33 +91,11 @@ const FamaFrench = () => {
             ref={graphParams}
             onSubmit={graphSettingsChange}
           >
-            <button
-              className={`btn btn-outline-dark m-3 mb-3 ${
-                graphParams.smb ? "active" : ""
-              }`}
-              name="smb"
-              onClick={graphSettingsChange}
-            >
-              SMB
-            </button>
-            <button
-              className={`btn btn-outline-dark m-3 mb-3 ${
-                graphParams.hml ? "active" : ""
-              }`}
-              name="hml"
-              onClick={graphSettingsChange}
-            >
-              HML
-            </button>
-            <button
-              className={`btn btn-outline-dark m-3 mb-3 ${
-                graphParams.mktRf ? "active" : ""
-              }`}
-              name="mktRf"
-              onClick={graphSettingsChange}
-            >
-              Mkt-Rf
-            </button>
+           {Object.keys(graphParams).slice(0,3).map((key) => (
+              <button className="btn btn-outline-dark m-3 mb-3" name={key} onClick={graphSettingsChange}>
+                {key.toUpperCase()}
+              </button>
+            ))}
             <button
               className="btn btn-outline-dark m-3 mb-3"
               onClick={() =>
@@ -242,7 +128,7 @@ const FamaFrench = () => {
           stockInfo={Boolean(false)}
           name="Fama French Model"
         />
-      </div>
+      </div> 
     </>
   );
 };

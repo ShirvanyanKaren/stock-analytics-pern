@@ -1,59 +1,58 @@
 import { useEffect, useState, useReducer } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useQuery } from '@apollo/client'
+import { getPortfolio } from '../services/portfolios';
 import {useDispatch, useSelector} from "react-redux";
-import { QUERY_USER, QUERY_STOCK } from '../utils/queries'
 import { getStockWeights, getStockObject, idbPromise } from '../utils/helpers';
 import { SET_STOCK_WEIGHTS } from '../utils/actions';
 import Auth  from '../utils/auth'
 import decode from 'jwt-decode';
-import axios from 'axios';
 
 
 const Home = () => {
 const [decodedToken, setToken] = useState('');
-const dispatch = useDispatch();
 const [stockWeights, setStockWeights] = useState({});
 const [loading, setLoading] = useState(true);
 const CheckStockWeights = useSelector((state) => state.stockWeights);
+const dispatch = useDispatch();
 
 
+const checkLoginPortfolios = async () => {
+  const token = localStorage.getItem('id_token');
+  if (!token || !Auth.loggedIn()) {
+    setToken('');
+    return;
+  }
+  const decoded = decode(token);
+  setToken(decoded);
+  if (Object.keys(CheckStockWeights).length > 0) {
+    console.log('Stock weights already exist in the store') 
+    return;
+  } 
+  try {
+    const user_id = decoded.data.id;
+    const portfolio = await getPortfolio(user_id);
+    const stocks = portfolio.stocks;
+    await idbPromise('stockWeights', 'put', {
+      ...stocks,
+      portfolio_id: portfolio.id
+    });
+
+    dispatch({
+      type: SET_STOCK_WEIGHTS,
+      payload: stocks
+    });
+  } catch (error) {
+    console.error('Error fetching portfolio:', error);
+  }
+};
 
 useEffect(() => {
-    const token = localStorage.getItem('id_token');
-    if (token) {
-      const decoded = decode(token);
-      console.log(decoded);
-      setToken(decoded);
-    } else {
-      setToken('');
-    }
-  }, []);
-
-
-const { data: userData } = useQuery(QUERY_USER, {
-  variables: { username: decodedToken?.data?.username },
-  skip: !decodedToken?.data?.username, 
-});
-const { data: stockData } = useQuery(QUERY_STOCK, {
-  variables: { portfolioId: userData?.user?.id },
-  skip: !userData?.user?.id, 
-});
-
-
-useEffect(() => {
-  
-  idbPromise('stockWeights', 'get').then(result => result.length === 0 ? setLoading(true) : setLoading(false));
-}, [stockWeights]);
-
-useEffect(() => {
-  getStockObject(userData, stockData, dispatch, setStockWeights)
-}, [userData, stockData]);
-
+  checkLoginPortfolios().finally(() => setLoading(false));
+}, []);
 
     return (
         <div className='container d-flex justify-content-center'>
-          { loading && userData && Auth.loggedIn()? (
+          { loading && Auth.loggedIn()? (
             <div className='container row justify-content-center'>
             <div className="spinner-border" role="status">
               <span className="visually-hidden">Loading...</span>

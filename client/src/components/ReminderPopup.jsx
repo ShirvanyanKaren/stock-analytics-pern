@@ -1,5 +1,5 @@
 // src/components/ReminderPopup.jsx
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Button, Dialog, DialogContent, DialogTitle, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 

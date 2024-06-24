@@ -1,9 +1,6 @@
 
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
-import RegressionTool from "./RegressionTool";
-
-
 
 const SideBar = () => {
    
@@ -28,7 +25,6 @@ const SideBar = () => {
             <Nav.Item>
                 <h4> Monte Carlo </h4>
             </Nav.Item>
- 
             </Navbar>
         </div>
           
