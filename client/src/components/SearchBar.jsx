@@ -6,6 +6,7 @@ import defaultStockImage from "../assets/default-stock.jpeg";
 import { faCaretDown, faCaretUp, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useNavigate, Link, useLocation } from "react-router-dom";
+import "../App.scss"; // Import the existing CSS file for styling
 
 const SearchBar = () => {
   const [options, setOptions] = useState([]);
@@ -84,7 +85,7 @@ const SearchBar = () => {
         <Dropdown>
           <Dropdown.Toggle variant="light" id="dropdown-search">
             <input
-              className="search-bar me-3 mt-2 mb-2 text-center"
+              className="search-bar-input me-3 mt-2 mb-2 text-center"
               placeholder={ location.pathname.split('/')[1] === 'stockinfo' ? 'Search for other stock' : 'Search for a stock' }
               style={{ borderRadius: "15px" }}
               name="query"
