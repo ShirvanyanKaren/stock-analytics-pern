@@ -1,9 +1,9 @@
-import { getCompanyFinancials, idbPromise, } from "../utils/helpers";
-import { formatDate, formatNumber, titleCase, } from "../utils/format";
+import { getCompanyFinancials, idbPromise } from "../utils/helpers";
+import { formatDate, formatNumber, titleCase } from "../utils/format";
 import { useEffect, useState, useCallback } from "react";
 import { useOutletContext } from "react-router-dom";
 import ToolTip from "./ToolTip";
-import { useHighlight } from "/src/contexts/HighlightContext";
+import { useHighlight } from "../contexts/HighlightContext";
 import { standardizeTerm } from "../utils/format";
 
 const StockFinancials = ({ symbol: initialSymbol }) => {
@@ -14,7 +14,7 @@ const StockFinancials = ({ symbol: initialSymbol }) => {
   const [isQuarters, setIsQuarters] = useState(true);
   const [statement, setStatement] = useState("income");
   const [symbol, setSymbol] = useState(initialSymbol);
-  const categories = ["Income Statement", "Balance Sheet", "Cash Flow Statement"];
+  const categories = ["income", "balance", "cash"];
 
   const fetchFinancials = useCallback(async () => {
     let data;
@@ -76,7 +76,7 @@ const StockFinancials = ({ symbol: initialSymbol }) => {
                 onClick={() => changeStatement(type)}
                 className={statement === type ? "info active-stat" : "info"}
               >
-                {type}
+                {type === "income" ? "Income Statement" : type === "balance" ? "Balance Sheet" : "Cash Flow Statement"}
               </h6>
             ))}
           </div>

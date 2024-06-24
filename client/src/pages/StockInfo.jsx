@@ -26,7 +26,6 @@ const StockInfo = () => {
   const location = useLocation();
   const stockSymbol = symbol;
 
-
   useEffect(() => {
     const getStockInfo = async () => {
       try {
@@ -60,6 +59,7 @@ const StockInfo = () => {
     height: "450px",
     margin: "auto",
   };
+
   return (
     <div>
       <Navbar
@@ -99,7 +99,6 @@ const StockInfo = () => {
         <StockFinancials symbol={stockSymbol} />
       )}
       
-
       {showReminderPopup && (
         <ReminderPopup open={showReminderPopup} handleClose={() => setShowReminderPopup(false)} />
       )}
@@ -113,6 +112,5 @@ const StockInfo = () => {
     </div>
   );
 };
-
 
 export default StockInfo;
