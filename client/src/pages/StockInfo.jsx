@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useLocation } from "react-router-dom";
-import { stockData, stockInfo, generateChartOptions } from "../utils/helpers";
+import { stockData, stockInfo, generateChartOptions, getStockOverview } from "../utils/helpers";
 import StockDetails from "../components/StockDetails";
 import StockFinancials from "../components/StockFinancials";
 import SideBar from "../components/SideBar";
@@ -21,6 +21,7 @@ const StockInfo = () => {
   const [endDate, setEndDate] = useState(new Date().toISOString().slice(0, 10));
   const [infoType, setInfoType] = useState("Summary");
   const [showReminderPopup, setShowReminderPopup] = useState(false);
+  const [stockOverview, setStockOverview] = useState({});
   const categories = ["Summary", "Financials", "Linear Regression", "Analysis"];
   const location = useLocation();
   const stockSymbol = symbol;
@@ -48,6 +49,15 @@ const StockInfo = () => {
 
     getStockInfo();
   }, [stockSymbol, startDate, endDate]);
+
+  useEffect(() => {
+    const fetchStockOverview = async () => {
+      const overview = await getStockOverview(stockSymbol);
+      setStockOverview(overview);
+    };
+
+    fetchStockOverview();
+  }, [stockSymbol]);
 
   useEffect(() => {
     setInfoType("Summary");
@@ -94,12 +104,27 @@ const StockInfo = () => {
         </div>
       )}
 
-      {infoType === "Financials" && (
+      {isLoaded && infoType === "Financials" && (
         <div className="col-10 m-auto justify-center stock-volume mt-5">
           <CanvasJSStockChart
             containerProps={containerProps}
             options={options}
           />
+          <div className="stock-overview">
+            <h2>{stockSymbol} Overview</h2>
+            {stockOverview ? (
+              <>
+                <p>Current Price: ${stockOverview.currentPrice}</p>
+                <p>Change: {stockOverview.priceChange} ({stockOverview.priceChangePercent}%)</p>
+                <p>After Hours Price: ${stockOverview.afterHoursPrice}</p>
+                <p>After Hours Change: {stockOverview.afterHoursChange} ({stockOverview.afterHoursChangePercent}%)</p>
+                <p>At Close: {stockOverview.lastCloseTime}</p>
+                <p>After Hours: {stockOverview.afterHoursTime}</p>
+              </>
+            ) : (
+              <p>Stock overview data is not available.</p>
+            )}
+          </div>
           <StockFinancials symbol={stockSymbol} />
         </div>
       )}

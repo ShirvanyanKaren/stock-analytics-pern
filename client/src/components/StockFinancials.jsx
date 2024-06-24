@@ -9,7 +9,7 @@ import { standardizeTerm } from "../utils/format";
 const StockFinancials = ({ symbol: initialSymbol }) => {
   const { helpMode, handleElementClick } = useOutletContext();
   const { addHighlight } = useHighlight();
-  const [financials, setFinancials] = useState([]);
+  const [financials, setFinancials] = useState({});
   const [isLoaded, setIsLoaded] = useState(false);
   const [isQuarters, setIsQuarters] = useState(true);
   const [statement, setStatement] = useState("income");
@@ -17,19 +17,23 @@ const StockFinancials = ({ symbol: initialSymbol }) => {
   const categories = ["income", "balance", "cash"];
 
   const fetchFinancials = useCallback(async () => {
-    let data;
-    const cachedData = await idbPromise("financials", "get");
+    try {
+      let data;
+      const cachedData = await idbPromise("financials", "get");
 
-    if (cachedData?.data?.symbol === symbol && cachedData?.data?.quarters === isQuarters) {
-      data = cachedData.data;
-    } else {
-      await idbPromise("financials", "delete");
-      data = await getCompanyFinancials(symbol, isQuarters);
-      await idbPromise("financials", "put", { symbol, quarters: isQuarters, data });
+      if (cachedData?.symbol === symbol && cachedData?.quarters === isQuarters) {
+        data = cachedData.data;
+      } else {
+        await idbPromise("financials", "delete");
+        data = await getCompanyFinancials(symbol, isQuarters);
+        await idbPromise("financials", "put", { symbol, quarters: isQuarters, data });
+      }
+
+      setFinancials(data);
+      setIsLoaded(true);
+    } catch (error) {
+      console.error("Error fetching financial data:", error);
     }
-
-    setFinancials(data);
-    setIsLoaded(true);
   }, [symbol, isQuarters]);
 
   useEffect(() => {
@@ -42,32 +46,36 @@ const StockFinancials = ({ symbol: initialSymbol }) => {
     }
     const metrics = Object.keys(financials[statement][0]).slice(2);
 
-    return metrics.map((metric, index) => {
-      const standardizedMetric = standardizeTerm(metric);
-      return (
-        <tr key={index}>
-          <td
-            className={`fw-bold ${helpMode ? "highlight" : ""}`}
-            onClick={() => {
-              handleElementClick(standardizedMetric);
-              addHighlight(standardizedMetric);
-            }}
-          >
-            <ToolTip info={titleCase(metric)}>{titleCase(metric)}</ToolTip>
-          </td>
-          {financials[statement].map((fin, index) => (
-            <td key={index}>{formatNumber(fin[metric])}</td>
-          ))}
-        </tr>
-      );
-    });
+    return (
+      <tbody>
+        {metrics.map((metric, index) => {
+          const standardizedMetric = standardizeTerm(metric);
+          return (
+            <tr key={index}>
+              <td
+                className={`fw-bold ${helpMode ? "highlight" : ""}`}
+                onClick={() => {
+                  handleElementClick(standardizedMetric);
+                  addHighlight(standardizedMetric);
+                }}
+              >
+                <ToolTip info={titleCase(metric)}>{titleCase(metric)}</ToolTip>
+              </td>
+              {financials[statement].map((fin, idx) => (
+                <td key={idx}>{formatNumber(fin[metric])}</td>
+              ))}
+            </tr>
+          );
+        })}
+      </tbody>
+    );
   };
 
   const changeStatement = (statement) => setStatement(statement);
 
   return (
     <div className="container mt-5">
-      {isLoaded && (
+      {isLoaded && financials && (
         <div className="row card custom-card">
           <div className="card-header d-flex flex-direction-row justify-content-around">
             {categories.map((type) => (
@@ -103,14 +111,15 @@ const StockFinancials = ({ symbol: initialSymbol }) => {
                   <thead>
                     <tr className="mt-2">
                       <th className="fs-6">Metrics</th>
-                      {financials[statement].map((fin, index) => (
-                        <th key={index} className="fs-6">
-                          {formatDate(fin.asOfDate)}
-                        </th>
-                      ))}
+                      {financials[statement] &&
+                        financials[statement].map((fin, index) => (
+                          <th key={index} className="fs-6">
+                            {formatDate(fin.asOfDate)}
+                          </th>
+                        ))}
                     </tr>
-                    {formatTable(financials)}
                   </thead>
+                  {financials[statement] && formatTable(financials)}
                 </table>
               </div>
             </div>

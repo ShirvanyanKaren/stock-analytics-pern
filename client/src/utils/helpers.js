@@ -418,6 +418,17 @@ export function generateChartOptions(type, config) {
       throw new Error("Unknown chart type");
   }
 }
+export async function getStockOverview(stockSymbol) {
+  try {
+    const response = await axios.get(`http://127.0.0.1:8000/stockoverview`, {
+      params: { symbol: stockSymbol },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching stock overview:', error);
+    return null;
+  }
+}
 
 export const returnInfo = {
   "SMB Beta":
