@@ -7,7 +7,6 @@ import { faCaretDown, faCaretUp, faSearch } from "@fortawesome/free-solid-svg-ic
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 
-
 const SearchBar = () => {
   const [options, setOptions] = useState([]);
   const [query, setQuery] = useState("");
@@ -82,21 +81,15 @@ const SearchBar = () => {
   return (
     <div className="drop-down-custom">
       <form onSubmit={handleSubmit} className="d-flex">
-        <Dropdown
-
-        >
-          <Dropdown.Toggle variant="light" id="dropdown-search"
-            
-          >
+        <Dropdown>
+          <Dropdown.Toggle variant="light" id="dropdown-search">
             <input
-              className="search-bar me-3 mt-2 mb-2 text-center "
+              className="search-bar me-3 mt-2 mb-2 text-center"
               placeholder={ location.pathname.split('/')[1] === 'stockinfo' ? 'Search for other stock' : 'Search for a stock' }
               style={{ borderRadius: "15px" }}
               name="query"
               value={query}
               onChange={handleInputChange}
-              // how to remove toggle icon from the dropdown
-
             />
             <FontAwesomeIcon icon={faSearch} />
           </Dropdown.Toggle>

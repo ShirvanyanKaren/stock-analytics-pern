@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { stockData, stockInfo, generateChartOptions, } from "../utils/helpers";
+import { stockData, stockInfo, generateChartOptions } from "../utils/helpers";
 import StockDetails from "../components/StockDetails";
 import StockFinancials from "../components/StockFinancials";
 import SideBar from "../components/SideBar";
