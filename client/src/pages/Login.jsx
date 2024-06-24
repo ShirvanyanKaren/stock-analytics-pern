@@ -1,18 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  MDBContainer,
-  MDBTabs,
-  MDBTabsItem,
-  MDBTabsLink,
-  MDBTabsContent,
-  MDBTabsPane,
-  MDBBtn,
-  MDBIcon,
-  MDBInput,
-  MDBCheckbox,
-} from "mdb-react-ui-kit";
-import { useMutation } from "@apollo/client";
-import { LOGIN_USER } from "../utils/mutations";
+import { loginUser, signupUser } from "../services/users";
 import { ADD_USER } from "../utils/mutations";
 import { SAVE_USER } from "../utils/actions";
 import { useDispatch } from "react-redux";
@@ -20,26 +7,23 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Auth from "../utils/auth";
 
 const Login = () => {
-  const [justifyActive, setJustifyActive] = useState("tab1");
-  const [login] = useMutation(LOGIN_USER);
-  const [addUser, { error }] = useMutation(ADD_USER);
-  const [apolloErrorText, setApolloErrorText] = useState("");
-  const [submitted, setSubmitted] = useState(false);
+  const [justifyActive, setJustifyActive] = useState("login");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
 
-
   useEffect(() => {
     location.state = localStorage.getItem("redirect") || "/";
     if (Auth.loggedIn()) {
+      console.log("here bro")
+      console.log(location.state)
       navigate(location.state);
     }
   }, []);
 
   useEffect(() => {
     if (location.pathname === "/signup") {
-      setJustifyActive("tab2");
+      setJustifyActive("signup");
     }
   }, [location.pathname]);
 
@@ -47,13 +31,19 @@ const Login = () => {
     email: "",
     password: "",
     username: "",
-    name: "",
+    error: "",
   });
 
   const handleJustifyClick = (value) => {
     if (value === justifyActive) {
       return;
     }
+    setFormState({
+      email: "",
+      password: "",
+      username: "",
+      error: "",
+    });
 
     setJustifyActive(value);
   };
@@ -66,209 +56,137 @@ const Login = () => {
     });
   };
 
-  const handleLoginSubmit = async (event) => {
+  const handleFormSubmit = async (event) => {
     event.preventDefault();
-    setSubmitted(true);
-
     try {
-      const mutationResponse = await login({
-        variables: {
-          email: formState.email,
-          password: formState.password,
-        },
-      });
-      const token = mutationResponse.data.login.token;
-      const userId = mutationResponse.data.login.user.id;
-      dispatch({
-        type: SAVE_USER,
-        payload: userId,
-      });
-      Auth.login(token);
-      console.log(location.state);
-      navigate(location.state);
-    } catch (e) {
-      if (e.graphQLErrors && e.graphQLErrors.length > 0) {
-        const errorMessages = e.graphQLErrors.map((error) => error.message);
-        let apolloErrorText = "An error occurred while signing in. Please try again.";
-        
+      if (!formState.username && justifyActive == 'signup' || !formState.email || !formState.password) {
+        setFormState({
+          ...formState,
+          error: "Please provide all required information.",
+        });
+        return;
       }
+      const res = justifyActive === "signup" ? await signupUser(formState) : await loginUser(formState);
+      if (res.statusText !== "OK") {
+        let error = res?.response?.data?.message;
+        setFormState({
+          ...formState,
+          error: error,
+        });
+        throw new Error(res);
+      }
+      const userId = res.data.user.id;
+      const token = res.data.token;
+      Auth.login(token);
+      Auth.getProfile(token).then((data) => {
+        dispatch({
+          type: SAVE_USER,
+          payload: userId,
+        });
+      });
+    } catch (e) {
       console.log(e);
     }
   };
 
-  const handleFormSubmit = async (event) => {
-    event.preventDefault();
-    setSubmitted(true);
-    try {
-      console.log(formState);
-      const mutationResponse = await addUser({
-        variables: {
-          email: formState.email,
-          password: formState.password,
-          username: formState.username,
-        },
-      });
-
-      console.log(mutationResponse);
-      const token = mutationResponse.data.addUser.token;
-      Auth.login(token);
-      Auth.getProfile(token).then((data) => {
-        dispatch({
-          type: LOGIN,
-          payload: data.data,
-        });
-        
-      });
-    } catch (e) {
-      if (e.graphQLErrors && e.graphQLErrors.length > 0) {
-        const errorMessages = e.graphQLErrors.map((error) => error.message);
-
-        let apolloErrorText =
-          "An error occurred while signing up. Please try again.";
-        errorMessages.forEach((msg) => {
-          if (msg.includes("E11000 duplicate key error")) {
-            if (msg.includes("email")) {
-              apolloErrorText = `An account with the email ${formState.email} already exists. Please use a different email address.`;
-            } else if (msg.includes("username")) {
-              apolloErrorText = `The username "${formState.username}" is already taken. Please choose a different username.`;
-            }
-          }
-        });
-
-        setApolloErrorText(apolloErrorText);
-      }
-    }
-  };
-
   return (
-    <MDBContainer className="p-3 my-5 d-flex flex-column w-50 card">
-      <MDBTabs
-        pills
-        justify
-        className="mb-3 d-flex flex-row justify-content-between"
-      >
-        <MDBTabsItem>
-          <MDBTabsLink
-            onClick={() => handleJustifyClick("tab1")}
-            active={justifyActive === "tab1"}
+    <div className="container mt-5 w-50">
+      <div className="card p-4">
+        <ul className="nav nav-pills mb-3 justify-content-center" id="pills-tab" role="tablist">
+          <li className="nav-item" role="presentation">
+            <button
+              className={`nav-link ${justifyActive === "login" ? "active" : ""}`}
+              id="pills-login-tab"
+              onClick={() => handleJustifyClick("login")}
+            >
+              Login
+            </button>
+          </li>
+          <li className="nav-item" role="presentation">
+            <button
+              className={`nav-link ${justifyActive === "signup" ? "active" : ""}`}
+              id="pills-register-tab"
+              onClick={() => handleJustifyClick("signup")}
+            >
+              Register
+            </button>
+          </li>
+        </ul>
+
+        <div className="tab-content" id="pills-tabContent">
+          <div
+            id="pills-login"
           >
-            Login
-          </MDBTabsLink>
-        </MDBTabsItem>
-        <MDBTabsItem>
-          <MDBTabsLink
-            onClick={() => handleJustifyClick("tab2")}
-            active={justifyActive === "tab2"}
-          >
-            Register
-          </MDBTabsLink>
-        </MDBTabsItem>
-      </MDBTabs>
-
-      <MDBTabsContent>
-        <MDBTabsPane show={justifyActive === "tab1"}>
-          <form onSubmit={handleLoginSubmit}>
-            <label htmlFor="form1" className="form-label">
-              Email address
-            </label>
-            <MDBInput
-              onChange={handleChange}
-              name="email"
-              wrapperClass="mb-4"
-              id="form1"
-              type="email"
-            />
-            <label> Password </label>
-            <MDBInput
-              onChange={handleChange}
-              name="password"
-              wrapperClass="mb-4"
-              id="form2"
-              type="password"
-            />
-
-            <div className="d-flex justify-content-between mx-4 mb-4">
-              <MDBCheckbox
-                name="flexCheck"
-                value=""
-                id="flexCheckDefault"
-                label="Remember me"
-              />
-              <a href="!#">Forgot password?</a>
-            </div>
-
-            <MDBBtn type="submit" className="mb-4 w-100">
-              Sign in
-            </MDBBtn>
-          </form>
-          <p className="text-center">
-            Not a member? <a href="#!">Register</a>
-          </p>
-        </MDBTabsPane>
-
-        <MDBTabsPane show={justifyActive === "tab2"}>
-          <form onSubmit={handleFormSubmit}>
-            <label htmlFor="form1" className="form-label">
-              Name
-            </label>
-            <MDBInput
-              onChange={handleChange}
-              wrapperClass="mb-4"
-              name="name"
-              id="form1"
-              type="text"
-            />
-            <label htmlFor="form1" className="form-label">
-              Username
-            </label>
-            <MDBInput
-              onChange={handleChange}
-              wrapperClass="mb-4"
-              name="username"
-              id="form1"
-              type="text"
-            />
-            <label htmlFor="form1" className="form-label">
-              Email address
-            </label>
-            <MDBInput
-              onChange={handleChange}
-              wrapperClass="mb-4"
-              name="email"
-              id="form1"
-              type="email"
-            />
-            <label htmlFor="form1" className="form-label">
-              Password
-            </label>
-            <MDBInput
-              onChange={handleChange}
-              wrapperClass="mb-4"
-              name="password"
-              id="form1"
-              type="password"
-            />
-
-            <div className="d-flex justify-content-center mb-4">
-              <MDBCheckbox
-                name="flexCheck"
-                id="flexCheckDefault"
-                label="I have read and agree to the terms"
-              />
-            </div>
-
-            <MDBBtn type="submit"  className="mb-4 w-100">
-              Sign up
-            </MDBBtn>
-            {apolloErrorText && (
-              <div className="alert alert-danger" role="alert">
-                {apolloErrorText}
+            <form onSubmit={handleFormSubmit}>
+              <div className="mb-3">
+                <label htmlFor="email" className="form-label">
+                { justifyActive === "login" ? "Email or Username" : "Email" }
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="email"
+                  name="email"
+                  value={formState.email}
+                  onChange={handleChange}
+                />
               </div>
-            )}
-          </form>
-        </MDBTabsPane>
-      </MDBTabsContent>
-    </MDBContainer>
+              { justifyActive === "login" ? null : (
+                <div className="mb-3">
+                  <label htmlFor="username" className="form-label">
+                    Username
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="username"
+                    name="username"
+                    value={formState.username}
+                    onChange={handleChange}
+                  />
+                </div>
+              )}
+              <div className="mb-3">
+                <label htmlFor="password" className="form-label">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  className="form-control"
+                  id="password"
+                  name="password"
+                  value={formState.password}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="d-flex justify-content-between mb-3">
+                <div className="form-check">
+                  <input className="form-check-input" type="checkbox" id="rememberMe" />
+                  <label className="form-check-label" htmlFor="rememberMe">
+                    Remember me
+                  </label>
+                </div>
+                <a href="#!">Forgot password?</a>
+              </div>
+              <button type="submit" className="btn btn-primary w-100">
+                Sign in
+              </button>
+            </form>
+            { justifyActive === "login" ? (
+              <p className="text-center mt-3">
+                Not a member? <a href="#!" onClick={() => handleJustifyClick("signup")}>Register</a>
+              </p>
+            ) : null}
+          </div>
+
+        </div>
+        {formState.error && (
+          <div className="alert alert-danger mt-3" role="alert">
+            {formState.error}
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 

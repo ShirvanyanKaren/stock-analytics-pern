@@ -129,6 +129,7 @@ export function idbPromise(storeName, method, object) {
       };
 
       if (method === "put") {
+        console.log("putting", object);
         store.put(object);
         resolve(object);
       } else if (method === "get") {

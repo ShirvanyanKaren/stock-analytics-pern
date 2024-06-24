@@ -27,8 +27,8 @@ const Header = () => {
               CincoData
             </Link>
           </Navbar.Brand>
-            <SearchBar className="w-25"/>
-            <Nav className="d-flex w-25 justify-content-around">
+          <SearchBar className="" />
+          <Nav className="d-flex justify-content-between ms-3 fs-5">
               <Nav.Link as={Link} to="/">Dashboard</Nav.Link>
               <Nav.Link as={Link} to="/">Portfolio</Nav.Link>
               <Nav.Link as={Link} to="/glossary">Glossary</Nav.Link>

@@ -89,13 +89,14 @@ body {
 }
 
 .dropdown-menu {
-  width: 300px;
+  width: 100%;
   margin-right: 5px;
   max-height: 300px;
   overflow-y: scroll;
 
   .search-list {
     display: flex;
+    width: 100%;
     flex-direction: row;
     align-items: center;
     padding: 20px;
@@ -257,7 +258,6 @@ body {
 }
  
 .drop-down-custom {
-  width: 25%;
   &.active {
     input {
       border-bottom: 1px solid #ccc;

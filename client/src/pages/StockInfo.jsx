@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useLocation } from "react-router-dom";
-import { useQuery } from "@apollo/client";
 import { useSelector } from "react-redux";
 import { stockData, stockInfo, generateChartOptions, } from "../utils/helpers";
-import { QUERY_ME } from "../utils/queries";
 import StockDetails from "../components/StockDetails";
 import StockFinancials from "../components/StockFinancials";
 import SideBar from "../components/SideBar";
@@ -15,7 +13,6 @@ import CanvasJSReact from "@canvasjs/react-stockcharts";
 const CanvasJSStockChart = CanvasJSReact.CanvasJSStockChart;
 
 const StockInfo = () => {
-  const { data } = useQuery(QUERY_ME); 
   const { symbol } = useParams();
   const [dataPoints, setDataPoints] =  useState([]);
   const [options, setOptions] = useState({});

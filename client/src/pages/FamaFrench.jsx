@@ -22,6 +22,7 @@ const FamaFrench = () => {
   const [hml, setHml] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [stats, setStats] = useState({});
+  const stockWeights = useSelector((state) => state.stockWeights);
 
   const endDate = new Date(new Date().getFullYear(), new Date().getMonth() - 1, 0)
   .toISOString()

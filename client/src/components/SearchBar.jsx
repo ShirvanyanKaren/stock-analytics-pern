@@ -3,14 +3,16 @@ import AddPortfolio from "./AddPortfolio";
 import { useEffect, useState, useCallback } from "react";
 import { stockSearch } from "../utils/helpers";
 import defaultStockImage from "../assets/default-stock.jpeg";
-import { faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
+import { faCaretDown, faCaretUp, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
+
 
 const SearchBar = () => {
   const [options, setOptions] = useState([]);
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -80,15 +82,23 @@ const SearchBar = () => {
   return (
     <div className="drop-down-custom">
       <form onSubmit={handleSubmit} className="d-flex">
-        <Dropdown>
-          <Dropdown.Toggle variant="light" id="dropdown-search">
+        <Dropdown
+
+        >
+          <Dropdown.Toggle variant="light" id="dropdown-search"
+            
+          >
             <input
-              className="search-bar me-3 mt-2 mb-2 h-300"
-              placeholder="Search for other stocks"
+              className="search-bar me-3 mt-2 mb-2 text-center "
+              placeholder={ location.pathname.split('/')[1] === 'stockinfo' ? 'Search for other stock' : 'Search for a stock' }
+              style={{ borderRadius: "15px" }}
               name="query"
               value={query}
               onChange={handleInputChange}
+              // how to remove toggle icon from the dropdown
+
             />
+            <FontAwesomeIcon icon={faSearch} />
           </Dropdown.Toggle>
           <Dropdown.Menu className="w-100 dropdown-menu">
             {options.length > 0 ? options.map(renderOption) : null}
