@@ -1,4 +1,3 @@
-// src/components/Watchlist.jsx
 import React, { useState, useEffect, useCallback } from "react";
 import { stockWatchlistSearch, getStockOverview } from "../utils/helpers";
 import { Link } from "react-router-dom";
@@ -81,8 +80,27 @@ const Watchlist = ({ onUpdate }) => {
     }
   };
 
-  const handleInputChange = (event) => {
+  const handleInputChange = async (event) => {
     setQuery(event.target.value);
+    if (event.target.value.length > 0) {
+      try {
+        console.log("Fetching data for query:", event.target.value); // Debugging
+        const data = await stockWatchlistSearch(event.target.value);
+        console.log("Received data:", data); // Debugging
+        const options = data.map((stock) => ({
+          exchange: stock.exchange,
+          image: stock.image ? `https://eodhd.com${stock.image}` : defaultStockImage,
+          label: stock.code,
+          open: stock.open.toFixed(2),
+          close: stock.close.toFixed(2),
+          change: ((stock.close - stock.open) / stock.open).toFixed(2),
+          name: stock.name,
+        }));
+        setOptions(options);
+      } catch (error) {
+        console.error("Error fetching stock data:", error);
+      }
+    }
   };
 
   const renderOption = (option) => (
@@ -163,7 +181,7 @@ const Watchlist = ({ onUpdate }) => {
                   <FontAwesomeIcon icon={faSearch} />
                 </Dropdown.Toggle>
                 <Dropdown.Menu className="w-100 dropdown-menu">
-                  {options.length > 0 ? options.map(renderOption) : null}
+                  {options.length > 0 ? options.map(renderOption) : <Dropdown.Item>No results found</Dropdown.Item>}
                 </Dropdown.Menu>
               </Dropdown>
             </form>

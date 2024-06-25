@@ -18,7 +18,9 @@ const SearchBar = () => {
     const fetchData = async () => {
       if (query.length > 0) {
         try {
+          console.log("Fetching data for query:", query); // Debugging
           const data = await stockSearch(query);
+          console.log("Received data:", data); // Debugging
           const options = data.map((stock) => ({
             exchange: stock.exchange,
             image: stock.image ? `https://eodhd.com${stock.image}` : defaultStockImage,
@@ -99,7 +101,7 @@ const SearchBar = () => {
             <FontAwesomeIcon icon={faSearch} />
           </Dropdown.Toggle>
           <Dropdown.Menu className="w-100 dropdown-menu">
-            {options.length > 0 ? options.map(renderOption) : null}
+            {options.length > 0 ? options.map(renderOption) : <Dropdown.Item>No results found</Dropdown.Item>}
           </Dropdown.Menu>
         </Dropdown>
       </form>

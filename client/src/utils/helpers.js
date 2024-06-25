@@ -128,17 +128,21 @@ export async function linReg(searchParams, startDate, endDate, weights) {
 }
 
 export async function stockSearch(query) {
-  const response = await axios.get(
-    `https://eodhd.com/api/query-search-extended/`,
-    {
-      params: {
-        q: query,
-        api_token: "65431c249ef2b9.93958016",
-      },
-    }
-  );
-
-  return response.data;
+  try {
+    const response = await axios.get(
+      `https://eodhd.com/api/query-search-extended/`,
+      {
+        params: {
+          q: query,
+          api_token: "65431c249ef2b9.93958016",
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching stock search results:", error);
+    throw error;
+  }
 }
 
 export async function getStockWeights(stockNumbers) {
