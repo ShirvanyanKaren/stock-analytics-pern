@@ -19,16 +19,16 @@ const Header = () => {
 
   return (
     <>
-      <Navbar expand="xxl" bg="light" data-bs-theme="light" className="nav-bar nav-bar-custom theme">
-        <div expand="xxl" className="justify-content-around navbar w-100">
+      <Navbar expand="xxl" bg="light" data-bs-theme="light" className="navbar d-flex justify-content-around">
+        {/* <div expand="xxl" className=" w-100 "> */}
           <Navbar.Brand className="ms-0" to="/home">
-            <FontAwesomeIcon icon={faDatabase} className="nav-brand" color="blue" />
+            <FontAwesomeIcon icon={faDatabase} className="nav-brand ms-4" color="blue" />
             <Link to="/" className="navbar-brand">
               CincoData
             </Link>
           </Navbar.Brand>
           <SearchBar className="" />
-          <Nav className="d-flex justify-content-between ms-3 fs-5">
+          <div className="d-flex flex-direction-row justify-content-around w-25 ms-3 fs-5">
               <Nav.Link as={Link} to="/">Dashboard</Nav.Link>
               <Nav.Link as={Link} to="/">Portfolio</Nav.Link>
               <Nav.Link as={Link} to="/glossary">Glossary</Nav.Link>
@@ -51,8 +51,8 @@ const Header = () => {
               <Nav.Link href="/login">Login</Nav.Link>
                 </>
               )}
-            </Nav>
-        </div>
+            </div>
+        {/* </div> */}
       </Navbar>
     </>
   );
