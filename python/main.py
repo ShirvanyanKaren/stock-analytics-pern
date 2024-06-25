@@ -230,21 +230,50 @@ async def stock_overview(symbol: str):
         stock = Ticker(symbol)
         stock_summary = stock.summary_detail[symbol]
         stock_price = stock.price[symbol]
-        
+
+        def convert_to_float(value):
+            try:
+                return float(value)
+            except (ValueError, TypeError):
+                return "N/A"
+
+        current_price = convert_to_float(stock_price.get('regularMarketPrice', 'N/A'))
+        price_change = convert_to_float(stock_price.get('regularMarketChange', 'N/A'))
+        price_change_percent = convert_to_float(stock_price.get('regularMarketChangePercent', 'N/A'))
+        after_hours_price = convert_to_float(stock_price.get('postMarketPrice', 'N/A'))
+        after_hours_change = convert_to_float(stock_price.get('postMarketChange', 'N/A'))
+        after_hours_change_percent = convert_to_float(stock_price.get('postMarketChangePercent', 'N/A'))
+
+        def format_price(price):
+            return f"${price:.2f}" if isinstance(price, float) else "N/A"
+
+        def format_change(change):
+            return f"{change:+.2f}" if isinstance(change, float) else "N/A"
+
+        def format_percent(percent):
+            return f"({percent * 100:.4f}%)" if isinstance(percent, float) else "N/A"
+
         overview = {
-            "currentPrice": stock_price.get('regularMarketPrice', 'N/A'),
-            "priceChange": stock_price.get('regularMarketChange', 'N/A'),
-            "priceChangePercent": stock_price.get('regularMarketChangePercent', 'N/A'),
-            "afterHoursPrice": stock_price.get('postMarketPrice', 'N/A'),
-            "afterHoursChange": stock_price.get('postMarketChange', 'N/A'),
-            "afterHoursChangePercent": stock_price.get('postMarketChangePercent', 'N/A'),
+            "currentPrice": format_price(current_price),
+            "priceChange": format_change(price_change),
+            "priceChangePercent": format_percent(price_change_percent),
+            "afterHoursPrice": format_price(after_hours_price),
+            "afterHoursChange": format_change(after_hours_change),
+            "afterHoursChangePercent": format_percent(after_hours_change_percent),
             "lastCloseTime": stock_price.get('regularMarketTime', 'N/A'),
             "afterHoursTime": stock_price.get('postMarketTime', 'N/A')
         }
-        
+
         return overview
     except Exception as e:
         raise HTTPException(status_code=404, detail=f"Error fetching stock overview: {str(e)}")
+
+
+
+
+
+
+
 
 if __name__ == "__main__":
     load_dotenv()

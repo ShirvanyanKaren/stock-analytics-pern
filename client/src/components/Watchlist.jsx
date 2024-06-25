@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { stockWatchlistSearch, getStockOverview } from "../utils/helpers";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -47,10 +47,10 @@ const Watchlist = ({ onUpdate }) => {
       if (stockOverview) {
         const newStock = {
           stock_symbol: stockSymbol,
-          stock_name: stockOverview.name || stockSymbol,
-          price: stockOverview.currentPrice || 0,
-          day_change: stockOverview.priceChangePercent || 0,
-          after_hours_change: stockOverview.afterHoursChangePercent || 0,
+          stock_name: stockOverview.currentPrice,
+          price: stockOverview.currentPrice,
+          day_change: `${stockOverview.priceChange} ${stockOverview.priceChangePercent}`,
+          after_hours_change: `${stockOverview.afterHoursChange} ${stockOverview.afterHoursChangePercent}`,
         };
         const newWatchlistStocks = [...watchlistStocks, newStock];
         setWatchlistStocks(newWatchlistStocks);
@@ -84,9 +84,7 @@ const Watchlist = ({ onUpdate }) => {
     setQuery(event.target.value);
     if (event.target.value.length > 0) {
       try {
-        console.log("Fetching data for query:", event.target.value); // Debugging
         const data = await stockWatchlistSearch(event.target.value);
-        console.log("Received data:", data); // Debugging
         const options = data.map((stock) => ({
           exchange: stock.exchange,
           image: stock.image ? `https://eodhd.com${stock.image}` : defaultStockImage,
@@ -129,8 +127,10 @@ const Watchlist = ({ onUpdate }) => {
   );
 
   const getStockClass = (change) => {
-    if (change > 0) return "stock-positive";
-    if (change < 0) return "stock-negative";
+    if (typeof change === "string") {
+      if (change.includes("+")) return "stock-positive";
+      if (change.includes("-")) return "stock-negative";
+    }
     return "stock-neutral";
   };
 
@@ -149,7 +149,11 @@ const Watchlist = ({ onUpdate }) => {
         {watchlistStocks.map((stock, index) => (
           <li key={index} className={`watchlist-stock ${getStockClass(stock.day_change)}`}>
             <Link to={`/stocks/${stock.stock_symbol}`}>
-              {stock.stock_symbol} {stock.day_change > 0 ? "▲" : stock.day_change < 0 ? "▼" : ""} {stock.day_change}%
+              {stock.stock_symbol} <br />
+              {stock.price} <br />
+              <span className={typeof stock.day_change === "string" && stock.day_change.includes("+") ? "text-success" : "text-danger"}>
+                {stock.day_change}
+              </span>
             </Link>
           </li>
         ))}

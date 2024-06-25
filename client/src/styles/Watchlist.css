@@ -32,21 +32,12 @@
   transition: color 0.3s;
 }
 
-.stock-positive {
-  background-color: #28a745;
-}
-
-.stock-negative {
-  background-color: #dc3545;
-}
 
 .stock-neutral {
   background-color: #6c757d;
 }
 
-.text-danger {
-  color: #dc3545;
-}
+
 
 .search-bar-input {
   width: 100%;
@@ -68,4 +59,12 @@
 .search-items li {
   list-style: none;
   margin-right: 10px;
+}
+
+.text-success {
+  color: #28a745;
+}
+
+.text-danger {
+  color: #dc3545;
 }
