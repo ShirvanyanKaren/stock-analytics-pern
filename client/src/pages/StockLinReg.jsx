@@ -6,8 +6,6 @@ import { linReg, idbPromise, indexOptions, generateChartOptions } from "../utils
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLineChart } from "@fortawesome/free-solid-svg-icons";
 import StockDetails from "../components/StockDetails";
-import Nav from "react-bootstrap/Nav";
-import Navbar from "react-bootstrap/Navbar";
 
 const CanvasJS = CanvasJSReact.CanvasJS;
 const CanvasJSChart = CanvasJSReact.CanvasJSChart;
@@ -22,9 +20,7 @@ const StockLinReg = () => {
   const [stockWeights, setStockWeights] = useState({});
   const [searchParams, setSearchParams] = useState({ symbol: "", index: "SP500" });
   const [options, setChartOptions] = useState({});
-  const [regressionInfo, setRegressionInfo] = useState({
-    longName: "Linear Regression",
-  });
+  const [regressionInfo, setRegressionInfo] = useState({ longName: "Linear Regression" });
   const [formula, setFormula] = useState({ coef: null, intercept: null });
   const [dates, setDates] = useState({
     startDate: new Date(new Date().getFullYear(), 0, 1).toISOString().slice(0, 10),
@@ -32,17 +28,23 @@ const StockLinReg = () => {
   });
 
   useEffect(() => {
-    if (symbol) {
-      const [stockSymbol, index] = symbol.split("-");
-      setSearchParams({ symbol: stockSymbol, index: index.replace("_", " ") });
-      fetchLinRegData(stockSymbol, index.replace("_", " "));
-      setIsLoaded(true);
-    }
+    if (!symbol) return;
+    const fetchAndSetData = async () => {
+      const params = symbol.split("-");
+      params[1] = params[1].replace("_", " ");
+      setSearchParams({ symbol: params[0], index: params[1] });
+      await fetchLinRegData(params[0], params[1]);
+    };
+    fetchAndSetData();
+    setIsLoaded(true);
   }, [symbol]);
 
   const fetchStockWeights = async () => {
     if (Object.keys(stockWeights).length === 0 || !stockWeights) {
       const weights = await idbPromise("stockWeights", "get");
+      if (!weights || weights.length === 0) {
+        return {};
+      }
       const weightsObject = await weights.map(({ portfolio_id, ...rest }) => rest)[0];
       setStockWeights(weightsObject);
       return weightsObject;
@@ -59,22 +61,26 @@ const StockLinReg = () => {
       alert("Start date cannot be the same as end date");
       return;
     }
-    let weightsObject = await fetchStockWeights();
-    weightsObject = useWeights || symbol === "Portfolio" ? JSON.stringify(weightsObject) : "";
-    const data = await linReg({ symbol, index }, dates.startDate, dates.endDate, weightsObject);
-    const dataArray = JSON.parse(data[0]);
-    const dps = dataArray.map((item) => ({ x: Number(item[1]), y: Number(item[0]) }));
-    const formula = { coef: data[1]["coef"], intercept: data[1]["intercept"] };
-    setRegressionInfo(data[1]["model"]);
-    setFormula(formula);
-    setDataPoints(dps);
-    const options = generateChartOptions("regression", {
-      theme: "dark1",
-      index: dps,
-      searchParams: { symbol, index },
-      formula: formula,
-    });
-    setChartOptions(options);
+    try {
+      let weightsObject = await fetchStockWeights();
+      weightsObject = useWeights || symbol === "Portfolio" ? JSON.stringify(weightsObject) : "";
+      const data = await linReg({ symbol, index }, dates.startDate, dates.endDate, weightsObject);
+      const dataArray = JSON.parse(data[0]);
+      const dps = dataArray.map((item) => ({ x: Number(item[1]), y: Number(item[0]) }));
+      const formula = { coef: data[1]["coef"], intercept: data[1]["intercept"] };
+      setRegressionInfo(data[1]["model"]);
+      setFormula(formula);
+      setDataPoints(dps);
+      const options = generateChartOptions("regression", {
+        theme: "dark1",
+        index: dps,
+        searchParams: { symbol, index },
+        formula: formula,
+      });
+      setChartOptions(options);
+    } catch (error) {
+      console.error("Error fetching linear regression data:", error);
+    }
   };
 
   const handleSubmit = async (event) => {
@@ -103,37 +109,8 @@ const StockLinReg = () => {
     setSearchParams((prevParams) => ({ ...prevParams, [name]: value }));
   };
 
-  const handleNavClick = (category) => {
-    if (category === "Summary") {
-      navigate(`/stock-info/${searchParams.symbol}`);
-    } else if (category === "Financials") {
-      navigate(`/stock-info/${searchParams.symbol}/financials`);
-    }
-  };
-
-  const categories = ["Summary", "Financials", "Linear Regression"];
-
   return (
     <div className="linear-reg mt-3">
-      <Navbar
-        expand="xxl"
-        bg="light"
-        data-bs-theme="light"
-        className="nav-bar nav-bar-custom justify-content-center"
-      >
-        <Nav className="d-flex justify-content-around w-100 stock-info">
-          {categories.map((type) => (
-            <button
-              key={type}
-              onClick={() => handleNavClick(type)}
-              className={`btn ${type === "Linear Regression" ? "btn-primary" : "btn-secondary"} m-2`}
-            >
-              {type}
-            </button>
-          ))}
-        </Nav>
-      </Navbar>
-
       <main>
         <div className="chart mt-4">
           <div className="d-flex justify-content-center">
@@ -148,9 +125,7 @@ const StockLinReg = () => {
                         <input
                           type="text"
                           name="symbol"
-                          className={`form-control text-center w-25 mt-2 ${
-                            useWeights ? "disabled-input" : ""
-                          }`}
+                          className={`form-control text-center w-25 mt-2 ${useWeights ? "disabled-input" : ""}`}
                           value={searchParams.symbol}
                           onChange={handleInputChange}
                           disabled={useWeights}
@@ -160,12 +135,7 @@ const StockLinReg = () => {
                     <div className="form-group text-center">
                       <label htmlFor="index">Index</label>
                       <Dropdown
-                        onSelect={(eventKey) =>
-                          setSearchParams((prev) => ({
-                            ...prev,
-                            index: eventKey,
-                          }))
-                        }
+                        onSelect={(eventKey) => setSearchParams((prev) => ({ ...prev, index: eventKey }))}
                       >
                         <Dropdown.Toggle className="w-75" id="dropdown-index">
                           {searchParams.index}
@@ -207,12 +177,7 @@ const StockLinReg = () => {
                           value={dates[date]}
                           max={new Date().toISOString().slice(0, 10)}
                           min={date === "startDate" ? "2010-01-01" : dates.startDate}
-                          onChange={(e) =>
-                            setDates({
-                              ...dates,
-                              [date]: e.target.value,
-                            })
-                          }
+                          onChange={(e) => setDates({ ...dates, [date]: e.target.value })}
                         />
                       </div>
                     ))}

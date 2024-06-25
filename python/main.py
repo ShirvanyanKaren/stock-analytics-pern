@@ -5,6 +5,7 @@ import pandas_datareader.data as pdr
 import datetime as dt
 import yfinance as yf
 import numpy as np
+import getFamaFrenchFactors as gff
 import pandas as pd
 import simplejson as json
 from yahooquery import Ticker 
@@ -15,14 +16,11 @@ import os
 
 load_dotenv()
 
-# run this script with uvicorn main:app --reload to start the server
-
 app = FastAPI()
 
-# Allow CORS for local development
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Adjust this to your frontend URL in production
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -58,55 +56,6 @@ def all_statements(symbol: str, quarterly: bool):
         'cash': cash.dropna(thresh=len(cash.columns) / 2).to_json(orient='records')
     }
 
-@app.get("/linreg")
-async def lin_reg(stocks: str, index: str, start: str, end: str, stockWeights: str):
-    symbols = [index, stocks]
-    stocks_df, stock_data = lin_reg_data(symbols, start, end, index, stockWeights)
-
-    if 'Portfolio' not in stocks_df.columns:
-        raise HTTPException(status_code=400, detail="Portfolio column is missing in the dataframe.")
-
-    formula = 'Portfolio ~ Mkt_RF + SMB + HML'
-    
-    model = sma.OLS.from_formula(formula, data=stocks_df).fit()
-    coef = model.params[1]
-    intercept = model.params[0]
-    r_squared = model.rsquared
-    model_html = model.summary().as_html().replace('\n', '')
-    model_summary = pd.read_html(model_html)[0].to_json(orient='values')
-    model_summary = json.loads(model_summary)
-    model_obj = {}
-    for arr in model_summary:
-        for i in range(0, len(arr), 2):
-            if arr[i]: 
-                model_obj[arr[i].replace(':', '')] = arr[i+1]
-    values = {'coef': coef, 'intercept': intercept, 'r_squared': r_squared, 'model': model_obj}
-    sorted_stocks = stock_data.sort_values(by=index, ascending=True)
-    json_data = sorted_stocks.reset_index(drop=True).to_json(date_format='iso', orient='values')
-    return json_data, values
-
-def lin_reg_data(symbols, start, end, index, stockWeights):
-    start = dt.datetime.strptime(start, '%Y-%m-%d')
-    end = dt.datetime.strptime(end, '%Y-%m-%d')
-    
-    if stockWeights:
-        weights = json.loads(stockWeights)
-    else:
-        weights = {symbol: 1 for symbol in symbols}
-    
-    stock_data = yf.download(symbols, start=start, end=end)['Adj Close']
-    stock_data = stock_data.pct_change().dropna()
-    
-    portfolio = (stock_data * pd.Series(weights)).sum(axis=1)
-    stock_data['Portfolio'] = portfolio
-    
-    ff_factors = pdr.get_data_famafrench('F-F_Research_Data_Factors', start=start, end=end)[0]
-    ff_factors.index = pd.to_datetime(ff_factors.index, format='%Y%m')
-    ff_factors = ff_factors.loc[stock_data.index]
-    stocks_df = stock_data.join(ff_factors[['Mkt-RF', 'SMB', 'HML']])
-    return stocks_df, stock_data
-
-
 def process_symbol(symbol: str):
     symbol = symbol.upper()
     if "-" in symbol and "KS" in symbol:
@@ -135,26 +84,6 @@ def fetch_stock_graph(symbol: str, start: str, end: str):
     stock = stock.to_json(orient='records')
     return stock
 
-def lin_reg_data(symbols, start, end, index, stockWeights):
-    start_date = dt.datetime.strptime(start, '%Y-%m-%d')
-    end_date = dt.datetime.strptime(end, '%Y-%m-%d')
-    data = yf.download(symbols, start=start_date, end=end_date)
-
-    if len(symbols) == 1:
-        data = data['Adj Close']
-    else:
-        data = data['Adj Close'][symbols]
-    
-    if stockWeights:
-        stockWeights = json.loads(stockWeights)
-        weighted_data = data.mul(pd.Series(stockWeights), axis=1)
-        portfolio_returns = weighted_data.sum(axis=1).pct_change().dropna()
-        data[index] = portfolio_returns
-    
-    data = data.dropna()
-    data = data.reset_index()
-    return data, data
-
 @app.get("/stockweights")
 async def stock_weights(stocks):
     stocks = json.loads(stocks)
@@ -168,35 +97,67 @@ async def stock_weights(stocks):
         weighted_portfolio[stock] = stocks[stock] / total_value
     return weighted_portfolio
 
-@app.get("/stockoverview")
-async def stock_overview(symbol: str):
-    try:
-        stock = yf.Ticker(symbol)
-        hist = stock.history(period="1d")
-        current_price = hist["Close"].iloc[-1]
-        previous_close = stock.history(period="2d")["Close"].iloc[0]
-        price_change = current_price - previous_close
-        price_change_percent = (price_change / previous_close) * 100
+def lin_reg_data(symbols, start, end, index, stockWeights):
+    start_date = dt.datetime.strptime(start, '%Y-%m-%d')
+    end_date = dt.datetime.strptime(end, '%Y-%m-%d')
+    using_weights = False
+    if symbols == 'Portfolio' or stockWeights != '':
+        using_weights = True
+        stock_weights = json.loads(stockWeights)
+    if index in ['UNRATE', 'CPIAUCSL', 'PPIACO', 'FEDFUNDS', 'GDP', 'USEPUINDXD', 'VIXCLS']:
+        index_data = pdr.DataReader(index, 'fred', start, end)
+        index_data.index = index_data.index.rename('Date')
+        if using_weights:
+            stock_keys = list(stock_weights.keys())
+            stocks = yf.download(stock_keys, start=start_date, end=end_date)['Adj Close'].pct_change()[1:]
+            stocks = stocks * pd.Series(stock_weights)
+            stocks = stocks.sum(axis=1)
+            stocks = pd.DataFrame({'Adj Close': stocks})
+            index_data = index_data.pct_change()
+        else:
+            stocks = yf.download(stocks, start=start_date, end=end_date)['Adj Close']
+        stock_data = pd.merge(stocks, index_data, on='Date')
+    else:
+        if using_weights:
+            stock_keys = list(stock_weights.keys())
+            stocks = yf.download(stock_keys, start=start_date, end=end_date)['Adj Close'].pct_change()[1:]
+            stocks = stocks * pd.Series(stock_weights)
+            stocks = stocks.sum(axis=1)
+            stock_data = pd.DataFrame({'Adj Close': stocks})
+            index_data = yf.download(index, start=start_date, end=end_date)['Adj Close']
+            index_data = index_data.pct_change()
+            stock_data[index] = index_data
+        else:
+            stock_data = yf.download(symbols, start=start_date, end=end_date)['Adj Close']
+            stock_data = stock_data.rename(columns={symbols[1]: 'Adj Close'})
+    stock_data = stock_data.dropna()
+    stocks_df = pd.DataFrame({
+        'Dependent': stock_data['Adj Close'],
+        'Independent': stock_data[index]
+    })
+    if using_weights: stock_data = stock_data * 100
+    return stocks_df, stock_data
 
-        after_hours_price = stock.history(period="1d", interval="1m")["Close"].iloc[-1]
-        after_hours_change = after_hours_price - current_price
-        after_hours_change_percent = (after_hours_change / current_price) * 100
-
-        last_close_time = stock.history(period="1d", interval="1m").index[-1].strftime("%B %d at %I:%M %p %Z")
-        after_hours_time = dt.datetime.now().strftime("%B %d at %I:%M %p %Z")
-
-        return {
-            "currentPrice": current_price,
-            "priceChange": price_change,
-            "priceChangePercent": price_change_percent,
-            "afterHoursPrice": after_hours_price,
-            "afterHoursChange": after_hours_change,
-            "afterHoursChangePercent": after_hours_change_percent,
-            "lastCloseTime": last_close_time,
-            "afterHoursTime": after_hours_time,
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+@app.get("/linreg")
+async def lin_reg(stocks: str, index: str, start: str, end: str, stockWeights: str):
+    symbols = [index, stocks]
+    stocks_df, stock_data = lin_reg_data(symbols, start, end, index, stockWeights)
+    formula = 'Dependent ~ Independent'
+    model = sma.OLS.from_formula(formula, data=stocks_df).fit()
+    coef = model.params[1]
+    intercept = model.params[0]
+    r_squared = model.rsquared
+    model_html = model.summary().as_html().replace('\n', '')
+    model_summary = pd.read_html(model_html)[0].to_json(orient='values')
+    model_summary = json.loads(model_summary)
+    model_obj = {}
+    for arr in model_summary:
+        for i in range(0, len(arr), 2):
+            if arr[i]: model_obj[arr[i].replace(':', '')] = arr[i + 1]
+    values = {'coef': coef, 'intercept': intercept, 'r_squared': r_squared, 'model': model_obj}
+    sorted_stocks = stock_data.sort_values(by=index, ascending=True)
+    json_data = sorted_stocks.reset_index(drop=True).to_json(date_format='iso', orient='values')
+    return json_data, values
 
 @app.get("/famafrench")
 async def fama_french(stockWeights: str, start: str, end: str):
@@ -224,11 +185,11 @@ async def fama_french(stockWeights: str, start: str, end: str):
         min_length = min(len(portfolio_mtl), len(factors))
         portfolio_mtl = portfolio_mtl[:min_length]
         factors = factors[:min_length]
-        
+
     portfolio_mtl.index = factors.index
     merged_port = pd.merge(portfolio_mtl, factors, on='Date')
     port_data = merged_port.copy()
-    merged_port[['Mkt-RF','SMB','HML','RF']] =  merged_port[['Mkt-RF','SMB','HML','RF']]/100
+    merged_port[['Mkt-RF','SMB','HML','RF']] = merged_port[['Mkt-RF','SMB','HML','RF']]/100
     merged_port['Excess Portfolio'] = merged_port['Portfolio'] - merged_port['RF']
     y = merged_port['Excess Portfolio']
     x = merged_port[['Mkt-RF','SMB','HML']]
@@ -242,13 +203,13 @@ async def fama_french(stockWeights: str, start: str, end: str):
     sharpe = (expected_return - risk_free) / merged_port['Excess Portfolio'].std()
     results = {'R-Squared': model.rsquared,
                'HML Beta': model.params['HML'],
-                'SMB Beta': model.params['SMB'],
-                'Mkt-RF': model.params['Mkt-RF'],
-                'intercept': model.params['const'],
+               'SMB Beta': model.params['SMB'],
+               'Mkt-RF': model.params['Mkt-RF'],
+               'intercept': model.params['const'],
                'Expected Return': expected_return * 100,
                'Mkt-RF P-Value': pvalues['Mkt-RF'],
-                'SMB P-Value': pvalues['SMB'],
-                'HML P-Value': pvalues['HML'],
+               'SMB P-Value': pvalues['SMB'],
+               'HML P-Value': pvalues['HML'],
                'Sharpe Ratio': sharpe,
                'Portfolio Beta': beta_m + beta_s + beta_v,
                }
@@ -256,17 +217,31 @@ async def fama_french(stockWeights: str, start: str, end: str):
     json_data = port_data.to_json(orient='index')
     return json_data, results
 
-@app.get("/gpt-analysis")
-async def gpt3():
-    print(os.getenv("OPENAI_API_KEY"))
-    client = OpenAI(
-        api_key=os.getenv("OPENAI_API_KEY")
-    )
-    completion = await client.chat.completions.create(model="gpt-3.5-turbo", messages=[{"role": "user", "content": "hello"}])
-    return completion.choices[0].message['content']
-
 if __name__ == "__main__":
     load_dotenv()
     PORT = int(os.getenv("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=PORT)
     print(f"process id: {os.getpid()}")
+
+
+    # stream = client.chat.completions.create(
+    #     model="gpt-4",
+    #     messages=[{"role": "user", "content": "Say this is a test"}],
+    #     stream=True,
+    # )
+    # for chunk in stream:
+    #     if chunk.choices[0].delta.content is not None:
+    #         print(chunk.choices[0].delta.content, end="")
+
+
+
+
+
+
+
+    
+   
+
+
+
+

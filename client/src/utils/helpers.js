@@ -12,104 +12,16 @@ const pyBackEnd = "http://127.0.0.1:8000";
 
 
 // Watchlist helper functions
-export async function addStock(stockState) {
-  try {
-    const response = await axios.post(`${pyBackEnd}/add-stock`, stockState);
-    return response.data;
-  } catch (error) {
-    throw new Error("Error adding stock");
-  }
-}
-
-export async function addToWatchlist(stockSymbol, userId) {
-  try {
-    const response = await axios.post(`${pyBackEnd}/add-to-watchlist`, {
-      stock_symbol: stockSymbol,
-      user_id: userId,
-    });
-    return response.data;
-  } catch (error) {
-    throw new Error("Error adding to watchlist");
-  }
-}
-
-export async function createWatchlist(watchlistName, userId) {
-  try {
-    const response = await axios.post(`${pyBackEnd}/create-watchlist`, {
-      name: watchlistName,
-      user_id: userId,
-    });
-    return response.data;
-  } catch (error) {
-    throw new Error("Error creating watchlist");
-  }
-}
-
-export async function stockWatchlistSearch(query) {
-  const response = await axios.get(
-    `https://eodhd.com/api/query-search-extended/`,
-    {
-      params: {
-        q: query,
-        api_token: "65431c249ef2b9.93958016",
-      },
-    }
-  );
-
-  return response.data;
-}
-
-export async function getWatchlistInfo(stockSymbols) {
-  try {
-    const stockInfoPromises = stockSymbols.map(async (symbol) => {
-      const overview = await getStockOverview(symbol);
-      return {
-        stockSymbol: symbol,
-        currentPrice: overview.currentPrice,
-        priceChange: overview.priceChange,
-        priceChangePercent: overview.priceChangePercent,
-        afterHoursPrice: overview.afterHoursPrice,
-        afterHoursChange: overview.afterHoursChange,
-        afterHoursChangePercent: overview.afterHoursChangePercent,
-      };
-    });
-
-    const stockInfos = await Promise.all(stockInfoPromises);
-    return stockInfos;
-  } catch (error) {
-    console.error('Error fetching watchlist info:', error);
-    return [];
-  }
-}
-
-export async function getWatchlist(userId) {
-  const response = await axios.get(`${pyBackEnd}/get-watchlist`, {
-    params: {
-      user_id: userId,
-    },
-  });
-  return response.data;
-}
-
 export async function stockData(stockSymbol, startDate, endDate) {
-  const response = await axios.get(
-    `${pyBackEnd}/stockgraph`,
-    {
-      params: {
-        symbol: stockSymbol,
-        start: startDate,
-        end: endDate,
-      },
-    }
-  );
+  const response = await axios.get(`${pyBackEnd}/stockgraph`, {
+    params: { symbol: stockSymbol, start: startDate, end: endDate },
+  });
   return response.data;
 }
 
 export async function stockInfo(stockSymbol) {
   const response = await axios.get(`${pyBackEnd}/stockinfo`, {
-    params: {
-      symbol: stockSymbol,
-    },
+    params: { symbol: stockSymbol },
   });
   return response.data;
 }
@@ -118,7 +30,7 @@ export async function linReg(searchParams, startDate, endDate, weights) {
   const response = await axios.get(`${pyBackEnd}/linreg`, {
     params: {
       stocks: searchParams.symbol,
-      index: indexOptions[searchParams.index],
+      index: searchParams.index,
       start: startDate,
       end: endDate,
       stockWeights: weights,
@@ -131,21 +43,15 @@ export async function stockSearch(query) {
   const response = await axios.get(
     `https://eodhd.com/api/query-search-extended/`,
     {
-      params: {
-        q: query,
-        api_token: "65431c249ef2b9.93958016",
-      },
+      params: { q: query, api_token: "65431c249ef2b9.93958016" },
     }
   );
-
   return response.data;
 }
 
 export async function getStockWeights(stockNumbers) {
   const response = await axios.get(`${pyBackEnd}/stockweights`, {
-    params: {
-      stocks: stockNumbers,
-    },
+    params: { stocks: stockNumbers },
   });
   return response.data;
 }
@@ -157,10 +63,7 @@ export async function getStockWeightsIdb() {
 
 export async function getCompanyFinancials(stockSymbol, quarterly) {
   const response = await axios.get(`${pyBackEnd}/financials`, {
-    params: {
-      symbol: stockSymbol,
-      quarterly: quarterly,
-    },
+    params: { symbol: stockSymbol, quarterly: quarterly },
   });
   let data = response.data;
   for (let key in data) {
@@ -172,11 +75,7 @@ export async function getCompanyFinancials(stockSymbol, quarterly) {
 
 export async function getFamaFrenchData(startDate, endDate, stockWeights) {
   const response = await axios.get(`${pyBackEnd}/famafrench`, {
-    params: {
-      stockWeights: stockWeights,
-      start: startDate,
-      end: endDate,
-    },
+    params: { stockWeights: stockWeights, start: startDate, end: endDate },
   });
   return response.data;
 }
@@ -209,7 +108,6 @@ export function idbPromise(storeName, method, object) {
       };
 
       if (method === "put") {
-        console.log("putting", object);
         store.put(object);
         resolve(object);
       } else if (method === "get") {
@@ -219,7 +117,6 @@ export function idbPromise(storeName, method, object) {
         };
       } else if (method === "delete") {
         store.clear();
-        console.log("deleted");
         resolve();
       }
 
@@ -267,7 +164,7 @@ export async function getStockObject(
 
 export async function setStockGraph(data) {
   const dataPoints = [];
-  for (var i = 0; i < data.length; i++) {
+  for (let i = 0; i < data.length; i++) {
     dataPoints.push({
       x: new Date(data[i].Date),
       y: {
@@ -318,11 +215,11 @@ export function generateChartOptions(type, config) {
               {
                 name: "Price (in USD)",
                 yValueFormatString: "$#,###.##",
-                type: "line", // Change this from "candlestick" to "line"
-                color: "#2BB148",
+                type: "candlestick",
+                color: "#049C",
                 dataPoints: data.map((point) => ({
                   x: new Date(point.Date),
-                  y: point.Close, // Use point.Close for the y value in line graph
+                  y: [point.Open, point.High, point.Low, point.Close],
                 })),
               },
             ],
@@ -378,7 +275,6 @@ export function generateChartOptions(type, config) {
           },
         },
       };
-  
 
     case "regression":
       const { theme: scatterTheme, searchParams, index, formula } = config;
@@ -491,14 +387,13 @@ export function generateChartOptions(type, config) {
               y: point,
             })),
           },
-        ].filter(Boolean), 
+        ].filter(Boolean),
       };
 
     default:
       throw new Error("Unknown chart type");
   }
 }
-// Use a constant for the backend URL to ensure consistency
 
 export async function getStockOverview(stockSymbol) {
   try {
