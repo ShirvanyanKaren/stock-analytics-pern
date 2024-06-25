@@ -13,14 +13,19 @@ import statsmodels.api as sma
 import uvicorn
 from dotenv import load_dotenv
 import os
+from openai import OpenAI
 
 load_dotenv()
 
+
+# run this script with uvicorn main:app --reload to start the server
+
 app = FastAPI()
 
+# Allow CORS for local development
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # Adjust this to your frontend URL in production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -56,12 +61,14 @@ def all_statements(symbol: str, quarterly: bool):
         'cash': cash.dropna(thresh=len(cash.columns) / 2).to_json(orient='records')
     }
 
+
 def process_symbol(symbol: str):
     symbol = symbol.upper()
     if "-" in symbol and "KS" in symbol:
         symbol = symbol.replace("-", ".")
     return symbol
 
+# make a set with all the keys like previous close, open, etc
 def fetch_stock_info(symbol: str):
     stock_info = Ticker(symbol).summary_detail
     stock_key_stats = Ticker(symbol).key_stats
@@ -132,14 +139,15 @@ def lin_reg_data(symbols, start, end, index, stockWeights):
             stock_data = stock_data.rename(columns={symbols[1]: 'Adj Close'})
     stock_data = stock_data.dropna()
     stocks_df = pd.DataFrame({
-        'Dependent': stock_data['Adj Close'],
-        'Independent': stock_data[index]
-    })
+            'Dependent': stock_data['Adj Close'],
+            'Independent': stock_data[index]
+        })
     if using_weights: stock_data = stock_data * 100
     return stocks_df, stock_data
 
 @app.get("/linreg")
 async def lin_reg(stocks: str, index: str, start: str, end: str, stockWeights: str):
+    print(stocks)
     symbols = [index, stocks]
     stocks_df, stock_data = lin_reg_data(symbols, start, end, index, stockWeights)
     formula = 'Dependent ~ Independent'
@@ -153,7 +161,7 @@ async def lin_reg(stocks: str, index: str, start: str, end: str, stockWeights: s
     model_obj = {}
     for arr in model_summary:
         for i in range(0, len(arr), 2):
-            if arr[i]: model_obj[arr[i].replace(':', '')] = arr[i + 1]
+            if arr[i] : model_obj[arr[i].replace(':', '')] = arr[i+1]
     values = {'coef': coef, 'intercept': intercept, 'r_squared': r_squared, 'model': model_obj}
     sorted_stocks = stock_data.sort_values(by=index, ascending=True)
     json_data = sorted_stocks.reset_index(drop=True).to_json(date_format='iso', orient='values')
@@ -185,11 +193,11 @@ async def fama_french(stockWeights: str, start: str, end: str):
         min_length = min(len(portfolio_mtl), len(factors))
         portfolio_mtl = portfolio_mtl[:min_length]
         factors = factors[:min_length]
-
+        
     portfolio_mtl.index = factors.index
     merged_port = pd.merge(portfolio_mtl, factors, on='Date')
     port_data = merged_port.copy()
-    merged_port[['Mkt-RF','SMB','HML','RF']] = merged_port[['Mkt-RF','SMB','HML','RF']]/100
+    merged_port[['Mkt-RF','SMB','HML','RF']] =  merged_port[['Mkt-RF','SMB','HML','RF']]/100
     merged_port['Excess Portfolio'] = merged_port['Portfolio'] - merged_port['RF']
     y = merged_port['Excess Portfolio']
     x = merged_port[['Mkt-RF','SMB','HML']]
@@ -203,13 +211,13 @@ async def fama_french(stockWeights: str, start: str, end: str):
     sharpe = (expected_return - risk_free) / merged_port['Excess Portfolio'].std()
     results = {'R-Squared': model.rsquared,
                'HML Beta': model.params['HML'],
-               'SMB Beta': model.params['SMB'],
-               'Mkt-RF': model.params['Mkt-RF'],
-               'intercept': model.params['const'],
+                'SMB Beta': model.params['SMB'],
+                'Mkt-RF': model.params['Mkt-RF'],
+                'intercept': model.params['const'],
                'Expected Return': expected_return * 100,
                'Mkt-RF P-Value': pvalues['Mkt-RF'],
-               'SMB P-Value': pvalues['SMB'],
-               'HML P-Value': pvalues['HML'],
+                'SMB P-Value': pvalues['SMB'],
+                'HML P-Value': pvalues['HML'],
                'Sharpe Ratio': sharpe,
                'Portfolio Beta': beta_m + beta_s + beta_v,
                }
@@ -217,11 +225,16 @@ async def fama_french(stockWeights: str, start: str, end: str):
     json_data = port_data.to_json(orient='index')
     return json_data, results
 
-if __name__ == "__main__":
-    load_dotenv()
-    PORT = int(os.getenv("PORT", 8000))
-    uvicorn.run(app, host="0.0.0.0", port=PORT)
-    print(f"process id: {os.getpid()}")
+@app.get("/gpt-analysis")
+async def gpt3():
+    print(os.getenv("OPENAI_API_KEY"))
+    client = OpenAI(
+        api_key=os.getenv("OPENAI_API_KEY")
+    )
+    completion = await client.chat.completions.create(model="gpt-3.5-turbo", messages=[{"role": "user", "content": "hello"}])
+    return completion.choices[0].message['content']
+
+    
 
 
     # stream = client.chat.completions.create(
@@ -236,6 +249,13 @@ if __name__ == "__main__":
 
 
 
+
+
+if __name__ == "__main__":
+    load_dotenv()
+    PORT = int(os.getenv("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=PORT)
+    print(f"process id: {os.getpid()}")
 
 
 
