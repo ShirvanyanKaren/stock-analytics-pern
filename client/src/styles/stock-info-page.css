@@ -70,3 +70,33 @@ h2 {
   color: white;
   border-radius: 4px;
 }
+.stock-info-page .nav-bar .btn {
+  margin: 5px;
+  font-size: 1rem;
+}
+
+.stock-info-page .nav-bar .btn.active {
+  background-color: #007bff;
+  color: white;
+}
+
+.stock-info-page .nav-bar .btn:not(.active) {
+  background-color: #e7e7e7;
+  color: #333;
+}
+
+.linear-reg .nav-bar .btn {
+  margin: 5px;
+  font-size: 1rem;
+}
+
+.linear-reg .nav-bar .btn.active {
+  background-color: #007bff;
+  color: white;
+}
+
+.linear-reg .nav-bar .btn:not(.active) {
+  background-color: #e7e7e7;
+  color: #333;
+}
+

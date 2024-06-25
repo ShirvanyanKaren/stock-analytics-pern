@@ -5,7 +5,6 @@ import pandas_datareader.data as pdr
 import datetime as dt
 import yfinance as yf
 import numpy as np
-import getFamaFrenchFactors as gff
 import pandas as pd
 import simplejson as json
 from yahooquery import Ticker 
@@ -15,7 +14,6 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
-
 
 # run this script with uvicorn main:app --reload to start the server
 
@@ -60,6 +58,54 @@ def all_statements(symbol: str, quarterly: bool):
         'cash': cash.dropna(thresh=len(cash.columns) / 2).to_json(orient='records')
     }
 
+@app.get("/linreg")
+async def lin_reg(stocks: str, index: str, start: str, end: str, stockWeights: str):
+    symbols = [index, stocks]
+    stocks_df, stock_data = lin_reg_data(symbols, start, end, index, stockWeights)
+
+    if 'Portfolio' not in stocks_df.columns:
+        raise HTTPException(status_code=400, detail="Portfolio column is missing in the dataframe.")
+
+    formula = 'Portfolio ~ Mkt_RF + SMB + HML'
+    
+    model = sma.OLS.from_formula(formula, data=stocks_df).fit()
+    coef = model.params[1]
+    intercept = model.params[0]
+    r_squared = model.rsquared
+    model_html = model.summary().as_html().replace('\n', '')
+    model_summary = pd.read_html(model_html)[0].to_json(orient='values')
+    model_summary = json.loads(model_summary)
+    model_obj = {}
+    for arr in model_summary:
+        for i in range(0, len(arr), 2):
+            if arr[i]: 
+                model_obj[arr[i].replace(':', '')] = arr[i+1]
+    values = {'coef': coef, 'intercept': intercept, 'r_squared': r_squared, 'model': model_obj}
+    sorted_stocks = stock_data.sort_values(by=index, ascending=True)
+    json_data = sorted_stocks.reset_index(drop=True).to_json(date_format='iso', orient='values')
+    return json_data, values
+
+def lin_reg_data(symbols, start, end, index, stockWeights):
+    start = dt.datetime.strptime(start, '%Y-%m-%d')
+    end = dt.datetime.strptime(end, '%Y-%m-%d')
+    
+    if stockWeights:
+        weights = json.loads(stockWeights)
+    else:
+        weights = {symbol: 1 for symbol in symbols}
+    
+    stock_data = yf.download(symbols, start=start, end=end)['Adj Close']
+    stock_data = stock_data.pct_change().dropna()
+    
+    portfolio = (stock_data * pd.Series(weights)).sum(axis=1)
+    stock_data['Portfolio'] = portfolio
+    
+    ff_factors = pdr.get_data_famafrench('F-F_Research_Data_Factors', start=start, end=end)[0]
+    ff_factors.index = pd.to_datetime(ff_factors.index, format='%Y%m')
+    ff_factors = ff_factors.loc[stock_data.index]
+    stocks_df = stock_data.join(ff_factors[['Mkt-RF', 'SMB', 'HML']])
+    return stocks_df, stock_data
+
 
 def process_symbol(symbol: str):
     symbol = symbol.upper()
@@ -88,6 +134,26 @@ def fetch_stock_graph(symbol: str, start: str, end: str):
     stock['Date'] = stock['Date'].dt.strftime('%Y-%m-%d')
     stock = stock.to_json(orient='records')
     return stock
+
+def lin_reg_data(symbols, start, end, index, stockWeights):
+    start_date = dt.datetime.strptime(start, '%Y-%m-%d')
+    end_date = dt.datetime.strptime(end, '%Y-%m-%d')
+    data = yf.download(symbols, start=start_date, end=end_date)
+
+    if len(symbols) == 1:
+        data = data['Adj Close']
+    else:
+        data = data['Adj Close'][symbols]
+    
+    if stockWeights:
+        stockWeights = json.loads(stockWeights)
+        weighted_data = data.mul(pd.Series(stockWeights), axis=1)
+        portfolio_returns = weighted_data.sum(axis=1).pct_change().dropna()
+        data[index] = portfolio_returns
+    
+    data = data.dropna()
+    data = data.reset_index()
+    return data, data
 
 @app.get("/stockweights")
 async def stock_weights(stocks):
@@ -131,28 +197,6 @@ async def stock_overview(symbol: str):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/linreg")
-async def lin_reg(stocks: str, index: str, start: str, end: str, stockWeights: str):
-    symbols = [index, stocks]
-    stocks_df, stock_data = lin_reg_data(symbols, start, end, index, stockWeights)
-    formula = 'Dependent ~ Independent'
-    model = sma.OLS.from_formula(formula, data=stocks_df).fit()
-    coef = model.params[1]
-    intercept = model.params[0]
-    r_squared = model.rsquared
-    model_html = model.summary().as_html().replace('\n', '')
-    model_summary = pd.read_html(model_html)[0].to_json(orient='values')
-    model_summary = json.loads(model_summary)
-    model_obj = {}
-    for arr in model_summary:
-        for i in range(0, len(arr), 2):
-            if arr[i]: 
-                model_obj[arr[i].replace(':', '')] = arr[i+1]
-    values = {'coef': coef, 'intercept': intercept, 'r_squared': r_squared, 'model': model_obj}
-    sorted_stocks = stock_data.sort_values(by=index, ascending=True)
-    json_data = sorted_stocks.reset_index(drop=True).to_json(date_format='iso', orient='values')
-    return json_data, values
 
 @app.get("/famafrench")
 async def fama_french(stockWeights: str, start: str, end: str):
@@ -226,27 +270,3 @@ if __name__ == "__main__":
     PORT = int(os.getenv("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=PORT)
     print(f"process id: {os.getpid()}")
-
-
-
-    # stream = client.chat.completions.create(
-    #     model="gpt-4",
-    #     messages=[{"role": "user", "content": "Say this is a test"}],
-    #     stream=True,
-    # )
-    # for chunk in stream:
-    #     if chunk.choices[0].delta.content is not None:
-    #         print(chunk.choices[0].delta.content, end="")
-
-
-
-
-
-
-
-    
-   
-
-
-
-

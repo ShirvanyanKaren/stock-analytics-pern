@@ -4,6 +4,7 @@ import { StoreProvider } from "./utils/GlobalState";
 import Header from "./components/Header";
 import HelpButton from "./components/HelpButton";
 import InfoPopup from "./components/InfoPopup";
+import Watchlist from "./components/Watchlist"; // Import the Watchlist component
 import { HighlightProvider } from "./contexts/HighlightContext";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-bootstrap";
@@ -30,11 +31,16 @@ function App() {
     <StoreProvider>
       <Provider store={store}>
         <HighlightProvider>
-          <div className="App">
-            <Header />
-            <Outlet context={{ helpMode, handleElementClick }} />
-            <HelpButton toggleHelpMode={toggleHelpMode} />
-            <InfoPopup info={popupInfo} />
+          <div className="App d-flex">
+            <div className="sidebar">
+              <Watchlist />
+            </div>
+            <div className="main-content flex-grow-1">
+              <Header />
+              <Outlet context={{ helpMode, handleElementClick }} />
+              <HelpButton toggleHelpMode={toggleHelpMode} />
+              <InfoPopup info={popupInfo} />
+            </div>
           </div>
         </HighlightProvider>
       </Provider>

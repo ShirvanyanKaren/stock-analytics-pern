@@ -6,10 +6,94 @@ import Auth from "../utils/auth";
 const pyBackEnd = "http://127.0.0.1:8000";
 
 
+
+////NEW AS OF 6/24/24 watchlist helper functions
+
+
+
+// Watchlist helper functions
+export async function addStock(stockState) {
+  try {
+    const response = await axios.post(`${pyBackEnd}/add-stock`, stockState);
+    return response.data;
+  } catch (error) {
+    throw new Error("Error adding stock");
+  }
+}
+
+export async function addToWatchlist(stockSymbol, userId) {
+  try {
+    const response = await axios.post(`${pyBackEnd}/add-to-watchlist`, {
+      stock_symbol: stockSymbol,
+      user_id: userId,
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error("Error adding to watchlist");
+  }
+}
+
+export async function createWatchlist(watchlistName, userId) {
+  try {
+    const response = await axios.post(`${pyBackEnd}/create-watchlist`, {
+      name: watchlistName,
+      user_id: userId,
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error("Error creating watchlist");
+  }
+}
+
+export async function stockWatchlistSearch(query) {
+  const response = await axios.get(
+    `https://eodhd.com/api/query-search-extended/`,
+    {
+      params: {
+        q: query,
+        api_token: "65431c249ef2b9.93958016",
+      },
+    }
+  );
+
+  return response.data;
+}
+
+export async function getWatchlistInfo(stockSymbols) {
+  try {
+    const stockInfoPromises = stockSymbols.map(async (symbol) => {
+      const overview = await getStockOverview(symbol);
+      return {
+        stockSymbol: symbol,
+        currentPrice: overview.currentPrice,
+        priceChange: overview.priceChange,
+        priceChangePercent: overview.priceChangePercent,
+        afterHoursPrice: overview.afterHoursPrice,
+        afterHoursChange: overview.afterHoursChange,
+        afterHoursChangePercent: overview.afterHoursChangePercent,
+      };
+    });
+
+    const stockInfos = await Promise.all(stockInfoPromises);
+    return stockInfos;
+  } catch (error) {
+    console.error('Error fetching watchlist info:', error);
+    return [];
+  }
+}
+
+export async function getWatchlist(userId) {
+  const response = await axios.get(`${pyBackEnd}/get-watchlist`, {
+    params: {
+      user_id: userId,
+    },
+  });
+  return response.data;
+}
+
 export async function stockData(stockSymbol, startDate, endDate) {
   const response = await axios.get(
     `${pyBackEnd}/stockgraph`,
-
     {
       params: {
         symbol: stockSymbol,
@@ -20,6 +104,7 @@ export async function stockData(stockSymbol, startDate, endDate) {
   );
   return response.data;
 }
+
 export async function stockInfo(stockSymbol) {
   const response = await axios.get(`${pyBackEnd}/stockinfo`, {
     params: {
@@ -29,12 +114,7 @@ export async function stockInfo(stockSymbol) {
   return response.data;
 }
 
-export async function linReg(
-  searchParams,
-  startDate,
-  endDate,
-  weights
-) {
+export async function linReg(searchParams, startDate, endDate, weights) {
   const response = await axios.get(`${pyBackEnd}/linreg`, {
     params: {
       stocks: searchParams.symbol,
@@ -418,9 +498,11 @@ export function generateChartOptions(type, config) {
       throw new Error("Unknown chart type");
   }
 }
+// Use a constant for the backend URL to ensure consistency
+
 export async function getStockOverview(stockSymbol) {
   try {
-    const response = await axios.get(`http://127.0.0.1:8000/stockoverview`, {
+    const response = await axios.get(`${pyBackEnd}/stockoverview`, {
       params: { symbol: stockSymbol },
     });
     return response.data;

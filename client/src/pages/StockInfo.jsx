@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation, useNavigate } from "react-router-dom"; // Import useNavigate
 import { stockData, stockInfo, generateChartOptions, getStockOverview } from "../utils/helpers";
 import StockDetails from "../components/StockDetails";
 import StockFinancials from "../components/StockFinancials";
-import SideBar from "../components/SideBar";
 import ReminderPopup from "../components/ReminderPopup";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import CanvasJSReact from "@canvasjs/react-stockcharts";
+import Button from 'react-bootstrap/Button'; // Import Button
 
 import '../styles/stock-info-page.css';  // Ensure the CSS is imported
 
@@ -24,8 +24,8 @@ const StockInfo = () => {
   const [infoType, setInfoType] = useState("Summary");
   const [showReminderPopup, setShowReminderPopup] = useState(false);
   const [stockOverview, setStockOverview] = useState({});
-  const categories = ["Summary", "Financials", "Linear Regression", "Analysis"];
   const location = useLocation();
+  const navigate = useNavigate(); // Initialize navigate
   const stockSymbol = symbol;
 
   useEffect(() => {
@@ -71,6 +71,10 @@ const StockInfo = () => {
     margin: "auto",
   };
 
+  const handleLinearRegressionClick = () => {
+    navigate(`/linear-regression/${symbol}-SP500`);
+  };
+
   return (
     <div className="stock-info-page">
       <Navbar
@@ -80,15 +84,26 @@ const StockInfo = () => {
         className="nav-bar nav-bar-custom justify-content-center"
       >
         <Nav className="d-flex justify-content-around w-100 stock-info">
-          {categories.map((type) => (
-            <h3
-              key={type}
-              onClick={() => setInfoType(type)}
-              className={infoType === type ? "active-stat info" : "info"}
-            >
-              {type}
-            </h3>
-          ))}
+          <Button
+            variant="primary"
+            className={infoType === "Summary" ? "active" : ""}
+            onClick={() => setInfoType("Summary")}
+          >
+            Summary
+          </Button>
+          <Button
+            variant="primary"
+            className={infoType === "Financials" ? "active" : ""}
+            onClick={() => setInfoType("Financials")}
+          >
+            Financials
+          </Button>
+          <Button
+            variant="primary"
+            onClick={handleLinearRegressionClick}
+          >
+            Linear Regression
+          </Button>
         </Nav>
       </Navbar>
 
@@ -139,13 +154,6 @@ const StockInfo = () => {
 
       {showReminderPopup && (
         <ReminderPopup open={showReminderPopup} handleClose={() => setShowReminderPopup(false)} />
-      )}
-
-      {infoType === "Linear Regression" && (
-        <div className="container">
-          <h2>Linear Regression</h2>
-          <SideBar />
-        </div>
       )}
     </div>
   );
