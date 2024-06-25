@@ -1,3 +1,4 @@
+// main.jsx
 import "bootstrap/dist/css/bootstrap.min.css";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
@@ -8,6 +9,7 @@ import Home from "./pages/Home";
 import StockLinReg from "./pages/StockLinReg";
 import FamaFrench from "./pages/FamaFrench";
 import Glossary from "./pages/Glossary";
+import Dashboard from "./pages/Dashboard";
 import App from "./App";
 
 const router = createBrowserRouter([
@@ -55,6 +57,10 @@ const router = createBrowserRouter([
       {
         path: "/stocks/:symbol",
         element: <StockInfo />, // Add this route to match "/stocks/:symbol"
+      },
+      {
+        path: "/dashboard",
+        element: <Dashboard />,
       },
     ],
   },

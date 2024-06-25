@@ -1,0 +1,14 @@
+.dashboard {
+    padding: 20px;
+  }
+  
+  .dashboard h2 {
+    margin-bottom: 20px;
+  }
+  
+  .watchlist-stocks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  

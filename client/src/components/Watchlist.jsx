@@ -1,3 +1,4 @@
+// src/components/Watchlist.jsx
 import React, { useState, useEffect, useCallback } from "react";
 import { stockWatchlistSearch, getStockOverview } from "../utils/helpers";
 import { Link } from "react-router-dom";
@@ -7,7 +8,7 @@ import { Button, Modal, Dropdown, DropdownButton } from "react-bootstrap";
 import defaultStockImage from "../assets/default-stock.jpeg";
 import "../styles/Watchlist.css";
 
-const Watchlist = () => {
+const Watchlist = ({ onUpdate }) => {
   const [watchlists, setWatchlists] = useState(["Default Watchlist"]);
   const [currentWatchlist, setCurrentWatchlist] = useState("Default Watchlist");
   const [watchlistStocks, setWatchlistStocks] = useState([]);
@@ -33,30 +34,8 @@ const Watchlist = () => {
     sessionStorage.setItem("currentWatchlist", currentWatchlist);
     const storedWatchlistStocks = JSON.parse(sessionStorage.getItem(currentWatchlist)) || [];
     setWatchlistStocks(storedWatchlistStocks);
+    onUpdate(currentWatchlist, storedWatchlistStocks);
   }, [currentWatchlist]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      if (query.length > 0) {
-        try {
-          const data = await stockWatchlistSearch(query);
-          const options = data.map((stock) => ({
-            exchange: stock.exchange,
-            image: stock.image ? `https://eodhd.com${stock.image}` : defaultStockImage,
-            label: stock.code,
-            open: stock.open.toFixed(2),
-            close: stock.close.toFixed(2),
-            change: ((stock.close - stock.open) / stock.open).toFixed(2),
-            name: stock.name,
-          }));
-          setOptions(options);
-        } catch (error) {
-          console.error("Error fetching stock data:", error);
-        }
-      }
-    };
-    fetchData();
-  }, [query]);
 
   const handleShow = () => setShow(true);
   const handleClose = () => setShow(false);
@@ -77,6 +56,7 @@ const Watchlist = () => {
         const newWatchlistStocks = [...watchlistStocks, newStock];
         setWatchlistStocks(newWatchlistStocks);
         sessionStorage.setItem(currentWatchlist, JSON.stringify(newWatchlistStocks));
+        onUpdate(currentWatchlist, newWatchlistStocks);
         setStockSymbol("");
         handleClose();
       } else {

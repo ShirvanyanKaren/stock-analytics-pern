@@ -1,3 +1,4 @@
+// src/App.jsx
 import { Outlet } from "react-router-dom";
 import { Provider } from "react-redux";
 import { StoreProvider } from "./utils/GlobalState";
@@ -16,6 +17,8 @@ import { useState } from "react";
 function App() {
   const [helpMode, setHelpMode] = useState(false);
   const [popupInfo, setPopupInfo] = useState("");
+  const [currentWatchlist, setCurrentWatchlist] = useState(sessionStorage.getItem("currentWatchlist") || "Default Watchlist");
+  const [watchlistStocks, setWatchlistStocks] = useState(JSON.parse(sessionStorage.getItem(currentWatchlist)) || []);
 
   const toggleHelpMode = () => {
     setHelpMode(!helpMode);
@@ -27,17 +30,22 @@ function App() {
     }
   };
 
+  const handleWatchlistUpdate = (watchlist, stocks) => {
+    setCurrentWatchlist(watchlist);
+    setWatchlistStocks(stocks);
+  };
+
   return (
     <StoreProvider>
       <Provider store={store}>
         <HighlightProvider>
           <div className="App d-flex">
             <div className="sidebar">
-              <Watchlist />
+              <Watchlist onUpdate={handleWatchlistUpdate} />
             </div>
             <div className="main-content flex-grow-1">
               <Header />
-              <Outlet context={{ helpMode, handleElementClick }} />
+              <Outlet context={{ helpMode, handleElementClick, currentWatchlist, watchlistStocks }} />
               <HelpButton toggleHelpMode={toggleHelpMode} />
               <InfoPopup info={popupInfo} />
             </div>
