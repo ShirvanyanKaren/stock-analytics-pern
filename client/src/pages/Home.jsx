@@ -75,7 +75,7 @@ const Home = () => {
               <span>Analysis Tools</span>
             </div>
             <div className="feature-card">
-              <img src="src/assets/Learning : AI.png" alt="Learning" />
+              <img src="src/assets/Learning_AI.png" alt="Learning" />
               <span>Learning</span>
             </div>
             <div className="feature-card">
