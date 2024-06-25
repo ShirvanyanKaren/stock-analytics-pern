@@ -4,58 +4,74 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import { faDatabase } from "@fortawesome/free-solid-svg-icons";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import Auth from "../utils/auth";
 import SearchBar from "./SearchBar";
 
 const Header = () => {
+  const navigate = useNavigate();
+
   const handleLogout = async () => {
     Auth.logout();
-    Navigate("/");
+    navigate("/");
+  };
+
+  const handleLogin = () => {
+    navigate("/login");
+  };
+
+  const handleSignup = () => {
+    navigate("/signup");
   };
 
   return (
-    <>
-      <Navbar expand="xxl" bg="light" data-bs-theme="light" className="nav-bar nav-bar-custom theme">
-        <Container expand="xxl" className="justify-content-between navbar">
-          <Navbar.Brand className="ms-0" to="/home">
-            <FontAwesomeIcon icon={faDatabase} className="nav-brand" color="blue" />
-            <Link to="/" className="navbar-brand">
-              CincoData
-            </Link>
-          </Navbar.Brand>
-          <div className="nav">
-            <SearchBar />
-            <Nav className="align-items-center ">
-              {Auth.loggedIn() ? (
-                <Nav.Link to="/" onClick={handleLogout}>
-                  Logout
-                </Nav.Link>
-              ) : (
-                <Nav.Link href="/login">Login/Signup</Nav.Link>
-              )}
-              <Nav.Link to="/features">Dashboard</Nav.Link>
-              <Nav.Link to="/pricing">Create Portfolio</Nav.Link>
-              <NavDropdown title="Features" id="collapsible-nav-dropdown">
-                <NavDropdown.Item href="/stocklinreg">
-                  Compare Portfolio
-                </NavDropdown.Item>
-                <NavDropdown.Item to="/action/3.2">
-                  Edit Portfolio
-                </NavDropdown.Item>
-                <NavDropdown.Item href="/famafrench">
-                  Expected Return
-                </NavDropdown.Item>
-              </NavDropdown>
-              <Nav.Link as={Link} to="/glossary">Glossary</Nav.Link>
-            </Nav>
-          </div>
+    <header className="header-main">
+      <div className="d-flex justify-content-around align-items-center m-2">
+        <Navbar.Brand className="logo-cinco d-flex align-items-center">
+          <Link to="/" className="navbar-brand ms-2">
+            CincoData [ ]
+          </Link>
+        </Navbar.Brand>
+        <SearchBar className="search-bar" />
+        <Navbar expand="xxl" >
+        <Container className="justify-content-center">
+          <Nav >
+            <NavDropdown title="Stock Data" id="stock-data-dropdown">
+              <NavDropdown.Item as={Link} to="/">Dashboard</NavDropdown.Item>
+              <NavDropdown.Item as={Link} to="/portfolio">Portfolio</NavDropdown.Item>
+            </NavDropdown>
+            <NavDropdown title="Analysis Tools" id="analysis-tools-dropdown">
+              <NavDropdown.Item as={Link} to="/linear-regression">Linear Regression</NavDropdown.Item>
+              <NavDropdown.Item as={Link} to="/famafrench">Expected Return</NavDropdown.Item>
+            </NavDropdown>
+            <NavDropdown title="Learning" id="learning-dropdown">
+              {/* Add relevant links here if needed */}
+            </NavDropdown>
+            <NavDropdown title="News" id="news-dropdown">
+              {/* Add relevant links here if needed */}
+            </NavDropdown>
+            <NavDropdown title="Resources" id="resources-dropdown">
+              <NavDropdown.Item as={Link} to="/glossary">Glossary</NavDropdown.Item>
+              {/* Add relevant links here if needed */}
+            </NavDropdown>
+          </Nav>
         </Container>
       </Navbar>
-    </>
+        <div className="login-buttons">
+          {Auth.loggedIn() ? (
+            <button type="button" className="button-2" onClick={handleLogout}>Logout</button>
+          ) : (
+            <>
+              <button type="button" className="button-3" onClick={handleLogin}>Log In</button>
+              <button type="button" className="button-2" onClick={handleSignup}>Sign Up</button>
+            </>
+          )}
+        </div>
+        
+      </div>
+    </header>
   );
 };
 

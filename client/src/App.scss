@@ -1,78 +1,69 @@
 // IMPORTS
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+// import a nice font from Google Fonts besides the default font above
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css?family=Nunito:200,300,400,600,700&display=swap");
 
 // VARIABLES
-$primary-color: #1a1a1a;
-$secondary-color: #4dffff;
-$tertiary-color: #ccc;
-$quaternary-color: #000;
-$quinary-color: #fff;
-$senary-color: #e6e6e6;
+$primary-color: #f7fafc; /* New top header color */
+$secondary-color: #00bfff; /* New light blue color */
+$third-color: #f1f1f1; /* New light grey color */
+$background-color: #eef0f2; /* New background color for the task bar */
+$text-color: #000000; /* Text color */
+$highlight-color: #ff0; /* Highlight color */
+$font-family: 'sans-serif'; /* Font family */
+$font-family-2: 'Open Sans', sans-serif; /* Font family 2 */
+$font-family-3: 'Nunito', sans-serif; /* Font family 3 */
 
 // STYLES
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Roboto', sans-serif;
+
 }
 
-html {
-  font-size: 80.5%;
+html, body {
+  height: 100%;
+  width: 100%;
+  background-color: $background-color;
+  color: $text-color;
+  font-family: $font-family-3;
 }
+h1, h2, h3, h4, h5, h6 {
+  font-weight: bold;
+  font-family: $font-family-2;
+  
+}
+
 .highlight {
-  background-color: yellow; /* or any color you prefer */
+  background-color: $highlight-color;
 }
 
 .logo-cinco {
   color: $secondary-color;
-}
-
-.home-card {
-  animation: fadeInUp 1s;
-  @keyframes fadeInUp {
-    0% {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-}
-
-a {
-  text-decoration: none;
-  color: $primary-color;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  color: $primary-color;
-}
-
-li {
-  font-size: 1.6rem;
-}
-
-#root {
-  background: cover;
-  background-size: cover;
-  background-color: #f1f1f1 !important; /* Ensure no transparency */
-  opacity: 1 !important; /* Ensure no transparency */
-}
-
-.nav-brand {
-  cursor: pointer;
+  font-size: 2rem;
   &:hover {
-    color: #504dff;
-    animation: bounce 1s;
+    // Add a smooth transition on hover
+    transition: all 0.3s ease;
+    color: darken($secondary-color, 10%);
   }
 }
 
-.search-bar {
-  width: 500px;
-  margin-right: 5px;
+.nav-bar-tools {
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 10px 12px 0 rgba(0,0,0,0.2);
+}
+.header-main {
+  // make the header sticky
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background-color: $primary-color;
+  box-shadow: 0 10px 12px 0 rgba(0,0,0,0.2);
 }
 
 .navbar-brand {
@@ -87,149 +78,233 @@ body {
 }
 
 .dropdown-menu {
-  width: 300px;
+  font-size: 0.75rem;
   margin-right: 5px;
   max-height: 300px;
   overflow-y: scroll;
 
-  .search-list {
+  .list-group-item {
     display: flex;
-    flex-direction: row;
     align-items: center;
-    padding: 20px;
+    padding: 10px;
+    background-color: $primary-color;
+    border-bottom: 1px solid $secondary-color;
+
     img {
-      width: 50px;
-      height: 50px;
-      margin-right: 5px;
+      width: 35px;
+      height: 35px;
+    }
+    button {
+      max-width: 30px;
+      max-height: 30px;
+      svg {
+        width: 10px;
+        height: 10px;
+      }
+
     }
     .search-items {
       display: flex;
       width: 100%;
       justify-content: space-around;
+      align-items: center;
+
+      li {
+        margin: 0 5px;
+      }
+    }
+  }
+
+  .text-dark {
+    color: $text-color;
+  }
+
+  .text-success {
+    color: green;
+  }
+
+  .text-danger {
+    color: red;
+  }
+}
+
+.search-bar-input {
+  width: 300px;
+  padding: 5px 10px;
+  border: 1px solid $secondary-color;
+  border-radius: 15px;
+  outline: none;
+}
+
+
+  .search-list {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px;
+    img {
+      width: 25px;
+      height: 25px;
+      margin-right: 5px;
+    }
+    button{
+      max-width: 50px;
+    }
+    .search-items {
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+
+.drop-down-custom {
+
+
+  .dropdown-menu {
+    // width: 100%;
+    // max-height: 300px;
+    // overflow-y: auto;
+    // background-color: $background-color;
+    // border: 1px solid $secondary-color;
+
+    // .list-group-item {
+    //   display: flex;
+    //   align-items: center;
+    //   padding: 10px;
+    //   background-color: $primary-color;
+    //   border-bottom: 1px solid $secondary-color;
+
+
+    //   .search-items {
+    //     display: flex;
+    //     width: 100%;
+    //     justify-content: space-around;
+    //     align-items: center;
+
+    //     li {
+    //       margin: 0 5px;
+    //     }
+    //   }
+    // }
+
+    // .text-dark {
+    //   color: $text-color;
+    // }
+
+    // .text-success {
+    //   color: green;
+    // }
+
+    // .text-danger {
+    //   color: red;
+    // }
+  }
+
+  .search-bar-input {
+    width: 300px;
+    padding: 5px 10px;
+    border: 1px solid $secondary-color;
+    border-radius: 15px;
+    outline: none;
+  }
+}
+
+.hero {
+  background-color: $secondary-color;
+  color: #ffffff; /* White text color for the hero section */
+  text-align: center;
+  padding: 5rem 1rem;
+
+  h2 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    font-size: 1.5rem;
+  }
+}
+
+.features {
+  display: flex;
+  justify-content: space-around;
+  padding: 2rem 1rem;
+
+  .feature-card {
+    background-color: #fff;
+    color: $text-color;
+    padding: 2rem;
+    border-radius: 10px;
+    width: 20%;
+    text-align: center;
+    border: 2px solid $secondary-color; /* Add border to match blue boxes */
+
+    img {
+      width: 50px;
+      height: 50px;
+      margin-bottom: 1rem;
+    }
+    span {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      display: block;
     }
   }
 }
 
-.active-stat {
-  background-color: #f1f1f1;
-  color: #504dff;
-  text-decoration: underline;
-  text-decoration-thickness: 5px;
+.newsletter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #eef4f9;
+  padding: 20px;
+  border-radius: 30px;
+
+  input[type="email"] {
+    width: 250px;
+    padding: 10px;
+    border: 2px solid $secondary-color;
+    border-radius: 30px;
+    margin-right: 10px;
+  }
+
+}
+.button-2, .button-3 {
+  &.button-2 {
+    background: $secondary-color;
+    color: $third-color;
+  }
+  &.button-3 {
+    background: $primary-color;
+    color: $secondary-color;
+  }
+  border: none;
+  border-radius: 30px;
+  padding: 10px 20px;
+  cursor: pointer;
 }
 
-.sidebar {
-  background-color: #f1f1f1;
+.footer {
+  background-color: $primary-color;
+  color: $text-color;
   text-align: center;
-  width: fit-content;
-  z-index: 100;
-  height: fit-content;
-  padding: 25px;
+  padding: 2rem 1rem;
 }
 
-#page-content-wrapper {
-  min-width: 0;
-  width: 100%;
-  opacity: 1 !important; /* Ensure no transparency */
-}
 
-.inactive {
-  display: none;
-}
 
-.stock-info {
-  h3 {
-    cursor: pointer;
-  }
-}
 
-.disabled-input {
-  pointer-events: none;
-  background-color: #eee;
-  color: 'muted';
-}
-
-.tool-tip {
-  font-size: 20px;
-}
-
-.tool-tip-header {
-  font-size: 24px;
-  font-weight: bold;
-}
-
-.tool-tip:hover {
-  cursor: pointer;
-}
-
-.input-bar {
-  width: 50%;
-  margin-right: 5px;
-}
-
-.statement, .info {
-  font-size: 20px;
-  font-weight: bold;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  cursor: pointer;
-  &:hover {
-    color: #504dff;
-  }
-  &.active {
-    color: #504dff;
-  }
-}
-
-.spinner-border {
-  width: 10rem;
-  height: 10rem;
-  margin-top: 10px;
-  margin-right: 5px;
-  margin-left: 5px;
-  color: #f1f1f1;
-}
-
-.particles {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  background-size: cover;
-  background-position: center;
-  opacity: 0.80;
-}
-
-.custom-card {
-  // add shadow
-  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-  // add a light grey color
-  background-color: #f1f1f1;
-  .card-items-custom {
-    // increase the border thickness
-    border-top: 1px solid #ccc;
-  }
-  .list-group-item {
-    background: #f1f1f1;
-    // increase the bottom and top border thickness
-    border-top: 1px solid #ccc;
-    border-bottom: 1px solid #ccc;
-  }
-}
-
-.stock-volume {
-  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-  border-radius: 4px;
-  .lin-reg-card {
-    width: fit-content;
+.lin-reg-card {
+  display: flex;
+  flex-direction: row;
+  .card {
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
   }
 }
 
 .nav-bar-custom {
-  background: transparent;
-  box-shadow: 0 10px 12px 0 rgba(0,0,0,0.2);
-  // add heavy bottom box shadow
-  box-shadow: 0 15px 12px 0 rgba(0,0,0,0.2);
   .nav-bar {
-    opacity: 1 !important; /* Ensure no transparency */
     z-index: 2;
   }
 }
@@ -307,6 +382,7 @@ body {
   gap: 10px;
 }
 
+
 .table-container {
   flex: 0 0 60%; /* Take up 60% of the width */
   max-height: 600px; 
@@ -348,4 +424,71 @@ body {
   background-color: #ccc !important;
   color: #fff !important;
   opacity: 1 !important; /* Ensure no transparency */
+}
+
+.glossary-container {
+  padding: 20px;
+  position: relative;
+}
+
+.glossary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.glossary-header input {
+  padding: 10px;
+  width: 300px;
+  font-size: 16px;
+}
+
+.glossary-filter {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.filter-button {
+  padding: 10px;
+  margin: 0 5px;
+  cursor: pointer;
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.filter-button.active {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.glossary-terms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.glossary-term-card {
+  background-color: #fff;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: calc(33.333% - 20px);
+  box-sizing: border-box;
+}
+
+.glossary-term-card h3 {
+  margin-top: 0;
+}
+
+.glossary-term-card p {
+  margin-top: 10px;
+}
+
+.stock-details-info {
+  font-weight: bold;
+  font-size: 20px;
 }

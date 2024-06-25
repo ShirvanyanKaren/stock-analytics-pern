@@ -1,16 +1,12 @@
 
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
-import RegressionTool from "./RegressionTool";
-
-
 
 const SideBar = () => {
    
 
     return (
         <>
-
         <div className="container">
             <Navbar className="col-md-12 d-md-block bg-light sidebar"
             activeKey="/home"
@@ -29,7 +25,6 @@ const SideBar = () => {
             <Nav.Item>
                 <h4> Monte Carlo </h4>
             </Nav.Item>
- 
             </Navbar>
         </div>
           

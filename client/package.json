@@ -25,7 +25,7 @@
         "@reduxjs/toolkit": "^1.9.5",
         "@stripe/stripe-js": "^2.1.3",
         "@testing-library/react": "^14.0.0",
-        "@vitejs/plugin-react": "^4.0.0",
+        "@vitejs/plugin-react": "^4.3.1",
         "animate.css": "^4.1.1",
         "axios": "^1.6.0",
         "bootstrap": "^5.3.2",
@@ -56,7 +56,8 @@
         "redux": "^4.2.1",
         "sass": "^1.69.5",
         "tsparticles": "^2.12.0",
-        "vitest": "^0.32.0"
+        "vitest": "^0.32.0",
+        "words-to-numbers": "^1.5.1"
     },
     "devDependencies": {
         "@types/react": "^18.0.37",
@@ -66,6 +67,6 @@
         "eslint-plugin-react": "^7.32.2",
         "eslint-plugin-react-hooks": "^4.6.0",
         "eslint-plugin-react-refresh": "^0.3.4",
-        "vite": "^5.2.12"
+        "vite": "^5.3.0"
     }
 }

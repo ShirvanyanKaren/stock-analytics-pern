@@ -8,7 +8,7 @@ import Login from "./pages/Login";
 import Home from "./pages/Home";
 import StockLinReg from "./pages/StockLinReg";
 import FamaFrench from "./pages/FamaFrench";
-import Glossary from "./components/Glossary";
+import Glossary from "./pages/Glossary";
 import App from "./App";
 
 const router = createBrowserRouter([
@@ -34,11 +34,11 @@ const router = createBrowserRouter([
         element: <StockInfo />,
       },
       {
-        path: "/stocklinreg/:symbol",
+        path: "/linear-regression/:symbol",
         element: <StockLinReg />,
       },
       {
-        path: "/stocklinreg",
+        path: "/linear-regression",
         element: <StockLinReg />,
       },
       {

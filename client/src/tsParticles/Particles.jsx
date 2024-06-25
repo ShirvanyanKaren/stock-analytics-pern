@@ -8,14 +8,14 @@ import CityBackground from "../assets/city-image.avif"
 
 function AppPar() {
     const particlesInit = async (main) => {
-        console.log(main);
+
      
     
         await loadFull(main);
     };
      
     const particlesLoaded = (container) => {
-        console.log(container);
+
     };
     return (
         <div className="particles">
