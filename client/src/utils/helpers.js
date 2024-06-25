@@ -420,7 +420,7 @@ export function generateChartOptions(type, config) {
 }
 export async function getStockOverview(stockSymbol) {
   try {
-    const response = await axios.get(`http://127.0.0.1:8000/stockoverview`, {
+    const response = await axios.get(`${pyBackEnd}/stockoverview`, {
       params: { symbol: stockSymbol },
     });
     return response.data;
@@ -429,6 +429,7 @@ export async function getStockOverview(stockSymbol) {
     return null;
   }
 }
+
 
 export const returnInfo = {
   "SMB Beta":
