@@ -26,6 +26,10 @@ const Header = () => {
     navigate("/signup");
   };
 
+  const handleLinearRegressionClick = () => {
+    navigate("/linear-regression");
+  };
+
   return (
     <header className="header-main">
       <div className="d-flex justify-content-around align-items-center m-2">
@@ -44,7 +48,6 @@ const Header = () => {
             </NavDropdown>
             <NavDropdown title="Analysis Tools" id="analysis-tools-dropdown">
               <NavDropdown.Item as={Link} to="/linear-regression">Linear Regression</NavDropdown.Item>
-              <NavDropdown.Item as={Link} to="/famafrench">Expected Return</NavDropdown.Item>
             </NavDropdown>
             <NavDropdown title="Learning" id="learning-dropdown">
               {/* Add relevant links here if needed */}

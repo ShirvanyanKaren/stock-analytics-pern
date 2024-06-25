@@ -1,4 +1,3 @@
-// src/main.jsx
 import "bootstrap/dist/css/bootstrap.min.css";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
@@ -52,6 +51,10 @@ const router = createBrowserRouter([
       {
         path: "/glossary/:term",
         element: <Glossary />,
+      },
+      {
+        path: "/stocks/:symbol",
+        element: <StockInfo />, // Add this route to match "/stocks/:symbol"
       },
     ],
   },

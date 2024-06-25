@@ -234,35 +234,31 @@ async def gpt3():
     completion = await client.chat.completions.create(model="gpt-3.5-turbo", messages=[{"role": "user", "content": "hello"}])
     return completion.choices[0].message['content']
 
-@app.get("/stockoverview")
-async def stock_overview(symbol: str):
-    try:
-        stock = Ticker(symbol)
-        stock_summary = stock.summary_detail[symbol]
-        stock_price = stock.price[symbol]
-        
-        overview = {
-            "currentPrice": stock_price.get('regularMarketPrice', 'N/A'),
-            "priceChange": stock_price.get('regularMarketChange', 'N/A'),
-            "priceChangePercent": stock_price.get('regularMarketChangePercent', 'N/A'),
-            "afterHoursPrice": stock_price.get('postMarketPrice', 'N/A'),
-            "afterHoursChange": stock_price.get('postMarketChange', 'N/A'),
-            "afterHoursChangePercent": stock_price.get('postMarketChangePercent', 'N/A'),
-            "lastCloseTime": stock_price.get('regularMarketTime', 'N/A'),
-            "afterHoursTime": stock_price.get('postMarketTime', 'N/A')
-        }
-        
-        return overview
-    except Exception as e:
-        raise HTTPException(status_code=404, detail=f"Error fetching stock overview: {str(e)}")
-
-
-
 if __name__ == "__main__":
     load_dotenv()
     PORT = int(os.getenv("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=PORT)
     print(f"process id: {os.getpid()}")
+
+
+
+    # stream = client.chat.completions.create(
+    #     model="gpt-4",
+    #     messages=[{"role": "user", "content": "Say this is a test"}],
+    #     stream=True,
+    # )
+    # for chunk in stream:
+    #     if chunk.choices[0].delta.content is not None:
+    #         print(chunk.choices[0].delta.content, end="")
+
+
+
+
+
+
+
+    
+   
 
 
 
