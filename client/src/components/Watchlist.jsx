@@ -130,6 +130,12 @@ const Watchlist = () => {
     </div>
   );
 
+  const getStockClass = (change) => {
+    if (change > 0) return "stock-positive";
+    if (change < 0) return "stock-negative";
+    return "stock-neutral";
+  };
+
   return (
     <div className="watchlist">
       <DropdownButton id="dropdown-basic-button" title={currentWatchlist}>
@@ -139,19 +145,14 @@ const Watchlist = () => {
           </Dropdown.Item>
         ))}
       </DropdownButton>
-      <h4>Your Watchlist</h4>
+      <h4>Watch List</h4>
       {error && <span className="text-danger">{error}</span>}
       <ul>
         {watchlistStocks.map((stock, index) => (
-          <li key={index} className="watchlist-stock">
+          <li key={index} className={`watchlist-stock ${getStockClass(stock.day_change)}`}>
             <Link to={`/stocks/${stock.stock_symbol}`}>
-              {stock.stock_symbol} - {stock.stock_name}
+              {stock.stock_symbol} {stock.day_change > 0 ? "▲" : stock.day_change < 0 ? "▼" : ""} {stock.day_change}%
             </Link>
-            <div className="stock-info">
-              <span>Price: ${stock.price}</span>
-              <span>Day Change: {stock.day_change}%</span>
-              <span>After Hours: {stock.after_hours_change}%</span>
-            </div>
           </li>
         ))}
       </ul>
