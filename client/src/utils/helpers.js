@@ -513,6 +513,7 @@ export async function getStockOverview(stockSymbol) {
 }
 
 
+
 export const returnInfo = {
   "SMB Beta":
     "The sensitivity of a portfolio's excess returns to the returns of the SMB factor. A beta of 1.0 indicates perfect correlation to the factor, 0.0 indicates no correlation, And negative values indicate an inverse correlation.",
