@@ -9,6 +9,8 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import CanvasJSReact from "@canvasjs/react-stockcharts";
 
+import '../styles/stock-info-page.css';  // Ensure the CSS is imported
+
 const CanvasJSStockChart = CanvasJSReact.CanvasJSStockChart;
 
 const StockInfo = () => {
@@ -65,12 +67,12 @@ const StockInfo = () => {
 
   const containerProps = {
     width: "100%",
-    height: "450px",
+    height: "100%",
     margin: "auto",
   };
 
   return (
-    <div>
+    <div className="stock-info-page">
       <Navbar
         expand="xxl"
         bg="light"
@@ -91,26 +93,32 @@ const StockInfo = () => {
       </Navbar>
 
       {isLoaded && infoType === "Summary" && (
-        <div className="col-10 m-auto justify-center stock-volume mt-5">
-          <CanvasJSStockChart
-            containerProps={containerProps}
-            options={options}
-          />
-          <StockDetails
-            stockStats={stockDetails}
-            stockInfo={true}
-            name={stockDetails.longName}
-          />
+        <div className="summary-section">
+          <div className="chart-section">
+            <CanvasJSStockChart
+              containerProps={containerProps}
+              options={options}
+            />
+          </div>
+          <div className="details-section">
+            <StockDetails
+              stockStats={stockDetails}
+              stockInfo={true}
+              name={stockDetails.longName}
+            />
+          </div>
         </div>
       )}
 
       {isLoaded && infoType === "Financials" && (
-        <div className="col-10 m-auto justify-center stock-volume mt-5">
-          <CanvasJSStockChart
-            containerProps={containerProps}
-            options={options}
-          />
-          <div className="stock-overview">
+        <div className="financials-section">
+          <div className="chart-section">
+            <CanvasJSStockChart
+              containerProps={containerProps}
+              options={options}
+            />
+          </div>
+          <div className="overview-section">
             <h2>{stockSymbol} Overview</h2>
             {stockOverview ? (
               <>
