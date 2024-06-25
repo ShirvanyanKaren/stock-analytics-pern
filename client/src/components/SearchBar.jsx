@@ -6,7 +6,7 @@ import defaultStockImage from "../assets/default-stock.jpeg";
 import { faCaretDown, faCaretUp, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useNavigate, Link, useLocation } from "react-router-dom";
-import "../App.scss"; // Import the existing CSS file for styling
+import "../App.scss";
 
 const SearchBar = () => {
   const [options, setOptions] = useState([]);
@@ -17,17 +17,21 @@ const SearchBar = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (query.length > 0) {
-        const data = await stockSearch(query);
-        const options = data.map((stock) => ({
-          exchange: stock.exchange,
-          image: stock.image ? `https://eodhd.com${stock.image}` : defaultStockImage,
-          label: stock.code,
-          open: stock.open.toFixed(2),
-          close: stock.close.toFixed(2),
-          change: ((stock.close - stock.open) / stock.open).toFixed(2),
-          name: stock.name,
-        }));
-        setOptions(options);
+        try {
+          const data = await stockSearch(query);
+          const options = data.map((stock) => ({
+            exchange: stock.exchange,
+            image: stock.image ? `https://eodhd.com${stock.image}` : defaultStockImage,
+            label: stock.code,
+            open: stock.open.toFixed(2),
+            close: stock.close.toFixed(2),
+            change: ((stock.close - stock.open) / stock.open).toFixed(2),
+            name: stock.name,
+          }));
+          setOptions(options);
+        } catch (error) {
+          console.error("Error fetching stock data:", error);
+        }
       }
     };
     fetchData();
@@ -49,7 +53,7 @@ const SearchBar = () => {
   }, []);
 
   const renderOption = useCallback((option) => (
-    <div className="list-group-item list-group-item-action active absolute search-list text-decoration-none">
+    <div className="list-group-item list-group-item-action active absolute search-list text-decoration-none" key={option.label}>
       <img src={option.image} alt={option.name} />
       <div className="search-items justify-content-around align-items-center">
         <li>
@@ -83,11 +87,10 @@ const SearchBar = () => {
     <div className="drop-down-custom">
       <form onSubmit={handleSubmit} className="d-flex">
         <Dropdown>
-          <Dropdown.Toggle variant="none"
-          id="dropdown-search">
+          <Dropdown.Toggle variant="none" id="dropdown-search">
             <input
               className="search-bar-input me-3 mt-2 mb-2 text-center"
-              placeholder={ location.pathname.split('/')[1] === 'stockinfo' ? 'Search for other stock' : 'Search for a stock' }
+              placeholder={location.pathname.split('/')[1] === 'stockinfo' ? 'Search for other stock' : 'Search for a stock'}
               style={{ borderRadius: "15px" }}
               name="query"
               value={query}

@@ -21,12 +21,11 @@ const Watchlist = () => {
 
   useEffect(() => {
     const storedWatchlists = JSON.parse(sessionStorage.getItem("watchlists")) || ["Default Watchlist"];
-    setWatchlists(storedWatchlists);
-
     const storedCurrentWatchlist = sessionStorage.getItem("currentWatchlist") || "Default Watchlist";
-    setCurrentWatchlist(storedCurrentWatchlist);
-
     const storedWatchlistStocks = JSON.parse(sessionStorage.getItem(storedCurrentWatchlist)) || [];
+
+    setWatchlists(storedWatchlists);
+    setCurrentWatchlist(storedCurrentWatchlist);
     setWatchlistStocks(storedWatchlistStocks);
   }, []);
 
@@ -39,17 +38,21 @@ const Watchlist = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (query.length > 0) {
-        const data = await stockWatchlistSearch(query);
-        const options = data.map((stock) => ({
-          exchange: stock.exchange,
-          image: stock.image ? `https://eodhd.com${stock.image}` : defaultStockImage,
-          label: stock.code,
-          open: stock.open.toFixed(2),
-          close: stock.close.toFixed(2),
-          change: ((stock.close - stock.open) / stock.open).toFixed(2),
-          name: stock.name,
-        }));
-        setOptions(options);
+        try {
+          const data = await stockWatchlistSearch(query);
+          const options = data.map((stock) => ({
+            exchange: stock.exchange,
+            image: stock.image ? `https://eodhd.com${stock.image}` : defaultStockImage,
+            label: stock.code,
+            open: stock.open.toFixed(2),
+            close: stock.close.toFixed(2),
+            change: ((stock.close - stock.open) / stock.open).toFixed(2),
+            name: stock.name,
+          }));
+          setOptions(options);
+        } catch (error) {
+          console.error("Error fetching stock data:", error);
+        }
       }
     };
     fetchData();
@@ -63,26 +66,24 @@ const Watchlist = () => {
   const handleAddToWatchlist = async (stockSymbol) => {
     try {
       const stockOverview = await getStockOverview(stockSymbol);
-      console.log('Stock Overview:', stockOverview); // Log data for debugging
       if (stockOverview) {
-        const newStock = { 
-          stock_symbol: stockSymbol, 
+        const newStock = {
+          stock_symbol: stockSymbol,
           stock_name: stockOverview.name || stockSymbol,
-          price: stockOverview.price || 0,
-          day_change: stockOverview.day_change || 0,
-          after_hours_change: stockOverview.after_hours_change || 0
+          price: stockOverview.currentPrice || 0,
+          day_change: stockOverview.priceChangePercent || 0,
+          after_hours_change: stockOverview.afterHoursChangePercent || 0,
         };
-        console.log('New Stock:', newStock); // Log new stock data for debugging
         const newWatchlistStocks = [...watchlistStocks, newStock];
         setWatchlistStocks(newWatchlistStocks);
         sessionStorage.setItem(currentWatchlist, JSON.stringify(newWatchlistStocks));
         setStockSymbol("");
         handleClose();
       } else {
-        setError('Failed to fetch stock overview.');
+        setError("Failed to fetch stock overview.");
       }
     } catch (e) {
-      console.error('Error adding to watchlist:', e); // Log error for debugging
+      console.error("Error adding to watchlist:", e);
       setError(e.message);
     }
   };
