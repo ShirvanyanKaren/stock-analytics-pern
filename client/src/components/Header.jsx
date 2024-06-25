@@ -27,35 +27,24 @@ const Header = () => {
   };
 
   return (
-    <header>
-      <Container className="d-flex justify-content-between align-items-center py-3">
+    <header className="header-main">
+      <div className="d-flex justify-content-around align-items-center m-2">
         <Navbar.Brand className="logo-cinco d-flex align-items-center">
-          <FontAwesomeIcon icon={faDatabase} className="nav-brand" color="blue" />
           <Link to="/" className="navbar-brand ms-2">
             CincoData [ ]
           </Link>
         </Navbar.Brand>
         <SearchBar className="search-bar" />
-        <div className="login-buttons">
-          {Auth.loggedIn() ? (
-            <button type="button" className="btn btn-primary" onClick={handleLogout}>Logout</button>
-          ) : (
-            <>
-              <button type="button" className="btn btn-primary me-2" onClick={handleLogin}>Log In</button>
-              <button type="button" className="btn btn-secondary" onClick={handleSignup}>Sign Up</button>
-            </>
-          )}
-        </div>
-      </Container>
-      <Navbar expand="xxl" bg="light" data-bs-theme="light" className="nav-bar">
+        <Navbar expand="xxl" >
         <Container className="justify-content-center">
-          <Nav className="fs-5">
+          <Nav >
             <NavDropdown title="Stock Data" id="stock-data-dropdown">
               <NavDropdown.Item as={Link} to="/">Dashboard</NavDropdown.Item>
               <NavDropdown.Item as={Link} to="/portfolio">Portfolio</NavDropdown.Item>
             </NavDropdown>
             <NavDropdown title="Analysis Tools" id="analysis-tools-dropdown">
               <NavDropdown.Item as={Link} to="/linear-regression">Linear Regression</NavDropdown.Item>
+              <NavDropdown.Item as={Link} to="/famafrench">Expected Return</NavDropdown.Item>
             </NavDropdown>
             <NavDropdown title="Learning" id="learning-dropdown">
               {/* Add relevant links here if needed */}
@@ -70,6 +59,18 @@ const Header = () => {
           </Nav>
         </Container>
       </Navbar>
+        <div className="login-buttons">
+          {Auth.loggedIn() ? (
+            <button type="button" className="button-2" onClick={handleLogout}>Logout</button>
+          ) : (
+            <>
+              <button type="button" className="button-3" onClick={handleLogin}>Log In</button>
+              <button type="button" className="button-2" onClick={handleSignup}>Sign Up</button>
+            </>
+          )}
+        </div>
+        
+      </div>
     </header>
   );
 };

@@ -83,7 +83,8 @@ const SearchBar = () => {
     <div className="drop-down-custom">
       <form onSubmit={handleSubmit} className="d-flex">
         <Dropdown>
-          <Dropdown.Toggle variant="light" id="dropdown-search">
+          <Dropdown.Toggle variant="none"
+          id="dropdown-search">
             <input
               className="search-bar-input me-3 mt-2 mb-2 text-center"
               placeholder={ location.pathname.split('/')[1] === 'stockinfo' ? 'Search for other stock' : 'Search for a stock' }

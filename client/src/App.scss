@@ -1,19 +1,26 @@
 // IMPORTS
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+// import a nice font from Google Fonts besides the default font above
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css?family=Nunito:200,300,400,600,700&display=swap");
 
 // VARIABLES
 $primary-color: #f7fafc; /* New top header color */
 $secondary-color: #00bfff; /* New light blue color */
+$third-color: #f1f1f1; /* New light grey color */
 $background-color: #eef0f2; /* New background color for the task bar */
 $text-color: #000000; /* Text color */
 $highlight-color: #ff0; /* Highlight color */
+$font-family: 'sans-serif'; /* Font family */
+$font-family-2: 'Open Sans', sans-serif; /* Font family 2 */
+$font-family-3: 'Nunito', sans-serif; /* Font family 3 */
 
 // STYLES
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Roboto', sans-serif;
+
 }
 
 html, body {
@@ -21,6 +28,12 @@ html, body {
   width: 100%;
   background-color: $background-color;
   color: $text-color;
+  font-family: $font-family-3;
+}
+h1, h2, h3, h4, h5, h6 {
+  font-weight: bold;
+  font-family: $font-family-2;
+  
 }
 
 .highlight {
@@ -30,14 +43,27 @@ html, body {
 .logo-cinco {
   color: $secondary-color;
   font-size: 2rem;
+  &:hover {
+    // Add a smooth transition on hover
+    transition: all 0.3s ease;
+    color: darken($secondary-color, 10%);
+  }
 }
 
-.navbar {
-  background-color: $primary-color;
+.nav-bar-tools {
   padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  box-shadow: 0 10px 12px 0 rgba(0,0,0,0.2);
+}
+.header-main {
+  // make the header sticky
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background-color: $primary-color;
+  box-shadow: 0 10px 12px 0 rgba(0,0,0,0.2);
 }
 
 .navbar-brand {
@@ -52,26 +78,134 @@ body {
 }
 
 .dropdown-menu {
-  width: 300px;
+  font-size: 0.75rem;
   margin-right: 5px;
   max-height: 300px;
   overflow-y: scroll;
 
-  .search-list {
+  .list-group-item {
     display: flex;
-    flex-direction: row;
     align-items: center;
-    padding: 20px;
+    padding: 10px;
+    background-color: $primary-color;
+    border-bottom: 1px solid $secondary-color;
+
     img {
-      width: 50px;
-      height: 50px;
-      margin-right: 5px;
+      width: 35px;
+      height: 35px;
+    }
+    button {
+      max-width: 30px;
+      max-height: 30px;
+      svg {
+        width: 10px;
+        height: 10px;
+      }
+
     }
     .search-items {
       display: flex;
       width: 100%;
       justify-content: space-around;
+      align-items: center;
+
+      li {
+        margin: 0 5px;
+      }
     }
+  }
+
+  .text-dark {
+    color: $text-color;
+  }
+
+  .text-success {
+    color: green;
+  }
+
+  .text-danger {
+    color: red;
+  }
+}
+
+.search-bar-input {
+  width: 300px;
+  padding: 5px 10px;
+  border: 1px solid $secondary-color;
+  border-radius: 15px;
+  outline: none;
+}
+
+
+  .search-list {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px;
+    img {
+      width: 25px;
+      height: 25px;
+      margin-right: 5px;
+    }
+    button{
+      max-width: 50px;
+    }
+    .search-items {
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+
+.drop-down-custom {
+
+
+  .dropdown-menu {
+    // width: 100%;
+    // max-height: 300px;
+    // overflow-y: auto;
+    // background-color: $background-color;
+    // border: 1px solid $secondary-color;
+
+    // .list-group-item {
+    //   display: flex;
+    //   align-items: center;
+    //   padding: 10px;
+    //   background-color: $primary-color;
+    //   border-bottom: 1px solid $secondary-color;
+
+
+    //   .search-items {
+    //     display: flex;
+    //     width: 100%;
+    //     justify-content: space-around;
+    //     align-items: center;
+
+    //     li {
+    //       margin: 0 5px;
+    //     }
+    //   }
+    // }
+
+    // .text-dark {
+    //   color: $text-color;
+    // }
+
+    // .text-success {
+    //   color: green;
+    // }
+
+    // .text-danger {
+    //   color: red;
+    // }
+  }
+
+  .search-bar-input {
+    width: 300px;
+    padding: 5px 10px;
+    border: 1px solid $secondary-color;
+    border-radius: 15px;
+    outline: none;
   }
 }
 
@@ -110,7 +244,6 @@ body {
       height: 50px;
       margin-bottom: 1rem;
     }
-
     span {
       font-size: 1.5rem;
       margin-bottom: 1rem;
@@ -135,14 +268,20 @@ body {
     margin-right: 10px;
   }
 
-  button {
+}
+.button-2, .button-3 {
+  &.button-2 {
     background: $secondary-color;
-    color: white;
-    border: none;
-    border-radius: 30px;
-    padding: 10px 20px;
-    cursor: pointer;
+    color: $third-color;
   }
+  &.button-3 {
+    background: $primary-color;
+    color: $secondary-color;
+  }
+  border: none;
+  border-radius: 30px;
+  padding: 10px 20px;
+  cursor: pointer;
 }
 
 .footer {
@@ -152,69 +291,12 @@ body {
   padding: 2rem 1rem;
 }
 
-/* Additional styles for the search bar and dropdown menu */
-.drop-down-custom {
-  position: relative;
-  display: inline-block;
 
-  .dropdown-menu {
-    width: 100%;
-    max-height: 300px;
-    overflow-y: auto;
-    background-color: $background-color;
-    border: 1px solid $secondary-color;
 
-    .list-group-item {
-      display: flex;
-      align-items: center;
-      padding: 10px;
-      background-color: $primary-color;
-      border-bottom: 1px solid $secondary-color;
-
-      img {
-        width: 50px;
-        height: 50px;
-        margin-right: 10px;
-      }
-
-      .search-items {
-        display: flex;
-        width: 100%;
-        justify-content: space-around;
-        align-items: center;
-
-        li {
-          margin: 0 10px;
-        }
-      }
-    }
-
-    .text-dark {
-      color: $text-color;
-    }
-
-    .text-success {
-      color: green;
-    }
-
-    .text-danger {
-      color: red;
-    }
-  }
-
-  .search-bar-input {
-    width: 300px;
-    padding: 5px 10px;
-    border: 1px solid $secondary-color;
-    border-radius: 15px;
-    outline: none;
-  }
-}
 
 .lin-reg-card {
   display: flex;
   flex-direction: row;
-  // for card in lin-reg-card, add border and border-radius
   .card {
     border: 1px solid #ccc;
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
@@ -222,10 +304,7 @@ body {
 }
 
 .nav-bar-custom {
-  background: transparent;
-  box-shadow: 0 10px 12px 0 rgba(0,0,0,0.2);
   .nav-bar {
-    opacity: 1 !important; 
     z-index: 2;
   }
 }
@@ -302,6 +381,7 @@ body {
   align-items: center; /* Vertically align items */
   gap: 10px;
 }
+
 
 .table-container {
   flex: 0 0 60%; /* Take up 60% of the width */

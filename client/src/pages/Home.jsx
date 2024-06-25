@@ -62,7 +62,7 @@ const Home = () => {
           <section className="hero">
             <div className="hero-content">
               <h2>Using data to help you trade smarter</h2>
-              <p>CincoData is built by retail investors for retail investors. Learn how to invest and use financial data all in one place.</p>
+              <h4>CincoData is built by retail investors for retail investors. Learn how to invest and use financial data all in one place.</h4>
             </div>
           </section>
           <section className="features">
@@ -85,7 +85,7 @@ const Home = () => {
           </section>
           <section className="newsletter">
             <input type="email" placeholder="your email@domain.com" />
-            <button type="submit">Subscribe</button>
+            <button type="submit" className="button-2">Subscribe</button>
           </section>
         </>
       )}

@@ -104,7 +104,7 @@ const AddPortfolio = ({ stockSymbol, longName, open, page }) => {
           Add Portfolio
         </Button>
       ) : (
-        <Button variant="primary" onClick={handleShow} className="add-portfolio-btn ms-2 end-0">
+        <Button variant="primary" onClick={handleShow} className="add-portfolio-btn d-flex justify-content-center">
           <FontAwesomeIcon icon={faCircleDollarToSlot} />
         </Button>
       )}

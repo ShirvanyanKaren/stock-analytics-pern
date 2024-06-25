@@ -5,6 +5,7 @@ import { Dropdown } from "react-bootstrap";
 import { linReg, idbPromise, indexOptions, generateChartOptions, } from "../utils/helpers";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLineChart } from "@fortawesome/free-solid-svg-icons";
+import Auth from "../utils/auth";
 import StockDetails from "../components/StockDetails";
 
 const CanvasJS = CanvasJSReact.CanvasJS;
@@ -42,7 +43,8 @@ const StockLinReg = () => {
   }, []);
 
   const fetchStockWeights = async () => {
-    if(Object.keys(stockWeights).length === 0 || !stockWeights){
+    if(! stockWeights || Object.keys(stockWeights).length === 0 && Auth.loggedIn())
+     {
       const weights = await idbPromise("stockWeights", "get");
       const weightsObject = await weights.map(({ portfolio_id, ...rest }) => rest)[0];
       setStockWeights(weightsObject);
@@ -92,6 +94,7 @@ const StockLinReg = () => {
       return;
     }
     setSearchParams({ symbol, index: searchParams.index });
+    console.log(searchParams, symbol);
     await fetchLinRegData(symbol, searchParams.index);
   };
 

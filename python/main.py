@@ -13,6 +13,7 @@ import statsmodels.api as sma
 import uvicorn
 from dotenv import load_dotenv
 import os
+from openai import OpenAI
 
 load_dotenv()
 
@@ -67,6 +68,7 @@ def process_symbol(symbol: str):
         symbol = symbol.replace("-", ".")
     return symbol
 
+# make a set with all the keys like previous close, open, etc
 def fetch_stock_info(symbol: str):
     stock_info = Ticker(symbol).summary_detail
     stock_key_stats = Ticker(symbol).key_stats
@@ -102,38 +104,50 @@ async def stock_weights(stocks):
         weighted_portfolio[stock] = stocks[stock] / total_value
     return weighted_portfolio
 
-@app.get("/stockoverview")
-async def stock_overview(symbol: str):
-    try:
-        stock = yf.Ticker(symbol)
-        hist = stock.history(period="1d")
-        current_price = hist["Close"].iloc[-1]
-        previous_close = stock.history(period="2d")["Close"].iloc[0]
-        price_change = current_price - previous_close
-        price_change_percent = (price_change / previous_close) * 100
-
-        after_hours_price = stock.history(period="1d", interval="1m")["Close"].iloc[-1]
-        after_hours_change = after_hours_price - current_price
-        after_hours_change_percent = (after_hours_change / current_price) * 100
-
-        last_close_time = stock.history(period="1d", interval="1m").index[-1].strftime("%B %d at %I:%M %p %Z")
-        after_hours_time = dt.datetime.now().strftime("%B %d at %I:%M %p %Z")
-
-        return {
-            "currentPrice": current_price,
-            "priceChange": price_change,
-            "priceChangePercent": price_change_percent,
-            "afterHoursPrice": after_hours_price,
-            "afterHoursChange": after_hours_change,
-            "afterHoursChangePercent": after_hours_change_percent,
-            "lastCloseTime": last_close_time,
-            "afterHoursTime": after_hours_time,
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+def lin_reg_data(symbols, start, end, index, stockWeights):
+    start_date = dt.datetime.strptime(start, '%Y-%m-%d')
+    end_date = dt.datetime.strptime(end, '%Y-%m-%d')
+    using_weights = False
+    if symbols == 'Portfolio' or stockWeights != '':
+        using_weights = True
+        stock_weights = json.loads(stockWeights)
+    if index in ['UNRATE', 'CPIAUCSL', 'PPIACO', 'FEDFUNDS', 'GDP', 'USEPUINDXD', 'VIXCLS']:
+        index_data = pdr.DataReader(index, 'fred', start, end)
+        index_data.index = index_data.index.rename('Date')
+        if using_weights:
+            stock_keys = list(stock_weights.keys())
+            stocks = yf.download(stock_keys, start=start_date, end=end_date)['Adj Close'].pct_change()[1:]
+            stocks = stocks * pd.Series(stock_weights)
+            stocks = stocks.sum(axis=1)
+            stocks = pd.DataFrame({'Adj Close': stocks})
+            index_data = index_data.pct_change()
+        else:
+            stocks = yf.download(stocks, start=start_date, end=end_date)['Adj Close']
+        stock_data = pd.merge(stocks, index_data, on='Date')
+    else:
+        if using_weights:
+            stock_keys = list(stock_weights.keys())
+            stocks = yf.download(stock_keys, start=start_date, end=end_date)['Adj Close'].pct_change()[1:]
+            stocks = stocks * pd.Series(stock_weights)
+            stocks = stocks.sum(axis=1)
+            stock_data = pd.DataFrame({'Adj Close': stocks})
+            index_data = yf.download(index, start=start_date, end=end_date)['Adj Close']
+            index_data = index_data.pct_change()
+            stock_data[index] = index_data
+        else:
+            stock_data = yf.download(symbols, start=start_date, end=end_date)['Adj Close']
+            stock_data = stock_data.rename(columns={symbols[1]: 'Adj Close'})
+    stock_data = stock_data.dropna()
+    stocks_df = pd.DataFrame({
+            'Dependent': stock_data['Adj Close'],
+            'Independent': stock_data[index]
+        })
+    if using_weights: stock_data = stock_data * 100
+    return stocks_df, stock_data
 
 @app.get("/linreg")
 async def lin_reg(stocks: str, index: str, start: str, end: str, stockWeights: str):
+    print(stocks)
     symbols = [index, stocks]
     stocks_df, stock_data = lin_reg_data(symbols, start, end, index, stockWeights)
     formula = 'Dependent ~ Independent'
@@ -147,8 +161,7 @@ async def lin_reg(stocks: str, index: str, start: str, end: str, stockWeights: s
     model_obj = {}
     for arr in model_summary:
         for i in range(0, len(arr), 2):
-            if arr[i]: 
-                model_obj[arr[i].replace(':', '')] = arr[i+1]
+            if arr[i] : model_obj[arr[i].replace(':', '')] = arr[i+1]
     values = {'coef': coef, 'intercept': intercept, 'r_squared': r_squared, 'model': model_obj}
     sorted_stocks = stock_data.sort_values(by=index, ascending=True)
     json_data = sorted_stocks.reset_index(drop=True).to_json(date_format='iso', orient='values')
@@ -221,6 +234,8 @@ async def gpt3():
     completion = await client.chat.completions.create(model="gpt-3.5-turbo", messages=[{"role": "user", "content": "hello"}])
     return completion.choices[0].message['content']
 
+
+
 if __name__ == "__main__":
     load_dotenv()
     PORT = int(os.getenv("PORT", 8000))
@@ -229,24 +244,5 @@ if __name__ == "__main__":
 
 
 
-    # stream = client.chat.completions.create(
-    #     model="gpt-4",
-    #     messages=[{"role": "user", "content": "Say this is a test"}],
-    #     stream=True,
-    # )
-    # for chunk in stream:
-    #     if chunk.choices[0].delta.content is not None:
-    #         print(chunk.choices[0].delta.content, end="")
-
-
-
-
-
-
-
     
    
-
-
-
-
