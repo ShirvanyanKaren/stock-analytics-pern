@@ -1,5 +1,5 @@
 const { faker } = require('@faker-js/faker')
-const {User, Portfolio}= require('../models')
+const {User, Portfolio, WatchList}= require('../models')
 
 
 const userSeeds = async (amount) => {
@@ -30,6 +30,10 @@ const userSeeds = async (amount) => {
             user_id: thisUser.id,
             portfolio_name: `${user.username}'s Portfolio`,
             
+        })
+        await WatchList.create({
+            user_id: thisUser.id,
+            watchlist_name: `${user.username}'s Watchlist`,
         })
     }
 
