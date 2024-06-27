@@ -18,7 +18,7 @@ function App() {
   const [helpMode, setHelpMode] = useState(false);
   const [popupInfo, setPopupInfo] = useState("");
   const [currentWatchlist, setCurrentWatchlist] = useState(sessionStorage.getItem("currentWatchlist") || "Default Watchlist");
-  const [watchlistStocks, setWatchlistStocks] = useState(JSON.parse(sessionStorage.getItem(currentWatchlist)) || []);
+  // const [watchlistStocks, setWatchlistStocks] = useState(JSON.parse(sessionStorage.getItem(currentWatchlist)) || []);
 
   const toggleHelpMode = () => {
     setHelpMode(!helpMode);
@@ -30,22 +30,19 @@ function App() {
     }
   };
 
-  const handleWatchlistUpdate = (watchlist, stocks) => {
-    setCurrentWatchlist(watchlist);
-    setWatchlistStocks(stocks);
-  };
+  // const handleWatchlistUpdate = (watchlist, stocks) => {
+  //   setCurrentWatchlist(watchlist);
+  //   setWatchlistStocks(stocks);
+  // };
 
   return (
     <StoreProvider>
       <Provider store={store}>
         <HighlightProvider>
           <div className="App d-flex">
-            <div className="sidebar">
-              <Watchlist onUpdate={handleWatchlistUpdate} />
-            </div>
             <div className="main-content flex-grow-1">
               <Header />
-              <Outlet context={{ helpMode, handleElementClick, currentWatchlist, watchlistStocks }} />
+              <Outlet context={{ helpMode, handleElementClick }} />
               <HelpButton toggleHelpMode={toggleHelpMode} />
               <InfoPopup info={popupInfo} />
             </div>

@@ -4,12 +4,16 @@ import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretDown, faCaretUp, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { Button, Modal, Dropdown, DropdownButton } from "react-bootstrap";
-import defaultStockImage from "../assets/default-stock.jpeg";
+import { addWatchList, getWatchlists, addStockToWatchList, deleteStockFromWatchList } from "../services/watchlists";
+import { idbPromise } from "../utils/helpers";
 import "../styles/Watchlist.css";
+import decode from "jwt-decode";
+import defaultStockImage from "../assets/default-stock.jpeg";
 
 const Watchlist = ({ onUpdate }) => {
-  const [watchlists, setWatchlists] = useState(["Default Watchlist"]);
-  const [currentWatchlist, setCurrentWatchlist] = useState("Default Watchlist");
+  const [watchlists, setWatchlists] = useState([""]);
+  const [currentWatchlist, setCurrentWatchlist] = useState("");
+  const [watchListObjects, setWatchListObjects] = useState({});
   const [watchlistStocks, setWatchlistStocks] = useState([]);
   const [show, setShow] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
@@ -19,31 +23,63 @@ const Watchlist = ({ onUpdate }) => {
   const [options, setOptions] = useState([]);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    const storedWatchlists = JSON.parse(sessionStorage.getItem("watchlists")) || ["Default Watchlist"];
-    const storedCurrentWatchlist = sessionStorage.getItem("currentWatchlist") || "Default Watchlist";
-    const storedWatchlistStocks = JSON.parse(sessionStorage.getItem(storedCurrentWatchlist)) || [];
 
-    setWatchlists(storedWatchlists);
-    setCurrentWatchlist(storedCurrentWatchlist);
-    setWatchlistStocks(storedWatchlistStocks);
+
+  const getWatchList = async () => {
+    const token = localStorage.getItem("id_token");
+    if (!token) return;
+    const decoded = decode(token);
+    const userId = decoded.data.id;
+    const watchlists = await getWatchlists(userId);
+    const watchlistNames = Object.keys(watchlists);
+    setWatchlists(watchlistNames);
+    const currentName = watchlistNames[0];
+    const watchListObjects = {}
+
+
+    for (let i = 0; i < watchlistNames.length; i++) {
+      const watchListItems = watchlists[watchlistNames[i]].watches;
+      const watchListArray = watchListItems.length ? await getStockOverview(watchListItems) : [];
+      watchListObjects[watchlistNames[i]] = watchListArray; 
+    }
+
+    console.log(watchListObjects[currentName]); 
+    setWatchListObjects(watchListObjects);
+    setCurrentWatchlist(currentName);
+    setWatchlistStocks(watchListObjects[currentName]);
+
+  };
+
+
+
+  useEffect(() => {
+    // const storedWatchlists = JSON.parse(sessionStorage.getItem("watchlists")) || ["Default Watchlist"];
+    // const storedCurrentWatchlist = sessionStorage.getItem("currentWatchlist") || "Default Watchlist";
+    // const storedWatchlistStocks = JSON.parse(sessionStorage.getItem(storedCurrentWatchlist)) || [];
+    
+    getWatchList();
+    // setWatchlists(storedWatchlists);
+    // setCurrentWatchlist(storedCurrentWatchlist);
+    // setWatchlistStocks(storedWatchlistStocks);
   }, []);
 
-  useEffect(() => {
-    sessionStorage.setItem("currentWatchlist", currentWatchlist);
-    const storedWatchlistStocks = JSON.parse(sessionStorage.getItem(currentWatchlist)) || [];
-    setWatchlistStocks(storedWatchlistStocks);
-    onUpdate(currentWatchlist, storedWatchlistStocks);
-  }, [currentWatchlist]);
+
 
   const handleShow = () => setShow(true);
   const handleClose = () => setShow(false);
   const handleShowCreate = () => setShowCreate(true);
   const handleCloseCreate = () => setShowCreate(false);
 
-  const handleAddToWatchlist = async (stockSymbol) => {
+  const handleAddToWatchlist = async (stockSymbol, watchListId) => {
     try {
       const stockOverview = await getStockOverview(stockSymbol);
+      const token = localStorage.getItem("id_token");
+      if (!token) {
+        return;
+      }
+      const decoded = decode(token);
+      const userId = decoded.data.id;
+      const addToWatchlist = await addStockToWatchList(userId, watchListId, stockSymbol);
       if (stockOverview) {
         const newStock = {
           stock_symbol: stockSymbol,
@@ -119,7 +155,7 @@ const Watchlist = ({ onUpdate }) => {
           />
           {(option.change * 100).toFixed(2)}%
         </li>
-        <Button variant="primary" onClick={() => handleAddToWatchlist(option.label)}>
+        <Button variant="primary" onClick={() => handleAddToWatchlist(option.label, watchListId)}>
           Add to Watchlist
         </Button>
       </div>
@@ -136,18 +172,29 @@ const Watchlist = ({ onUpdate }) => {
 
   return (
     <div className="watchlist">
-      <DropdownButton id="dropdown-basic-button" title={currentWatchlist}>
+      <h4>Watch List</h4>
+      <DropdownButton id="dropdown-basic-button" title={currentWatchlist} classnName="m-2">
         {watchlists.map((watchlist, index) => (
-          <Dropdown.Item key={index} onClick={() => setCurrentWatchlist(watchlist)}>
+          <Dropdown.Item key={index} onClick={() => setCurrentWatchlist(watchListObjects[watchlist])}>
             {watchlist}
           </Dropdown.Item>
         ))}
       </DropdownButton>
-      <h4>Watch List</h4>
       {error && <span className="text-danger">{error}</span>}
       <ul>
         {watchlistStocks.map((stock, index) => (
-          <li key={index} className={`watchlist-stock ${getStockClass(stock.day_change)}`}>
+          <li key={index} className={`watchlist-stock card`}>
+            <Link to={`/stocks/${stock.symbol}`}>
+              {stock.symbol} <br />
+              {stock.price} <br />
+             <span className={stock.priceChange < 0 ? "text-danger" : "text-success"}>{stock.priceChange.toFixed(2)}</span> <span className={stock.priceChangePercent < 0 ? "text-danger" : "text-success"}> {stock.priceChangePercent.toFixed(2)}</span>
+            </Link>
+          </li>
+        ))}
+          {/* after_hours_change: `${stockOverview.afterHoursChange.toFixed(3)} ${stockOverview.afterHoursChangePercent.toFixed(3)}`, */}
+              {/* {symbols: ["LW", "APA", "AMT", "AZO", "GEN", "COO", "CTAS", "CME", "INVH", "LYV"]} */}
+        {/* {watchlistStocks.map((stock, index) => (
+          <li key={index} className={`watchlist-stock card`}>
             <Link to={`/stocks/${stock.stock_symbol}`}>
               {stock.stock_symbol} <br />
               {stock.price} <br />
@@ -156,14 +203,16 @@ const Watchlist = ({ onUpdate }) => {
               </span>
             </Link>
           </li>
-        ))}
+        ))} */}
       </ul>
-      <Button variant="primary" onClick={handleShow} className="mt-2">
+      <div className="d-flex flex-direction-row">
+      <Button variant="primary" onClick={handleShow} className="m-2">
         Add Stock
       </Button>
-      <Button variant="secondary" onClick={handleShowCreate} className="mt-2">
+      <Button variant="secondary"  onClick={handleShowCreate} className="m-2">
         Create Watchlist
       </Button>
+      </div>
 
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
@@ -221,7 +270,7 @@ const Watchlist = ({ onUpdate }) => {
         </Modal.Footer>
       </Modal>
     </div>
-  );
+  );  
 };
 
 export default Watchlist;

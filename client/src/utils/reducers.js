@@ -1,13 +1,15 @@
 import {
     SAVE_USER,
     SET_STOCK_WEIGHTS,
+    SET_WATCHLIST,
   } from "./actions";
   
   // initial state of the store
   export const initialState = {
     user: [],
-    currencyRates: [],
+    watchList: [],
     stockWeights: {},
+
   };
   
   // export the reducer function
@@ -26,6 +28,13 @@ import {
           ...state,
           stockWeights: action.payload,
         };
+      case SET_WATCHLIST:
+        console.log("SET_WATCHLIST action dispatched with payload:", action.payload);
+        return {
+          ...state,
+          watchList: action.payload
+        };
+
       default:
         return state;
     }

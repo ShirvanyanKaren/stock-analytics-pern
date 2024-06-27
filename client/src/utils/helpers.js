@@ -504,17 +504,19 @@ export function generateChartOptions(type, config) {
 }
 // Use a constant for the backend URL to ensure consistency
 
-export async function getStockOverview(stockSymbol) {
+export async function getStockOverview(stockSymbols) {
   try {
-    const response = await axios.get(`${pyBackEnd}/stockoverview`, {
-      params: { symbol: stockSymbol },
+    console.log(stockSymbols)
+    const response = await axios.post(`${pyBackEnd}/stockoverview`, {
+      symbols: stockSymbols,
     });
     return response.data;
   } catch (error) {
     console.error('Error fetching stock overview:', error);
     return null;
   }
-}
+} 
+
 
 
 

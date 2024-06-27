@@ -10,7 +10,10 @@ import pandas as pd
 import simplejson as json
 from yahooquery import Ticker 
 import statsmodels.api as sma
+import asyncio
+import concurrent.futures
 import uvicorn
+from pydantic import BaseModel
 from dotenv import load_dotenv
 import os
 from openai import OpenAI
@@ -18,6 +21,9 @@ from openai import OpenAI
 load_dotenv()
 
 app = FastAPI()
+
+class SymbolList(BaseModel):
+    symbols: list[str]
 
 app.add_middleware(
     CORSMiddleware,
@@ -224,27 +230,39 @@ async def gpt3():
     completion = await client.chat.completions.create(model="gpt-3.5-turbo", messages=[{"role": "user", "content": "hello"}])
     return completion.choices[0].message['content']
 
-@app.get("/stockoverview")
-async def stock_overview(symbol: str):
+
+def fetch_stock_data(symbol):
     try:
         stock = Ticker(symbol)
         stock_summary = stock.summary_detail[symbol]
         stock_price = stock.price[symbol]
-
         overview = {
-            "currentPrice": stock_price.get('regularMarketPrice', 'N/A'),
+            "price": stock_price.get('regularMarketPrice', 'N/A'),
             "priceChange": stock_price.get('regularMarketChange', 'N/A'),
             "priceChangePercent": stock_price.get('regularMarketChangePercent', 'N/A'),
             "afterHoursPrice": stock_price.get('postMarketPrice', 'N/A'),
             "afterHoursChange": stock_price.get('postMarketChange', 'N/A'),
             "afterHoursChangePercent": stock_price.get('postMarketChangePercent', 'N/A'),
             "lastCloseTime": stock_price.get('regularMarketTime', 'N/A'),
-            "afterHoursTime": stock_price.get('postMarketTime', 'N/A')
+            "afterHoursTime": stock_price.get('postMarketTime', 'N/A'),
+            "symbol": symbol,
         }
-
         return overview
     except Exception as e:
-        raise HTTPException(status_code=404, detail=f"Error fetching stock overview: {str(e)}")
+        print(f"Error fetching data for {symbol}: {e}")
+        return None
+
+@app.post("/stockoverview")
+async def stock_overview(symbols: SymbolList):
+    try:
+        loop = asyncio.get_event_loop()
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            tasks = [loop.run_in_executor(executor, fetch_stock_data, symbol) for symbol in symbols.symbols]
+            res = await asyncio.gather(*tasks)
+        return [r for r in res if r is not None]
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=500, detail="Error fetching stock data")
 
 
 

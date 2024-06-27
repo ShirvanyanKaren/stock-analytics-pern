@@ -6,7 +6,7 @@ const authMiddleware = require('../../utils/auth');
 router.post('/login', async (req, res) => {
     try {
         // find user by email or username depending on what was entered
-        const user = req.body.email ? await User.findOne({ where: { email: req.body.email } }) : await User.findOne({ where: { username: req.body.username } });
+        const user = req.body.email.length ? await User.findOne({ where: { email: req.body.email } }) : await User.findOne({ where: { username: req.body.username } });
         const validPassword =  user?.checkPassword(req.body.password); 
         if (!user && !validPassword) {
         res.status(400).json({ message: 'Incorrect email or password, please try again' });

@@ -11,6 +11,8 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+  const userNameRegex = /^[a-zA-Z0-9]{3,30}$/;
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
   useEffect(() => {
     location.state = localStorage.getItem("redirect") || "/";
@@ -56,18 +58,30 @@ const Login = () => {
     });
   };
 
+  const validateForm = (formState) => {
+    if (!formState.email || !formState.password) {
+      setFormState({
+        ...formState,
+        error: "Please provide all required information.",
+      });
+      return false;
+    } else if (justifyActive === "signup" && !userNameRegex.test(formState.username)) {
+      setFormState({
+        ...formState,
+        error: "Username must be between 3 and 30 characters and contain only letters and numbers.",
+      });
+      return false;
+    }
+    return true;
+  };
+
   const handleFormSubmit = async (event) => {
     event.preventDefault();
     try {
-      if (!formState.username && justifyActive == 'signup' || !formState.email || !formState.password) {
-        setFormState({
-          ...formState,
-          error: "Please provide all required information.",
-        });
-        return;
-      }
+      if (!validateForm(formState)) return;
+      if (justifyActive === "login" && !emailRegex.test(formState.email)) [formState.username, formState.email] = [formState.email, formState.username];
       const res = justifyActive === "signup" ? await signupUser(formState) : await loginUser(formState);
-      if (res.statusText !== "OK") {
+      if (res.statusText !== "OK") {  
         let error = res?.response?.data?.message;
         setFormState({
           ...formState,
@@ -123,7 +137,7 @@ const Login = () => {
                 { justifyActive === "login" ? "Email or Username" : "Email" }
                 </label>
                 <input
-                  type="text"
+                  type={ justifyActive === "login" ? "text" : "email"}
                   className="form-control"
                   id="email"
                   name="email"
