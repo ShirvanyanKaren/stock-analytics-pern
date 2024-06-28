@@ -10,7 +10,7 @@ import Auth from "../utils/auth";
 import SearchBar from "./SearchBar"; 
 import Watchlist from "./Watchlist";
 import Draggable from 'react-draggable'; 
-import '../styles/Watchlist.css'
+import '../styles/Watchlist.scss'
 
 const Header = () => {
   const [watchListClose, setWatchListClose] = useState(true);
@@ -85,9 +85,9 @@ const Header = () => {
       </header>
       {watchListClose ? null : 
         <Draggable> 
-          <div className="sidebar">
+          <div className="watchlist-container">
             <div className="d-flex justify-content-end">
-            <button type="button" className="btn-close" aria-label="Close" onClick={handleWatchlist}></button>
+            <button type="button" className="btn-close btn-close-white" aria-label="Close" onClick={handleWatchlist}></button>
             </div>
             <Watchlist />
           </div>

@@ -197,6 +197,8 @@ export function idbPromise(storeName, method, object) {
         db.createObjectStore("stockWeights", { keyPath: "portfolio_id" });
       } else if (storeName === "financials") {
         db.createObjectStore("financials", { keyPath: "symbol" });
+      } else if (storeName === "watchlist") {
+        db.createObjectStore("watchlist", { keyPath: "watchlist_name" });
       }
     };
 
@@ -205,13 +207,12 @@ export function idbPromise(storeName, method, object) {
     };
     request.onsuccess = function (e) {
       db = request.result;
+      console.log(db)
       tx = db.transaction(storeName, "readwrite");
       store = tx.objectStore(storeName);
-
       db.onerror = function (e) {
         console.log("error", e);
       };
-
       if (method === "put") {
         console.log("putting", object);
         store.put(object);
@@ -521,6 +522,7 @@ export async function getStockOverview(stockSymbols) {
 
 
 export const returnInfo = {
+  "Add to Watchlist": "Add this stock to your watchlist.",
   "SMB Beta":
     "The sensitivity of a portfolio's excess returns to the returns of the SMB factor. A beta of 1.0 indicates perfect correlation to the factor, 0.0 indicates no correlation, And negative values indicate an inverse correlation.",
   "HML Beta":

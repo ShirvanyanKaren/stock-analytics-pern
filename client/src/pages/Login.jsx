@@ -183,7 +183,7 @@ const Login = () => {
                 <a href="#!">Forgot password?</a>
               </div>
               <button type="submit" className="btn btn-primary w-100">
-                Sign in
+                { justifyActive === "login" ? "Login" : "Register" }
               </button>
             </form>
             { justifyActive === "login" ? (
@@ -203,5 +203,8 @@ const Login = () => {
     </div>
   );
 };
+
+
+
 
 export default Login;

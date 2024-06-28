@@ -83,8 +83,8 @@ const Home = () => {
               <span>CincoData+</span>
             </div>
           </section>
-          <section className="newsletter">
-            <input type="email" placeholder="your email@domain.com" />
+          <section className="newsletter ">
+            <input type="email" placeholder="your email@domain.com" className="text-center"/>
             <button type="submit" className="button-2">Subscribe</button>
           </section>
         </>

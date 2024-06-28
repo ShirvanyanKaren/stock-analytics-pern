@@ -7,7 +7,7 @@ import {
   // initial state of the store
   export const initialState = {
     user: [],
-    watchList: [],
+    watchlist: {},
     stockWeights: {},
 
   };
@@ -34,6 +34,7 @@ import {
           ...state,
           watchList: action.payload
         };
+        
 
       default:
         return state;

@@ -64,14 +64,14 @@ router.post('/:user_id', async (req, res) => {
                 watchlist_name: req.body.watchlist_name,
             },
         });
-        if (findWatchList) return res.status(400).json({ message: 'WatchList already exists' });
+        if (findWatchList) return res.status(400).json({ message: 'Watch list already exists' });
         const watchList = await WatchList.create({
             user_id: req.params.user_id,
             watchlist_name: req.body.watchlist_name,
         });
-        res.json(watchList);
+        res.status(200).json(watchList);
     } catch (err) {
-        res.status(400).json(err);
+        res.status(400).json({ message: err.message });
     }
 }
 );
@@ -104,7 +104,7 @@ router.post('/stock/:watchlist_id', async (req, res) => {
             watchlist_id: req.params.watchlist_id,
             stock_symbol: req.body.stock_symbol,
         });
-        res.json(watchListStock);
+        res.status(200).json(watchListStock);
     } catch (err) {
         res.status(400).json(err);
     }
@@ -119,7 +119,7 @@ router.delete('/stock/:watchlist_id', async (req, res) => {
                 stock_symbol: req.body.stock_symbol
             },
         });
-        res.json(watchList);
+        res.status(200).json(watchList);
     } catch (err) {
         res.status(400).json(err);
     }

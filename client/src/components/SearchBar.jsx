@@ -5,10 +5,12 @@ import { stockSearch } from "../utils/helpers";
 import defaultStockImage from "../assets/default-stock.jpeg";
 import { faCaretDown, faCaretUp, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useNavigate, Link, useLocation } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom"
+import { faArrowsToEye } from "@fortawesome/free-solid-svg-icons";
 import "../App.scss";
+import Button from "react-bootstrap/Button";
 
-const SearchBar = () => {
+const SearchBar = ({ handleAddStock, watchlist, watchlistId }) => {
   const [options, setOptions] = useState([]);
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
@@ -17,10 +19,9 @@ const SearchBar = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (query.length > 0) {
+        console.log(watchlistId)
         try {
-          console.log("Fetching data for query:", query); // Debugging
           const data = await stockSearch(query);
-          console.log("Received data:", data); // Debugging
           const options = data.map((stock) => ({
             exchange: stock.exchange,
             image: stock.image ? `https://eodhd.com${stock.image}` : defaultStockImage,
@@ -41,6 +42,7 @@ const SearchBar = () => {
 
   const handleSubmit = useCallback((event) => {
     event.preventDefault();
+    if (watchlist) return;
     if (query && options.length > 0) {
       const firstOption = options[0];
       const route = firstOption.exchange === "KO" 
@@ -55,7 +57,7 @@ const SearchBar = () => {
   }, []);
 
   const renderOption = useCallback((option) => (
-    <div className="list-group-item list-group-item-action active absolute search-list text-decoration-none" key={option.label}>
+    <div className="list-group-item list-group-item-action active absolute search-list text-decoration-none" >
       <img src={option.image} alt={option.name} />
       <div className="search-items justify-content-around align-items-center">
         <li>
@@ -73,21 +75,31 @@ const SearchBar = () => {
           {(option.change * 100).toFixed(2)}%
         </li>
         <div>
-          <AddPortfolio
-            stockDetails={option}
-            stockSymbol={option.label}
-            longName={option.name}
-            open={parseFloat(option.open)}
-            page={false}
-          />
+          {(watchlist ? 
+            <button
+            title="Add to Watchlist"
+            onClick={() => handleAddStock(option.label)} 
+            className="add-watchlist-btn btn btn-primary d-flex justify-content-center"
+            >
+              <FontAwesomeIcon icon={faArrowsToEye} />
+            </button>
+           : (
+            <AddPortfolio
+              stockDetails={option}
+              stockSymbol={option.label}
+              longName={option.name}
+              open={parseFloat(option.open)}
+              page={false}
+            />
+          ))}
         </div>
       </div>
     </div>
-  ), []);
+  ), []);   
 
   return (
     <div className="drop-down-custom">
-      <form onSubmit={handleSubmit} className="d-flex">
+      <form onSubmit={handleSubmit } className="d-flex">
         <Dropdown>
           <Dropdown.Toggle variant="none" id="dropdown-search">
             <input

@@ -1,5 +1,4 @@
-const User = require('../../models/user');
-const Portfolio = require('../../models/portfolio');
+const { User, Portfolio, WatchList } = require('../../models');
 const router = require('express').Router();
 const authMiddleware = require('../../utils/auth');
 
@@ -41,6 +40,11 @@ router.post('/signup', async (req, res) => {
         const portfolio = await Portfolio.create({
         user_id: user.id,
         portfolio_name: `${user.username}'s Portfolio`,
+        });
+        
+        const watchList = await WatchList.create({
+        user_id: user.id,
+        watchlist_name: `${user.username}'s Watchlist`,
         });
 
         await User.update({ portfolio_id: portfolio.id,}, {
