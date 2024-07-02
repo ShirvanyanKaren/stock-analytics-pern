@@ -61,8 +61,8 @@ const Home = () => {
         <>
           <section className="hero">
             <div className="hero-content">
-              <h2>Using data to help you trade smarter</h2>
-              <h4>CincoData is built by retail investors for retail investors. Learn how to invest and use financial data all in one place.</h4>
+              <h2>Understand and Analyze Markets</h2>
+              <h4>Research your favorite stock while learning</h4>
             </div>
           </section>
           <section className="features">
