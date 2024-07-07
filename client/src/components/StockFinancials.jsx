@@ -1,14 +1,10 @@
-import { getCompanyFinancials, idbPromise, getStockOverview, stockData } from "../utils/helpers";
+import { getCompanyFinancials, idbPromise } from "../utils/helpers";
 import { formatDate, formatNumber, titleCase } from "../utils/format";
 import { useEffect, useState, useCallback } from "react";
 import { useOutletContext } from "react-router-dom";
 import ToolTip from "./ToolTip";
 import { useHighlight } from "../contexts/HighlightContext";
 import { standardizeTerm } from "../utils/format";
-import CanvasJSReact from "@canvasjs/react-stockcharts";
-import { generateFinancialsChartOptions } from "../utils/helpers"; // Import the new function
-
-const CanvasJSStockChart = CanvasJSReact.CanvasJSStockChart;
 
 const StockFinancials = ({ symbol }) => {
   const { helpMode, handleElementClick } = useOutletContext();
@@ -17,9 +13,6 @@ const StockFinancials = ({ symbol }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isQuarters, setIsQuarters] = useState(true);
   const [statement, setStatement] = useState("income");
-  const [stockOverview, setStockOverview] = useState([]);
-  const [dataPoints, setDataPoints] = useState([]);
-  const [options, setOptions] = useState({});
   const categories = ["income", "balance", "cash"];
 
   const fetchFinancials = useCallback(async () => {
@@ -45,36 +38,6 @@ const StockFinancials = ({ symbol }) => {
   useEffect(() => {
     fetchFinancials();
   }, [fetchFinancials]);
-
-  useEffect(() => {
-    const fetchStockOverview = async () => {
-      const overview = await getStockOverview([symbol]); // Pass as an array
-      if (overview) {
-        setStockOverview(overview);
-      }
-    };
-
-    fetchStockOverview();
-  }, [symbol]);
-
-  useEffect(() => {
-    const getStockInfo = async () => {
-      try {
-        const endDate = new Date().toISOString().slice(0, 10);
-        const startDate = new Date(new Date().setFullYear(new Date().getFullYear() - 1)).toISOString().slice(0, 10);
-        const data = await stockData(symbol, startDate, endDate);
-        const dataArr = JSON.parse(data);
-        const options = generateFinancialsChartOptions(dataArr); // Use the new function
-        setOptions(options);
-        setDataPoints(dataArr);
-        setIsLoaded(true);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-
-    getStockInfo();
-  }, [symbol]);
 
   const formatTable = (financials) => {
     if (!financials[statement] || financials[statement].length === 0) {
@@ -108,12 +71,6 @@ const StockFinancials = ({ symbol }) => {
   };
 
   const changeStatement = (statement) => setStatement(statement);
-
-  const containerProps = {
-    width: "100%",
-    height: "300px", // Adjust the height for better visualization
-    margin: "auto",
-  };
 
   return (
     <div className="container mt-5">
@@ -168,27 +125,6 @@ const StockFinancials = ({ symbol }) => {
           </div>
         </div>
       )}
-      <div className="chart-section">
-        <CanvasJSStockChart
-          containerProps={containerProps}
-          options={options}
-        />
-      </div>
-      <div className="overview-section">
-        <h2>{symbol} Overview</h2>
-        {stockOverview && stockOverview.length > 0 && stockOverview[0] ? (
-          <>
-            <p>Current Price: ${stockOverview[0].price}</p>
-            <p>Change: {stockOverview[0].priceChange} ({stockOverview[0].priceChangePercent}%)</p>
-            <p>After Hours Price: ${stockOverview[0].afterHoursPrice}</p>
-            <p>After Hours Change: {stockOverview[0].afterHoursChange} ({stockOverview[0].afterHoursChangePercent}%)</p>
-            <p>At Close: {stockOverview[0].lastCloseTime}</p>
-            <p>After Hours: {stockOverview[0].afterHoursTime}</p>
-          </>
-        ) : (
-          <p>Stock overview data is not available.</p>
-        )}
-      </div>
     </div>
   );
 };

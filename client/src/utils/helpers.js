@@ -321,7 +321,7 @@ export function generateFinancialsChartOptions(data) {
       buttons: [{
         range: 1,
         rangeType: "year",
-        label: "1Y"
+        label: "5Y"
       }],
       buttonStyle: {
         display: "none"

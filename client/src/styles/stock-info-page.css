@@ -98,3 +98,16 @@ h2 {
   color: #333;
 }
 
+.financials-section {
+  display: flex;
+}
+
+.sticky-card-container {
+  flex: 0 0 300px; /* Fixed width for the sticky card */
+  margin-right: 20px;
+}
+
+.financials-content {
+  flex-grow: 1; /* Allow the financials content to take the remaining space */
+  overflow-y: auto; /* Ensure financials content can scroll independently */
+}
