@@ -231,7 +231,8 @@ async def gpt3():
     return completion.choices[0].message['content']
 
 
-def fetch_stock_data(symbol):
+
+def fetch_stock_overview(symbol):
     try:
         stock = Ticker(symbol)
         stock_summary = stock.summary_detail[symbol]
@@ -252,18 +253,17 @@ def fetch_stock_data(symbol):
         print(f"Error fetching data for {symbol}: {e}")
         return None
 
-@app.post("/stockoverview")
+@app.post("/fetch-stock-overview")
 async def stock_overview(symbols: SymbolList):
     try:
         loop = asyncio.get_event_loop()
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            tasks = [loop.run_in_executor(executor, fetch_stock_data, symbol) for symbol in symbols.symbols]
+            tasks = [loop.run_in_executor(executor, fetch_stock_overview, symbol) for symbol in symbols.symbols]
             res = await asyncio.gather(*tasks)
         return [r for r in res if r is not None]
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="Error fetching stock data")
-
 
 
 

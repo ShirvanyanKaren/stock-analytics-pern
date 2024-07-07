@@ -287,6 +287,49 @@ export async function setStockGraph(data) {
   return dataPoints;
 }
 
+/// new function for financials chart design
+export function generateFinancialsChartOptions(data) {
+  return {
+    theme: "light2",
+    charts: [{
+      axisX: {
+        lineThickness: 1,
+        tickLength: 5,
+        labelFontSize: 12,
+      },
+      axisY: {
+        title: "Stock Price",
+        prefix: "$",
+        tickLength: 5,
+        labelFontSize: 12,
+      },
+      data: [{
+        type: "line",
+        dataPoints: data.map(point => ({
+          x: new Date(point.Date),
+          y: point.Close
+        }))
+      }]
+    }],
+    navigator: {
+      enabled: false
+    },
+    rangeSelector: {
+      inputFields: {
+        enabled: false
+      },
+      buttons: [{
+        range: 1,
+        rangeType: "year",
+        label: "1Y"
+      }],
+      buttonStyle: {
+        display: "none"
+      }
+    }
+  };
+}
+
 export function generateChartOptions(type, config) {
   switch (type) {
     case "stock":
@@ -507,8 +550,8 @@ export function generateChartOptions(type, config) {
 
 export async function getStockOverview(stockSymbols) {
   try {
-    console.log(stockSymbols)
-    const response = await axios.post(`${pyBackEnd}/stockoverview`, {
+    console.log("Stock Symbols:", stockSymbols); // Add a console log to check the symbols
+    const response = await axios.post(`${pyBackEnd}/fetch-stock-overview`, {
       symbols: stockSymbols,
     });
     return response.data;
@@ -516,7 +559,8 @@ export async function getStockOverview(stockSymbols) {
     console.error('Error fetching stock overview:', error);
     return null;
   }
-} 
+}
+
 
 
 
