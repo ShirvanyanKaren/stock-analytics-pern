@@ -1,12 +1,10 @@
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import { returnInfo } from "../utils/helpers";
-import { formatNumber, titleCase  } from "../utils/format";
+import { formatNumber, titleCase } from "../utils/format";
 import AddPortfolio from "./AddPortfolio";
 import ToolTip from "./ToolTip";
 
-
-const StockDetails = (props) => {
-  const { stockStats, stockInfo, longName } = props;
+const StockDetails = ({ stockStats, stockInfo, longName }) => {
   const entries = useMemo(() => {
     return Object.entries(stockStats).filter(([key]) => returnInfo[titleCase(key)]);
   }, [stockStats]);
@@ -20,6 +18,7 @@ const StockDetails = (props) => {
         </span>
       </li>
     ));
+
   return (
     <div className="container mt-5">
       <div className="row card custom-card">
@@ -28,24 +27,24 @@ const StockDetails = (props) => {
             {longName} Overview
           </h3>
         </div>
-          <div className="col-12 card-items-custom d-flex">
-            <ul className="list-group list-group-flush col-6">
-              {renderStockDetails(entries.slice(0, entries.length / 2))}
-            </ul>
-            <ul className="list-group list-group-flush col-6">
-              {renderStockDetails(entries.slice(entries.length / 2))}
-            </ul>
-          </div>
-            {stockInfo && (
-              <form>
-              <AddPortfolio
-                stockSymbol={stockStats.stockSymbol}
-                page={Boolean(true)}
-                longName={stockStats.longName}
-                open={stockStats.open}
-              />
-              </form>
-            )}
+        <div className="col-12 card-items-custom d-flex">
+          <ul className="list-group list-group-flush col-6">
+            {renderStockDetails(entries.slice(0, entries.length / 2))}
+          </ul>
+          <ul className="list-group list-group-flush col-6">
+            {renderStockDetails(entries.slice(entries.length / 2))}
+          </ul>
+        </div>
+        {stockInfo && (
+          <form>
+            <AddPortfolio
+              stockSymbol={stockStats.stockSymbol}
+              page={Boolean(true)}
+              longName={stockStats.longName}
+              open={stockStats.open}
+            />
+          </form>
+        )}
       </div>
     </div>
   );

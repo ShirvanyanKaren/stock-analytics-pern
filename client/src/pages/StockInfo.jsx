@@ -107,20 +107,18 @@ const StockInfo = () => {
 
       {isLoaded && infoType === "Summary" && (
         <div className="summary-section">
-          <div className="chart-details-section">
-            <div className="chart-section">
-              <CanvasJSStockChart
-                containerProps={{ width: "100%", height: "100%", margin: "auto" }}
-                options={options}
-              />
-            </div>
-            <div className="details-section">
-              <StockDetails
-                stockStats={stockDetails}
-                stockInfo={true}
-                longName={stockDetails.longName}
-              />
-            </div>
+          <div className="chart-section">
+            <CanvasJSStockChart
+              containerProps={{ width: "100%", height: "600px", margin: "auto" }}
+              options={options}
+            />
+          </div>
+          <div className="overview-section">
+            <StockDetails
+              stockStats={stockDetails}
+              stockInfo={true}
+              longName={stockDetails.longName}
+            />
           </div>
           <div className="info-statistics-section">
             <StockStatisticsCard symbol={stockSymbol} />
