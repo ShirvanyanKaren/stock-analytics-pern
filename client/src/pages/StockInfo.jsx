@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { stockData, stockInfo, generateChartOptions, getStockOverview } from "../utils/helpers";
 import StockDetails from "../components/StockDetails";
 import StockFinancials from "../components/StockFinancials";
 import ReminderPopup from "../components/ReminderPopup";
+import StockStatisticsCard from "../components/StockStatisticsCard"; // Ensure the component is imported correctly
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import Button from 'react-bootstrap/Button';
@@ -106,18 +107,23 @@ const StockInfo = () => {
 
       {isLoaded && infoType === "Summary" && (
         <div className="summary-section">
-          <div className="chart-section">
-            <CanvasJSStockChart
-              containerProps={{ width: "100%", height: "100%", margin: "auto" }}
-              options={options}
-            />
+          <div className="chart-details-section">
+            <div className="chart-section">
+              <CanvasJSStockChart
+                containerProps={{ width: "100%", height: "100%", margin: "auto" }}
+                options={options}
+              />
+            </div>
+            <div className="details-section">
+              <StockDetails
+                stockStats={stockDetails}
+                stockInfo={true}
+                longName={stockDetails.longName}
+              />
+            </div>
           </div>
-          <div className="details-section">
-            <StockDetails
-              stockStats={stockDetails}
-              stockInfo={true}
-              longName={stockDetails.longName}
-            />
+          <div className="info-statistics-section">
+            <StockStatisticsCard symbol={stockSymbol} />
           </div>
         </div>
       )}

@@ -265,6 +265,15 @@ async def stock_overview(symbols: SymbolList):
         print(e)
         raise HTTPException(status_code=500, detail="Error fetching stock data")
 
+@app.get("/stock-statistics")
+async def stock_statistics(symbol: str):
+    stock = yf.Ticker(symbol)
+    try:
+        stats = stock.info
+    except ValueError as e:
+        print(f"Failed to fetch data: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch stock statistics")
+    return stats
 
 
 

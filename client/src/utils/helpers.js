@@ -7,10 +7,40 @@ const pyBackEnd = "http://127.0.0.1:8000";
 
 
 
+
+//nEW FUNCTION for stock stats and stuff 7/6/24
+
+export async function fetchStockStatistics(symbol) {
+  try {
+    const response = await axios.get(`${pyBackEnd}/stock-statistics`, {
+      params: {
+        symbol: symbol,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching stock statistics:', error);
+    throw error;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ////NEW AS OF 6/24/24 watchlist helper functions
-
-
-
 // Watchlist helper functions
 export async function addStock(stockState) {
   try {

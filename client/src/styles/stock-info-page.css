@@ -111,3 +111,68 @@ h2 {
   flex-grow: 1; /* Allow the financials content to take the remaining space */
   overflow-y: auto; /* Ensure financials content can scroll independently */
 }
+.stock-info-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.nav-bar-custom {
+  margin-bottom: 20px;
+}
+
+.summary-section {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+}
+
+.chart-details-section {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.chart-section {
+  flex: 1;
+  min-width: 300px;
+  margin: 10px;
+}
+
+.details-section {
+  flex: 1;
+  min-width: 300px;
+  margin: 10px;
+}
+
+.info-statistics-section {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.info-statistics-section > * {
+  flex: 1;
+  min-width: 300px;
+  margin: 10px;
+}
+
+.financials-section {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+
+.sticky-card-container {
+  flex: 1;
+  min-width: 300px;
+  margin: 10px;
+}
+
+.financials-content {
+  flex: 2;
+  margin: 10px;
+}
