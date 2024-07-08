@@ -86,10 +86,30 @@ router.get('/profile', authMiddleware.authMiddleware, async (req, res) => {
     }
 );
 
+
 router.get('/', async (req, res) => {
     try {
         const users = await User.findAll();
         res.json(users);
+    } catch (err) {
+        res.status(400).json(err);
+    }
+    }
+);
+
+router.put('/:id', authMiddleware.authMiddleware, async (req, res) => {
+    try {
+        const user = await User.update(req.body, {
+        individualHooks: true,
+        where: {
+            id: req.params.id,
+        },
+        });
+        if (!user[0]) {
+        res.status(404).json({ message: 'No user found with this id' });
+        return;
+        }
+        res.json(user);
     } catch (err) {
         res.status(400).json(err);
     }

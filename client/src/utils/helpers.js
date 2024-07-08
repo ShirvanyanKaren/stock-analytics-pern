@@ -6,12 +6,6 @@ import Auth from "../utils/auth";
 const pyBackEnd = "http://127.0.0.1:8000";
 
 
-
-////NEW AS OF 6/24/24 watchlist helper functions
-
-
-
-// Watchlist helper functions
 export async function addStock(stockState) {
   try {
     const response = await axios.post(`${pyBackEnd}/add-stock`, stockState);
@@ -135,9 +129,11 @@ export async function stockSearch(query) {
         params: {
           q: query,
           api_token: "65431c249ef2b9.93958016",
+          exchange: "US",
         },
       }
     );
+    console.log(response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching stock search results:", error);
@@ -207,7 +203,6 @@ export function idbPromise(storeName, method, object) {
     };
     request.onsuccess = function (e) {
       db = request.result;
-      console.log(db)
       tx = db.transaction(storeName, "readwrite");
       store = tx.objectStore(storeName);
       db.onerror = function (e) {
@@ -519,10 +514,7 @@ export async function getStockOverview(stockSymbols) {
 } 
 
 
-
-
 export const returnInfo = {
-  "Add to Watchlist": "Add this stock to your watchlist.",
   "SMB Beta":
     "The sensitivity of a portfolio's excess returns to the returns of the SMB factor. A beta of 1.0 indicates perfect correlation to the factor, 0.0 indicates no correlation, And negative values indicate an inverse correlation.",
   "HML Beta":

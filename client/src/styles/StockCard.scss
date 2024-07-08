@@ -1,0 +1,40 @@
+.s-card {
+  margin: 10px;
+  width: 30%;
+  box-sizing: border-box;
+  padding: 10px; 
+
+  .card-content {
+    display: flex;
+  }
+
+  .company-container {
+    flex: 1; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    .company-logo{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 150px;
+      height: 150px;
+      background-color: #464d51;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      img {
+        width: 75px;
+        height: 75px;
+      }
+    }
+  }
+
+  .stock-info {
+    flex: 1; /* Metrics take up the other half of the card */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+}

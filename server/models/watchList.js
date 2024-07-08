@@ -14,6 +14,10 @@ WatchList.init(
           watchlist_name: {
             type: DataTypes.STRING,
             allowNull: false,
+            validate: {
+                len: [1],
+                },
+            
           },
           metrics: {
             type: DataTypes.JSONB,

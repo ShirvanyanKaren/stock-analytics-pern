@@ -1,44 +1,51 @@
-// src/components/StockCard.jsx
-import React from 'react';
 import PropTypes from 'prop-types';
-import "../styles/StockCard.css";
+import '../styles/StockCard.scss';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowDown, faArrowAltCircleDown, faArrowDownShortWide } from '@fortawesome/free-solid-svg-icons';
+import { formatNumber } from '../utils/format';
 
 const StockCard = ({ stock }) => {
   return (
-    <div className="stock-card">
-      <h3>{stock.stock_symbol}</h3>
-      <div className="stock-card-content">
-        <div className="snapshot">
-          <p>Snapshot</p>
-          <div className="snapshot-image">{/* Replace with actual image if available */}</div>
+    <div className='card s-card'>
+      <div className='card-content'>
+        <div className='company-container text-center'> 
+        <div className='ticker-name'>
+          <h6>{stock.symbol}</h6>
         </div>
-        <div className="metrics">
-          <p>Metrics</p>
-          <p>Price: {stock.price}</p>
-          <p>Day Change: {stock.day_change}%</p>
-          <p>After Hours Change: {stock.after_hours_change}%</p>
+        <div className='company-logo'>
+            <img src={`https://financialmodelingprep.com/image-stock/${stock.symbol}.png`} alt={stock.symbol} />
+          </div>
         </div>
-        <div className="ratios">
-          <p>Ratios</p>
-          {/* Add actual ratios here */}
+        <div className='stock-info'>
+          <div>
+            <h6>Metrics</h6>
+            <p
+            >Price: {stock.price}</p>
+            <p
+            >Day Change:&nbsp;
+            <span className={stock.priceChange > 0 ? 'text-success' : 'text-danger'}>
+            {formatNumber(stock.priceChange, 2)}%</span>
+            </p>
+            <p
+            > After Hours Price: {formatNumber(stock.afterHoursPrice, 2)}
+            </p>
+            <p
+            >After Hours Change:&nbsp;
+            <span className={stock.afterHoursChange > 0 ? 'text-success' : 'text-danger'}>
+            {formatNumber(stock.afterHoursChange, 3)}%
+            </span>
+            </p>
+          </div>
         </div>
       </div>
-      <div className="stock-card-footer">
-        <button>Show more</button>
+      <div>
+        <div className='d-flex justify-content-center'> 
+        <button className='btn btn-light'>Show more info 
+          <span className='ms-1'> <FontAwesomeIcon icon={faArrowDownShortWide} /></span>
+          </button>
+        </div>
       </div>
     </div>
   );
 };
-
-StockCard.propTypes = {
-  stock: PropTypes.shape({
-    stock_symbol: PropTypes.string.isRequired,
-    stock_name: PropTypes.string,
-    price: PropTypes.number,
-    day_change: PropTypes.number,
-    after_hours_change: PropTypes.number,
-    // Add other necessary prop types here
-  }).isRequired,
-};
-
 export default StockCard;

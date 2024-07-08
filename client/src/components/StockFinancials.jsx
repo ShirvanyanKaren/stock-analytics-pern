@@ -62,7 +62,7 @@ const StockFinancials = ({ symbol: initialSymbol }) => {
                 <ToolTip info={titleCase(metric)}>{titleCase(metric)}</ToolTip>
               </td>
               {financials[statement].map((fin, idx) => (
-                <td key={idx}>{formatNumber(fin[metric])}</td>
+                <td key={idx}>{formatNumber(fin[metric], 2)}</td>
               ))}
             </tr>
           );

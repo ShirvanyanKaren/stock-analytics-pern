@@ -71,6 +71,7 @@ router.post('/:user_id', async (req, res) => {
         });
         res.status(200).json(watchList);
     } catch (err) {
+        console.log(err);
         res.status(400).json({ message: err.message });
     }
 }

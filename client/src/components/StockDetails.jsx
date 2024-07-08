@@ -16,7 +16,7 @@ const StockDetails = (props) => {
       <li className="list-group-item" key={key}>
         <ToolTip info={titleCase(key)} />
         <span className="float-end fw-bold">
-          {formatNumber(value)}
+          {formatNumber(value, 2)}
         </span>
       </li>
     ));

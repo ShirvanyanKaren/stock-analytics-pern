@@ -13,17 +13,9 @@ const Home = () => {
   const dispatch = useDispatch();
 
   const checkLoginPortfolios = async () => {
-    const token = localStorage.getItem('id_token');
-    if (!token || !Auth.loggedIn()) {
-      setToken('');
-      return;
-    }
-    const decoded = decode(token);
-    setToken(decoded);
-    if (Object.keys(CheckStockWeights).length > 0) {
-      console.log('Stock weights already exist in the store');
-      return;
-    }
+    const decoded = Auth.loggedIn() ? Auth.getProfile() : '';
+    console.log('decoded:', decoded);
+    if (Object.keys(CheckStockWeights).length > 0) return;
     try {
       const user_id = decoded.data.id;
       const portfolio = await getPortfolio(user_id);

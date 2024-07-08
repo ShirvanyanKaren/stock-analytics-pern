@@ -10,6 +10,7 @@ import StockLinReg from "./pages/StockLinReg";
 import FamaFrench from "./pages/FamaFrench";
 import Glossary from "./pages/Glossary";
 import Dashboard from "./pages/Dashboard";
+import Auth from "./utils/auth";
 import App from "./App";
 
 const router = createBrowserRouter([
@@ -20,7 +21,7 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Home />,
+        element: Auth.loggedIn() ? <Dashboard /> : <Home />,
       },
       {
         path: "/login",
@@ -56,12 +57,12 @@ const router = createBrowserRouter([
       },
       {
         path: "/stocks/:symbol",
-        element: <StockInfo />, // Add this route to match "/stocks/:symbol"
+        element: <StockInfo />,
       },
       {
         path: "/dashboard",
-        element: <Dashboard />,
-      },
+        element: Auth.loggedIn() ? <Dashboard /> : <Home />,
+      }
     ],
   },
 ]);

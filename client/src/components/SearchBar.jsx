@@ -19,7 +19,6 @@ const SearchBar = ({ handleAddStock, watchlist, watchlistId }) => {
   useEffect(() => {
     const fetchData = async () => {
       if (query.length > 0) {
-        console.log(watchlistId)
         try {
           const data = await stockSearch(query);
           const options = data.map((stock) => ({
@@ -31,6 +30,7 @@ const SearchBar = ({ handleAddStock, watchlist, watchlistId }) => {
             change: ((stock.close - stock.open) / stock.open).toFixed(2),
             name: stock.name,
           }));
+          console.log(options);
           setOptions(options);
         } catch (error) {
           console.error("Error fetching stock data:", error);
@@ -104,7 +104,7 @@ const SearchBar = ({ handleAddStock, watchlist, watchlistId }) => {
           <Dropdown.Toggle variant="none" id="dropdown-search">
             <input
               className="search-bar-input me-3 mt-2 mb-2 text-center"
-              placeholder={location.pathname.split('/')[1] === 'stockinfo' ? 'Search for other stock' : 'Search for a stock'}
+              placeholder={location.pathname.split('/')[1] === 'stockinfo' ? 'Search for other stock' : 'Search for a company'}
               style={{ borderRadius: "15px" }}
               name="query"
               value={query}

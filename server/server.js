@@ -4,6 +4,7 @@ const cors = require('cors');
 const sequelize = require('./config/connection');
 const { authMiddleware } = require('./utils/auth');
 const controllers = require('./controllers');
+const { spawn } = require('child_process');
 
 const PORT = process.env.PORT || 3001;
 const app = express();
@@ -25,7 +26,6 @@ if (process.env.NODE_ENV === 'production') {
     res.sendFile(path.join(__dirname, '../client/dist/index.html'));
   });
 } else {
-  const { spawn } = require('child_process');
   const childPython = spawn('uvicorn', ['main:app', '--reload'], { cwd: '../python' });
 
   childPython.stderr.on('data', (data) => {

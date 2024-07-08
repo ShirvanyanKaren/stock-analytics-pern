@@ -70,17 +70,22 @@ def process_symbol(symbol: str):
     return symbol
 
 def fetch_stock_info(symbol: str):
-    stock_info = Ticker(symbol).summary_detail
-    stock_key_stats = Ticker(symbol).key_stats
-    long_name = Ticker(symbol).price[symbol]['longName']
-    for key, value in stock_key_stats[symbol].items():
-        if key not in stock_info[symbol]:
-            stock_info[symbol][key] = value
-    stock_info[symbol]['longName'] = long_name
-    stock_info[symbol]['52WeekHigh'] = stock_info[symbol].pop('fiftyTwoWeekHigh')
-    stock_info[symbol]['52WeekLow'] = stock_info[symbol].pop('fiftyTwoWeekLow')
-    stock_info[symbol]['stockSymbol'] = symbol
-    return stock_info
+    try:
+        stock_info = Ticker(symbol).summary_detail
+        stock_key_stats = Ticker(symbol).key_stats or { symbol: {} }
+        long_name = Ticker(symbol).price[symbol]['longName']
+        long_name = Ticker(symbol).price[symbol]['longName']
+        if type(stock_key_stats[symbol]) == 'dict':
+            for key, value in stock_key_stats[symbol].items():
+                if key not in stock_info[symbol]:
+                    stock_info[symbol][key] = value
+        stock_info[symbol]['longName'] = long_name
+        stock_info[symbol]['52WeekHigh'] = stock_info[symbol].pop('fiftyTwoWeekHigh')
+        stock_info[symbol]['52WeekLow'] = stock_info[symbol].pop('fiftyTwoWeekLow')
+        stock_info[symbol]['stockSymbol'] = symbol
+        return stock_info
+    except Exception as e:
+        print(f"error fetching data for {symbol}: {e}")
 
 def fetch_stock_graph(symbol: str, start: str, end: str):
     start_date = dt.datetime.strptime(start, '%Y-%m-%d')

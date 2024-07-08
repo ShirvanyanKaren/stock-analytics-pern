@@ -1,0 +1,25 @@
+$primary-color: #f7fafc; /* New top header color */
+$secondary-color: #00bfff; /* New light blue color */
+
+.dashboard {
+  .dashboard-options {
+    .btn {
+      background-color: $primary-color;
+      font-size: x-large;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border: 1px solid #ddd;
+      &.active {
+        font-weight: bold;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+    }
+  }
+  .watchlist-content {
+    .watchlist-cards {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+  }
+}
+
