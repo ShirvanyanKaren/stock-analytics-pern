@@ -6,6 +6,42 @@ import Auth from "../utils/auth";
 const pyBackEnd = "http://127.0.0.1:8000";
 
 
+
+
+//nEW FUNCTION for stock stats and stuff 7/6/24
+
+export async function fetchStockStatistics(symbol) {
+  try {
+    const response = await axios.get(`${pyBackEnd}/stock-statistics`, {
+      params: {
+        symbol: symbol,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching stock statistics:', error);
+    throw error;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+////NEW AS OF 6/24/24 watchlist helper functions
+// Watchlist helper functions
 export async function addStock(stockState) {
   try {
     const response = await axios.post(`${pyBackEnd}/add-stock`, stockState);
@@ -282,6 +318,49 @@ export async function setStockGraph(data) {
   return dataPoints;
 }
 
+/// new function for financials chart design
+export function generateFinancialsChartOptions(data) {
+  return {
+    theme: "light2",
+    charts: [{
+      axisX: {
+        lineThickness: 1,
+        tickLength: 5,
+        labelFontSize: 12,
+      },
+      axisY: {
+        title: "Stock Price",
+        prefix: "$",
+        tickLength: 5,
+        labelFontSize: 12,
+      },
+      data: [{
+        type: "line",
+        dataPoints: data.map(point => ({
+          x: new Date(point.Date),
+          y: point.Close
+        }))
+      }]
+    }],
+    navigator: {
+      enabled: false
+    },
+    rangeSelector: {
+      inputFields: {
+        enabled: false
+      },
+      buttons: [{
+        range: 1,
+        rangeType: "year",
+        label: "5Y"
+      }],
+      buttonStyle: {
+        display: "none"
+      }
+    }
+  };
+}
+
 export function generateChartOptions(type, config) {
   switch (type) {
     case "stock":
@@ -310,20 +389,44 @@ export function generateChartOptions(type, config) {
               title: "Stock Price",
               prefix: "$",
               tickLength: 0,
+              includeZero: false, // Ensures the y-axis doesn't start from zero for better visibility
             },
             toolTip: {
               shared: true,
+              contentFormatter: function (e) {
+                let content = `<strong>${e.entries[0].dataPoint.x.toLocaleDateString()}</strong>`;
+                e.entries.forEach(function (entry) {
+                  content += `<br/>${entry.dataSeries.name}: $${entry.dataPoint.y.toFixed(2)}`;
+                });
+                return content;
+              },
             },
             data: [
               {
                 name: "Price (in USD)",
                 yValueFormatString: "$#,###.##",
-                type: "line", // Change this from "candlestick" to "line"
+                type: "line",
                 color: "#2BB148",
                 dataPoints: data.map((point) => ({
                   x: new Date(point.Date),
-                  y: point.Close, // Use point.Close for the y value in line graph
+                  y: point.Close,
                 })),
+              },
+              {
+                type: "line",
+                name: "50 Day MA",
+                showInLegend: true,
+                yValueFormatString: "$#,###.##",
+                color: "#FF5733",
+                dataPoints: calculateMovingAverage(data, 50),
+              },
+              {
+                type: "line",
+                name: "200 Day MA",
+                showInLegend: true,
+                yValueFormatString: "$#,###.##",
+                color: "#C70039",
+                dataPoints: calculateMovingAverage(data, 200),
               },
             ],
           },
@@ -339,15 +442,23 @@ export function generateChartOptions(type, config) {
               title: "Volume",
               prefix: "$",
               tickLength: 0,
+              includeZero: false,
             },
             toolTip: {
               shared: true,
+              contentFormatter: function (e) {
+                let content = `<strong>${e.entries[0].dataPoint.x.toLocaleDateString()}</strong>`;
+                e.entries.forEach(function (entry) {
+                  content += `<br/>${entry.dataSeries.name}: ${entry.dataPoint.y.toLocaleString()}`;
+                });
+                return content;
+              },
             },
             data: [
               {
                 color: "#049C",
                 name: "Volume",
-                yValueFormatString: "$#,###.##",
+                yValueFormatString: "#,###",
                 type: "column",
                 dataPoints: data.map((point) => ({
                   x: new Date(point.Date),
@@ -371,13 +482,26 @@ export function generateChartOptions(type, config) {
             },
           ],
           slider: {
-            minimum: new Date("2022-05-01"),
-            maximum: new Date("2022-07-01"),
+            minimum: new Date(data[0].Date),
+            maximum: new Date(data[data.length - 1].Date),
             fontColor: "white",
             indexLabelFontColor: "white",
           },
         },
       };
+
+      function calculateMovingAverage(data, days) {
+        const maData = [];
+        for (let i = 0; i < data.length; i++) {
+          if (i < days - 1) {
+            maData.push({ x: new Date(data[i].Date), y: null });
+          } else {
+            const sum = data.slice(i - days + 1, i + 1).reduce((acc, cur) => acc + cur.Close, 0);
+            maData.push({ x: new Date(data[i].Date), y: sum / days });
+          }
+        }
+        return maData;
+      }
   
 
     case "regression":
@@ -502,8 +626,8 @@ export function generateChartOptions(type, config) {
 
 export async function getStockOverview(stockSymbols) {
   try {
-    console.log(stockSymbols)
-    const response = await axios.post(`${pyBackEnd}/stockoverview`, {
+    console.log("Stock Symbols:", stockSymbols); // Add a console log to check the symbols
+    const response = await axios.post(`${pyBackEnd}/fetch-stock-overview`, {
       symbols: stockSymbols,
     });
     return response.data;

@@ -12,14 +12,54 @@
   width: 100%;
 }
 
-.summary-section,
-.financials-section {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
+.summary-section {
+  display: flex;
+  flex-direction: column;
   width: 100%;
-  max-width: 1200px; /* Max width to prevent overstretching */
-  height: auto; /* Ensure the sections adjust height */
+  align-items: center;
+}
+
+.chart-section {
+  width: 100%;
+  max-width: 1200px;
+  margin: 20px 0;
+}
+
+.overview-section {
+  width: 100%;
+  max-width: 800px;
+  margin: 20px 0;
+}
+
+.info-statistics-section {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+
+.info-statistics-section > * {
+  flex: 1;
+  min-width: 300px;
+  margin: 10px;
+}
+
+.financials-section {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+
+.sticky-card-container {
+  flex: 0 0 300px;
+  margin-right: 20px;
+}
+
+.financials-content {
+  flex-grow: 1;
+  overflow-y: auto;
 }
 
 .chart-section,
@@ -54,8 +94,6 @@ h2 {
   margin-top: 20px;
 }
 
-
-
 .info {
   cursor: pointer;
   padding: 5px 10px;
@@ -68,6 +106,7 @@ h2 {
   color: white;
   border-radius: 4px;
 }
+
 .stock-info-page .nav-bar .btn {
   margin: 5px;
   font-size: 1rem;
@@ -97,4 +136,3 @@ h2 {
   background-color: #e7e7e7;
   color: #333;
 }
-

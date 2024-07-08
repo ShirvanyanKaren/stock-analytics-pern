@@ -56,8 +56,8 @@ const SearchBar = ({ handleAddStock, watchlist, watchlistId }) => {
     setQuery(event.target.value);
   }, []);
 
-  const renderOption = useCallback((option) => (
-    <div className="list-group-item list-group-item-action active absolute search-list text-decoration-none" >
+  const renderOption = useCallback((option, index) => (
+    <div key={option.label + index} className="list-group-item list-group-item-action active absolute search-list text-decoration-none">
       <img src={option.image} alt={option.name} />
       <div className="search-items justify-content-around align-items-center">
         <li>
@@ -75,15 +75,15 @@ const SearchBar = ({ handleAddStock, watchlist, watchlistId }) => {
           {(option.change * 100).toFixed(2)}%
         </li>
         <div>
-          {(watchlist ? 
+          {watchlist ? (
             <button
-            title="Add to Watchlist"
-            onClick={() => handleAddStock(option.label)} 
-            className="add-watchlist-btn btn btn-primary d-flex justify-content-center"
+              title="Add to Watchlist"
+              onClick={() => handleAddStock(option.label)} 
+              className="add-watchlist-btn btn btn-primary d-flex justify-content-center"
             >
               <FontAwesomeIcon icon={faArrowsToEye} />
             </button>
-           : (
+          ) : (
             <AddPortfolio
               stockDetails={option}
               stockSymbol={option.label}
@@ -91,11 +91,12 @@ const SearchBar = ({ handleAddStock, watchlist, watchlistId }) => {
               open={parseFloat(option.open)}
               page={false}
             />
-          ))}
+          )}
         </div>
       </div>
     </div>
-  ), []);   
+  ), [watchlist, handleAddStock]);
+  
 
   return (
     <div className="drop-down-custom">
