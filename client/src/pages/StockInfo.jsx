@@ -1,13 +1,17 @@
-import { useEffect, useState } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { stockData, stockInfo, generateChartOptions, getStockOverview } from "../utils/helpers";
 import StockDetails from "../components/StockDetails";
 import StockFinancials from "../components/StockFinancials";
-import SideBar from "../components/SideBar";
 import ReminderPopup from "../components/ReminderPopup";
+import StockStatisticsCard from "../components/StockStatisticsCard"; // Ensure the component is imported correctly
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
-import CanvasJSReact from "@canvasjs/react-stockcharts";
+import Button from 'react-bootstrap/Button';
+import StickyCard from "../components/StickyCard"; // Import StickyCard
+import CanvasJSReact from "@canvasjs/react-stockcharts"; // Import CanvasJSReact
+
+import '../styles/stock-info-page.css';
 
 const CanvasJSStockChart = CanvasJSReact.CanvasJSStockChart;
 
@@ -22,8 +26,8 @@ const StockInfo = () => {
   const [infoType, setInfoType] = useState("Summary");
   const [showReminderPopup, setShowReminderPopup] = useState(false);
   const [stockOverview, setStockOverview] = useState({});
-  const categories = ["Summary", "Financials", "Linear Regression", "Analysis"];
   const location = useLocation();
+  const navigate = useNavigate();
   const stockSymbol = symbol;
 
   useEffect(() => {
@@ -52,8 +56,10 @@ const StockInfo = () => {
 
   useEffect(() => {
     const fetchStockOverview = async () => {
-      const overview = await getStockOverview(stockSymbol);
-      setStockOverview(overview);
+      const overview = await getStockOverview([stockSymbol]); // Pass as an array
+      if (overview) {
+        setStockOverview(overview[0]);
+      }
     };
 
     fetchStockOverview();
@@ -63,14 +69,12 @@ const StockInfo = () => {
     setInfoType("Summary");
   }, [location]);
 
-  const containerProps = {
-    width: "100%",
-    height: "450px",
-    margin: "auto",
+  const handleLinearRegressionClick = () => {
+    navigate(`/linear-regression/${symbol}-SP500`);
   };
 
   return (
-    <div>
+    <div className="stock-info-page">
       <Navbar
         expand="xxl"
         bg="light"
@@ -78,66 +82,63 @@ const StockInfo = () => {
         className="nav-bar nav-bar-custom justify-content-center"
       >
         <Nav className="d-flex justify-content-around w-100 stock-info">
-          {categories.map((type) => (
-            <h3
-              key={type}
-              onClick={() => setInfoType(type)}
-              className={infoType === type ? "active-stat info" : "info"}
-            >
-              {type}
-            </h3>
-          ))}
+          <Button
+            variant="primary"
+            className={infoType === "Summary" ? "active" : ""}
+            onClick={() => setInfoType("Summary")}
+          >
+            Summary
+          </Button>
+          <Button
+            variant="primary"
+            className={infoType === "Financials" ? "active" : ""}
+            onClick={() => setInfoType("Financials")}
+          >
+            Financials
+          </Button>
+          <Button
+            variant="primary"
+            onClick={handleLinearRegressionClick}
+          >
+            Linear Regression
+          </Button>
         </Nav>
       </Navbar>
 
       {isLoaded && infoType === "Summary" && (
-        <div className="col-10 m-auto justify-center stock-volume mt-5">
-          <CanvasJSStockChart
-            containerProps={containerProps}
-            options={options}
-          />
-          <StockDetails
-            stockStats={stockDetails}
-            stockInfo={true}
-            name={stockDetails.longName}
-          />
+        <div className="summary-section">
+          <div className="chart-section">
+            <CanvasJSStockChart
+              containerProps={{ width: "100%", height: "600px", margin: "auto" }}
+              options={options}
+            />
+          </div>
+          <div className="overview-section">
+            <StockDetails
+              stockStats={stockDetails}
+              stockInfo={true}
+              longName={stockDetails.longName}
+            />
+          </div>
+          <div className="info-statistics-section">
+            <StockStatisticsCard symbol={stockSymbol} />
+          </div>
         </div>
       )}
 
       {isLoaded && infoType === "Financials" && (
-        <div className="col-10 m-auto justify-center stock-volume mt-5">
-          <CanvasJSStockChart
-            containerProps={containerProps}
-            options={options}
-          />
-          <div className="stock-overview">
-            <h2>{stockSymbol} Overview</h2>
-            {stockOverview ? (
-              <>
-                <p>Current Price: ${stockOverview.currentPrice}</p>
-                <p>Change: {stockOverview.priceChange} ({stockOverview.priceChangePercent}%)</p>
-                <p>After Hours Price: ${stockOverview.afterHoursPrice}</p>
-                <p>After Hours Change: {stockOverview.afterHoursChange} ({stockOverview.afterHoursChangePercent}%)</p>
-                <p>At Close: {stockOverview.lastCloseTime}</p>
-                <p>After Hours: {stockOverview.afterHoursTime}</p>
-              </>
-            ) : (
-              <p>Stock overview data is not available.</p>
-            )}
+        <div className="financials-section d-flex">
+          <div className="sticky-card-container">
+            <StickyCard data={dataPoints} stockOverview={stockOverview} />
           </div>
-          <StockFinancials symbol={stockSymbol} />
+          <div className="financials-content flex-grow-1">
+            <StockFinancials symbol={stockSymbol} />
+          </div>
         </div>
       )}
 
       {showReminderPopup && (
         <ReminderPopup open={showReminderPopup} handleClose={() => setShowReminderPopup(false)} />
-      )}
-
-      {infoType === "Linear Regression" && (
-        <div className="container">
-          <h2>Linear Regression</h2>
-          <SideBar />
-        </div>
       )}
     </div>
   );

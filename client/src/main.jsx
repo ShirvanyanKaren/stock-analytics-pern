@@ -1,4 +1,4 @@
-// src/main.jsx
+// main.jsx
 import "bootstrap/dist/css/bootstrap.min.css";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
@@ -9,6 +9,8 @@ import Home from "./pages/Home";
 import StockLinReg from "./pages/StockLinReg";
 import FamaFrench from "./pages/FamaFrench";
 import Glossary from "./pages/Glossary";
+import Dashboard from "./pages/Dashboard";
+import Auth from "./utils/auth";
 import App from "./App";
 
 const router = createBrowserRouter([
@@ -19,7 +21,7 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Home />,
+        element: Auth.loggedIn() ? <Dashboard /> : <Home />,
       },
       {
         path: "/login",
@@ -53,6 +55,14 @@ const router = createBrowserRouter([
         path: "/glossary/:term",
         element: <Glossary />,
       },
+      {
+        path: "/stocks/:symbol",
+        element: <StockInfo />,
+      },
+      {
+        path: "/dashboard",
+        element: Auth.loggedIn() ? <Dashboard /> : <Home />,
+      }
     ],
   },
 ]);

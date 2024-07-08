@@ -6,14 +6,13 @@ import ToolTip from "./ToolTip";
 import { useHighlight } from "../contexts/HighlightContext";
 import { standardizeTerm } from "../utils/format";
 
-const StockFinancials = ({ symbol: initialSymbol }) => {
+const StockFinancials = ({ symbol }) => {
   const { helpMode, handleElementClick } = useOutletContext();
   const { addHighlight } = useHighlight();
   const [financials, setFinancials] = useState({});
   const [isLoaded, setIsLoaded] = useState(false);
   const [isQuarters, setIsQuarters] = useState(true);
   const [statement, setStatement] = useState("income");
-  const [symbol, setSymbol] = useState(initialSymbol);
   const categories = ["income", "balance", "cash"];
 
   const fetchFinancials = useCallback(async () => {
@@ -62,7 +61,7 @@ const StockFinancials = ({ symbol: initialSymbol }) => {
                 <ToolTip info={titleCase(metric)}>{titleCase(metric)}</ToolTip>
               </td>
               {financials[statement].map((fin, idx) => (
-                <td key={idx}>{formatNumber(fin[metric])}</td>
+                <td key={idx}>{formatNumber(fin[metric], 2)}</td>
               ))}
             </tr>
           );

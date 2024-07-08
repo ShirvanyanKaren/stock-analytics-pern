@@ -13,17 +13,9 @@ const Home = () => {
   const dispatch = useDispatch();
 
   const checkLoginPortfolios = async () => {
-    const token = localStorage.getItem('id_token');
-    if (!token || !Auth.loggedIn()) {
-      setToken('');
-      return;
-    }
-    const decoded = decode(token);
-    setToken(decoded);
-    if (Object.keys(CheckStockWeights).length > 0) {
-      console.log('Stock weights already exist in the store');
-      return;
-    }
+    const decoded = Auth.loggedIn() ? Auth.getProfile() : '';
+    console.log('decoded:', decoded);
+    if (Object.keys(CheckStockWeights).length > 0) return;
     try {
       const user_id = decoded.data.id;
       const portfolio = await getPortfolio(user_id);
@@ -61,8 +53,8 @@ const Home = () => {
         <>
           <section className="hero">
             <div className="hero-content">
-              <h2>Using data to help you trade smarter</h2>
-              <h4>CincoData is built by retail investors for retail investors. Learn how to invest and use financial data all in one place.</h4>
+              <h2>Understand and Analyze Markets</h2>
+              <h4>Research your favorite stock while learning</h4>
             </div>
           </section>
           <section className="features">
@@ -83,8 +75,8 @@ const Home = () => {
               <span>CincoData+</span>
             </div>
           </section>
-          <section className="newsletter">
-            <input type="email" placeholder="your email@domain.com" />
+          <section className="newsletter ">
+            <input type="email" placeholder="your email@domain.com" className="text-center"/>
             <button type="submit" className="button-2">Subscribe</button>
           </section>
         </>

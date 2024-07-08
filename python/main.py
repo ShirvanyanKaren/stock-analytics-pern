@@ -10,22 +10,24 @@ import pandas as pd
 import simplejson as json
 from yahooquery import Ticker 
 import statsmodels.api as sma
+import asyncio
+import concurrent.futures
 import uvicorn
+from pydantic import BaseModel
 from dotenv import load_dotenv
 import os
 from openai import OpenAI
 
 load_dotenv()
 
-
-# run this script with uvicorn main:app --reload to start the server
-
 app = FastAPI()
 
-# Allow CORS for local development
+class SymbolList(BaseModel):
+    symbols: list[str]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Adjust this to your frontend URL in production
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -61,26 +63,29 @@ def all_statements(symbol: str, quarterly: bool):
         'cash': cash.dropna(thresh=len(cash.columns) / 2).to_json(orient='records')
     }
 
-
 def process_symbol(symbol: str):
     symbol = symbol.upper()
     if "-" in symbol and "KS" in symbol:
         symbol = symbol.replace("-", ".")
     return symbol
 
-# make a set with all the keys like previous close, open, etc
 def fetch_stock_info(symbol: str):
-    stock_info = Ticker(symbol).summary_detail
-    stock_key_stats = Ticker(symbol).key_stats
-    long_name = Ticker(symbol).price[symbol]['longName']
-    for key, value in stock_key_stats[symbol].items():
-        if key not in stock_info[symbol]:
-            stock_info[symbol][key] = value
-    stock_info[symbol]['longName'] = long_name
-    stock_info[symbol]['52WeekHigh'] = stock_info[symbol].pop('fiftyTwoWeekHigh')
-    stock_info[symbol]['52WeekLow'] = stock_info[symbol].pop('fiftyTwoWeekLow')
-    stock_info[symbol]['stockSymbol'] = symbol
-    return stock_info
+    try:
+        stock_info = Ticker(symbol).summary_detail
+        stock_key_stats = Ticker(symbol).key_stats or { symbol: {} }
+        long_name = Ticker(symbol).price[symbol]['longName']
+        long_name = Ticker(symbol).price[symbol]['longName']
+        if type(stock_key_stats[symbol]) == 'dict':
+            for key, value in stock_key_stats[symbol].items():
+                if key not in stock_info[symbol]:
+                    stock_info[symbol][key] = value
+        stock_info[symbol]['longName'] = long_name
+        stock_info[symbol]['52WeekHigh'] = stock_info[symbol].pop('fiftyTwoWeekHigh')
+        stock_info[symbol]['52WeekLow'] = stock_info[symbol].pop('fiftyTwoWeekLow')
+        stock_info[symbol]['stockSymbol'] = symbol
+        return stock_info
+    except Exception as e:
+        print(f"error fetching data for {symbol}: {e}")
 
 def fetch_stock_graph(symbol: str, start: str, end: str):
     start_date = dt.datetime.strptime(start, '%Y-%m-%d')
@@ -92,7 +97,7 @@ def fetch_stock_graph(symbol: str, start: str, end: str):
     return stock
 
 @app.get("/stockweights")
-async def stock_weights(stocks):
+async def stock_weights(stocks: str):
     stocks = json.loads(stocks)
     total_value = 0
     weighted_portfolio = {}
@@ -147,7 +152,6 @@ def lin_reg_data(symbols, start, end, index, stockWeights):
 
 @app.get("/linreg")
 async def lin_reg(stocks: str, index: str, start: str, end: str, stockWeights: str):
-    print(stocks)
     symbols = [index, stocks]
     stocks_df, stock_data = lin_reg_data(symbols, start, end, index, stockWeights)
     formula = 'Dependent ~ Independent'
@@ -227,34 +231,57 @@ async def fama_french(stockWeights: str, start: str, end: str):
 
 @app.get("/gpt-analysis")
 async def gpt3():
-    print(os.getenv("OPENAI_API_KEY"))
-    client = OpenAI(
-        api_key=os.getenv("OPENAI_API_KEY")
-    )
+    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
     completion = await client.chat.completions.create(model="gpt-3.5-turbo", messages=[{"role": "user", "content": "hello"}])
     return completion.choices[0].message['content']
 
-@app.get("/stockoverview")
-async def stock_overview(symbol: str):
+
+
+def fetch_stock_overview(symbol):
     try:
         stock = Ticker(symbol)
         stock_summary = stock.summary_detail[symbol]
         stock_price = stock.price[symbol]
-        
         overview = {
-            "currentPrice": stock_price.get('regularMarketPrice', 'N/A'),
+            "price": stock_price.get('regularMarketPrice', 'N/A'),
             "priceChange": stock_price.get('regularMarketChange', 'N/A'),
             "priceChangePercent": stock_price.get('regularMarketChangePercent', 'N/A'),
             "afterHoursPrice": stock_price.get('postMarketPrice', 'N/A'),
             "afterHoursChange": stock_price.get('postMarketChange', 'N/A'),
             "afterHoursChangePercent": stock_price.get('postMarketChangePercent', 'N/A'),
             "lastCloseTime": stock_price.get('regularMarketTime', 'N/A'),
-            "afterHoursTime": stock_price.get('postMarketTime', 'N/A')
+            "afterHoursTime": stock_price.get('postMarketTime', 'N/A'),
+            "symbol": symbol,
         }
-        
         return overview
     except Exception as e:
-        raise HTTPException(status_code=404, detail=f"Error fetching stock overview: {str(e)}")
+        print(f"Error fetching data for {symbol}: {e}")
+        return None
+
+@app.post("/fetch-stock-overview")
+async def stock_overview(symbols: SymbolList):
+    try:
+        loop = asyncio.get_event_loop()
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            tasks = [loop.run_in_executor(executor, fetch_stock_overview, symbol) for symbol in symbols.symbols]
+            res = await asyncio.gather(*tasks)
+        return [r for r in res if r is not None]
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=500, detail="Error fetching stock data")
+
+@app.get("/stock-statistics")
+async def stock_statistics(symbol: str):
+    stock = yf.Ticker(symbol)
+    try:
+        stats = stock.info
+    except ValueError as e:
+        print(f"Failed to fetch data: {e}")
+        raise HTTPException(status_code=500, detail="Failed to fetch stock statistics")
+    return stats
+
+
+
 
 
 
@@ -263,6 +290,24 @@ if __name__ == "__main__":
     PORT = int(os.getenv("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=PORT)
     print(f"process id: {os.getpid()}")
+
+    # stream = client.chat.completions.create(
+    #     model="gpt-4",
+    #     messages=[{"role": "user", "content": "Say this is a test"}],
+    #     stream=True,
+    # )
+    # for chunk in stream:
+    #     if chunk.choices[0].delta.content is not None:
+    #         print(chunk.choices[0].delta.content, end="")
+
+
+
+
+
+
+
+    
+   
 
 
 

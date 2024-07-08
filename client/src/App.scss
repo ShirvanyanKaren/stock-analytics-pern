@@ -14,6 +14,7 @@ $highlight-color: #ff0; /* Highlight color */
 $font-family: 'sans-serif'; /* Font family */
 $font-family-2: 'Open Sans', sans-serif; /* Font family 2 */
 $font-family-3: 'Nunito', sans-serif; /* Font family 3 */
+// nice light grey color for the background
 
 // STYLES
 * {
@@ -34,6 +35,14 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: bold;
   font-family: $font-family-2;
   
+}
+.spinner-border {
+  color: $secondary-color;
+  width: 5rem;
+  height: 5rem;
+  margin: 3%;
+
+
 }
 
 .highlight {
@@ -97,11 +106,6 @@ body {
     button {
       max-width: 30px;
       max-height: 30px;
-      svg {
-        width: 10px;
-        height: 10px;
-      }
-
     }
     .search-items {
       display: flex;
@@ -160,46 +164,6 @@ body {
 .drop-down-custom {
 
 
-  .dropdown-menu {
-    // width: 100%;
-    // max-height: 300px;
-    // overflow-y: auto;
-    // background-color: $background-color;
-    // border: 1px solid $secondary-color;
-
-    // .list-group-item {
-    //   display: flex;
-    //   align-items: center;
-    //   padding: 10px;
-    //   background-color: $primary-color;
-    //   border-bottom: 1px solid $secondary-color;
-
-
-    //   .search-items {
-    //     display: flex;
-    //     width: 100%;
-    //     justify-content: space-around;
-    //     align-items: center;
-
-    //     li {
-    //       margin: 0 5px;
-    //     }
-    //   }
-    // }
-
-    // .text-dark {
-    //   color: $text-color;
-    // }
-
-    // .text-success {
-    //   color: green;
-    // }
-
-    // .text-danger {
-    //   color: red;
-    // }
-  }
-
   .search-bar-input {
     width: 300px;
     padding: 5px 10px;
@@ -208,6 +172,9 @@ body {
     outline: none;
   }
 }
+
+
+
 
 .hero {
   background-color: $secondary-color;

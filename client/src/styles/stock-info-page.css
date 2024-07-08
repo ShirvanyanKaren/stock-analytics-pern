@@ -1,0 +1,138 @@
+/* stock-info-page.css */
+
+.stock-info-page {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.nav-bar-custom {
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.summary-section {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+}
+
+.chart-section {
+  width: 100%;
+  max-width: 1200px;
+  margin: 20px 0;
+}
+
+.overview-section {
+  width: 100%;
+  max-width: 800px;
+  margin: 20px 0;
+}
+
+.info-statistics-section {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+
+.info-statistics-section > * {
+  flex: 1;
+  min-width: 300px;
+  margin: 10px;
+}
+
+.financials-section {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+
+.sticky-card-container {
+  flex: 0 0 300px;
+  margin-right: 20px;
+}
+
+.financials-content {
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.chart-section,
+.details-section,
+.overview-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+  .summary-section,
+  .financials-section {
+    grid-template-columns: 1fr;
+  }
+}
+
+.stock-overview {
+  padding: 20px;
+}
+
+h2 {
+  margin-bottom: 15px;
+}
+
+.stock-volume {
+  margin-top: 20px;
+}
+
+.info {
+  cursor: pointer;
+  padding: 5px 10px;
+  transition: all 0.3s ease;
+}
+
+.info:hover,
+.active-stat {
+  background: #007bff;
+  color: white;
+  border-radius: 4px;
+}
+
+.stock-info-page .nav-bar .btn {
+  margin: 5px;
+  font-size: 1rem;
+}
+
+.stock-info-page .nav-bar .btn.active {
+  background-color: #007bff;
+  color: white;
+}
+
+.stock-info-page .nav-bar .btn:not(.active) {
+  background-color: #e7e7e7;
+  color: #333;
+}
+
+.linear-reg .nav-bar .btn {
+  margin: 5px;
+  font-size: 1rem;
+}
+
+.linear-reg .nav-bar .btn.active {
+  background-color: #007bff;
+  color: white;
+}
+
+.linear-reg .nav-bar .btn:not(.active) {
+  background-color: #e7e7e7;
+  color: #333;
+}

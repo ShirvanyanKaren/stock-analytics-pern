@@ -1,12 +1,11 @@
-const User = require('../../models/user');
-const Portfolio = require('../../models/portfolio');
+const { User, Portfolio, WatchList } = require('../../models');
 const router = require('express').Router();
 const authMiddleware = require('../../utils/auth');
 
 router.post('/login', async (req, res) => {
     try {
         // find user by email or username depending on what was entered
-        const user = req.body.email ? await User.findOne({ where: { email: req.body.email } }) : await User.findOne({ where: { username: req.body.username } });
+        const user = req.body.email.length ? await User.findOne({ where: { email: req.body.email } }) : await User.findOne({ where: { username: req.body.username } });
         const validPassword =  user?.checkPassword(req.body.password); 
         if (!user && !validPassword) {
         res.status(400).json({ message: 'Incorrect email or password, please try again' });
@@ -41,6 +40,11 @@ router.post('/signup', async (req, res) => {
         const portfolio = await Portfolio.create({
         user_id: user.id,
         portfolio_name: `${user.username}'s Portfolio`,
+        });
+        
+        const watchList = await WatchList.create({
+        user_id: user.id,
+        watchlist_name: `${user.username}'s Watchlist`,
         });
 
         await User.update({ portfolio_id: portfolio.id,}, {
@@ -82,10 +86,30 @@ router.get('/profile', authMiddleware.authMiddleware, async (req, res) => {
     }
 );
 
+
 router.get('/', async (req, res) => {
     try {
         const users = await User.findAll();
         res.json(users);
+    } catch (err) {
+        res.status(400).json(err);
+    }
+    }
+);
+
+router.put('/:id', authMiddleware.authMiddleware, async (req, res) => {
+    try {
+        const user = await User.update(req.body, {
+        individualHooks: true,
+        where: {
+            id: req.params.id,
+        },
+        });
+        if (!user[0]) {
+        res.status(404).json({ message: 'No user found with this id' });
+        return;
+        }
+        res.json(user);
     } catch (err) {
         res.status(400).json(err);
     }

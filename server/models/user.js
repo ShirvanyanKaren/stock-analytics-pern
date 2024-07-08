@@ -34,7 +34,12 @@ User.init(
             validate: {
                 len: [4],
             },
-        }
+        },
+        avatar: {
+            type: DataTypes.STRING,
+            allowNull: true,
+            defaultValue: 'https://via.placeholder.com/150',
+        },
     },
     {
         hooks: {

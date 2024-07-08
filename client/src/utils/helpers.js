@@ -6,10 +6,124 @@ import Auth from "../utils/auth";
 const pyBackEnd = "http://127.0.0.1:8000";
 
 
+
+
+//nEW FUNCTION for stock stats and stuff 7/6/24
+
+export async function fetchStockStatistics(symbol) {
+  try {
+    const response = await axios.get(`${pyBackEnd}/stock-statistics`, {
+      params: {
+        symbol: symbol,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching stock statistics:', error);
+    throw error;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+////NEW AS OF 6/24/24 watchlist helper functions
+// Watchlist helper functions
+export async function addStock(stockState) {
+  try {
+    const response = await axios.post(`${pyBackEnd}/add-stock`, stockState);
+    return response.data;
+  } catch (error) {
+    throw new Error("Error adding stock");
+  }
+}
+
+export async function addToWatchlist(stockSymbol, userId) {
+  try {
+    const response = await axios.post(`${pyBackEnd}/add-to-watchlist`, {
+      stock_symbol: stockSymbol,
+      user_id: userId,
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error("Error adding to watchlist");
+  }
+}
+
+export async function createWatchlist(watchlistName, userId) {
+  try {
+    const response = await axios.post(`${pyBackEnd}/create-watchlist`, {
+      name: watchlistName,
+      user_id: userId,
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error("Error creating watchlist");
+  }
+}
+
+export async function stockWatchlistSearch(query) {
+  const response = await axios.get(
+    `https://eodhd.com/api/query-search-extended/`,
+    {
+      params: {
+        q: query,
+        api_token: "65431c249ef2b9.93958016",
+      },
+    }
+  );
+
+  return response.data;
+}
+
+export async function getWatchlistInfo(stockSymbols) {
+  try {
+    const stockInfoPromises = stockSymbols.map(async (symbol) => {
+      const overview = await getStockOverview(symbol);
+      return {
+        stockSymbol: symbol,
+        currentPrice: overview.currentPrice,
+        priceChange: overview.priceChange,
+        priceChangePercent: overview.priceChangePercent,
+        afterHoursPrice: overview.afterHoursPrice,
+        afterHoursChange: overview.afterHoursChange,
+        afterHoursChangePercent: overview.afterHoursChangePercent,
+      };
+    });
+
+    const stockInfos = await Promise.all(stockInfoPromises);
+    return stockInfos;
+  } catch (error) {
+    console.error('Error fetching watchlist info:', error);
+    return [];
+  }
+}
+
+export async function getWatchlist(userId) {
+  const response = await axios.get(`${pyBackEnd}/get-watchlist`, {
+    params: {
+      user_id: userId,
+    },
+  });
+  return response.data;
+}
+
 export async function stockData(stockSymbol, startDate, endDate) {
   const response = await axios.get(
     `${pyBackEnd}/stockgraph`,
-
     {
       params: {
         symbol: stockSymbol,
@@ -20,6 +134,7 @@ export async function stockData(stockSymbol, startDate, endDate) {
   );
   return response.data;
 }
+
 export async function stockInfo(stockSymbol) {
   const response = await axios.get(`${pyBackEnd}/stockinfo`, {
     params: {
@@ -29,12 +144,7 @@ export async function stockInfo(stockSymbol) {
   return response.data;
 }
 
-export async function linReg(
-  searchParams,
-  startDate,
-  endDate,
-  weights
-) {
+export async function linReg(searchParams, startDate, endDate, weights) {
   const response = await axios.get(`${pyBackEnd}/linreg`, {
     params: {
       stocks: searchParams.symbol,
@@ -48,17 +158,23 @@ export async function linReg(
 }
 
 export async function stockSearch(query) {
-  const response = await axios.get(
-    `https://eodhd.com/api/query-search-extended/`,
-    {
-      params: {
-        q: query,
-        api_token: "65431c249ef2b9.93958016",
-      },
-    }
-  );
-
-  return response.data;
+  try {
+    const response = await axios.get(
+      `https://eodhd.com/api/query-search-extended/`,
+      {
+        params: {
+          q: query,
+          api_token: "65431c249ef2b9.93958016",
+          exchange: "US",
+        },
+      }
+    );
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching stock search results:", error);
+    throw error;
+  }
 }
 
 export async function getStockWeights(stockNumbers) {
@@ -113,6 +229,8 @@ export function idbPromise(storeName, method, object) {
         db.createObjectStore("stockWeights", { keyPath: "portfolio_id" });
       } else if (storeName === "financials") {
         db.createObjectStore("financials", { keyPath: "symbol" });
+      } else if (storeName === "watchlist") {
+        db.createObjectStore("watchlist", { keyPath: "watchlist_name" });
       }
     };
 
@@ -123,11 +241,9 @@ export function idbPromise(storeName, method, object) {
       db = request.result;
       tx = db.transaction(storeName, "readwrite");
       store = tx.objectStore(storeName);
-
       db.onerror = function (e) {
         console.log("error", e);
       };
-
       if (method === "put") {
         console.log("putting", object);
         store.put(object);
@@ -202,6 +318,49 @@ export async function setStockGraph(data) {
   return dataPoints;
 }
 
+/// new function for financials chart design
+export function generateFinancialsChartOptions(data) {
+  return {
+    theme: "light2",
+    charts: [{
+      axisX: {
+        lineThickness: 1,
+        tickLength: 5,
+        labelFontSize: 12,
+      },
+      axisY: {
+        title: "Stock Price",
+        prefix: "$",
+        tickLength: 5,
+        labelFontSize: 12,
+      },
+      data: [{
+        type: "line",
+        dataPoints: data.map(point => ({
+          x: new Date(point.Date),
+          y: point.Close
+        }))
+      }]
+    }],
+    navigator: {
+      enabled: false
+    },
+    rangeSelector: {
+      inputFields: {
+        enabled: false
+      },
+      buttons: [{
+        range: 1,
+        rangeType: "year",
+        label: "5Y"
+      }],
+      buttonStyle: {
+        display: "none"
+      }
+    }
+  };
+}
+
 export function generateChartOptions(type, config) {
   switch (type) {
     case "stock":
@@ -230,20 +389,44 @@ export function generateChartOptions(type, config) {
               title: "Stock Price",
               prefix: "$",
               tickLength: 0,
+              includeZero: false, // Ensures the y-axis doesn't start from zero for better visibility
             },
             toolTip: {
               shared: true,
+              contentFormatter: function (e) {
+                let content = `<strong>${e.entries[0].dataPoint.x.toLocaleDateString()}</strong>`;
+                e.entries.forEach(function (entry) {
+                  content += `<br/>${entry.dataSeries.name}: $${entry.dataPoint.y.toFixed(2)}`;
+                });
+                return content;
+              },
             },
             data: [
               {
                 name: "Price (in USD)",
                 yValueFormatString: "$#,###.##",
-                type: "line", // Change this from "candlestick" to "line"
+                type: "line",
                 color: "#2BB148",
                 dataPoints: data.map((point) => ({
                   x: new Date(point.Date),
-                  y: point.Close, // Use point.Close for the y value in line graph
+                  y: point.Close,
                 })),
+              },
+              {
+                type: "line",
+                name: "50 Day MA",
+                showInLegend: true,
+                yValueFormatString: "$#,###.##",
+                color: "#FF5733",
+                dataPoints: calculateMovingAverage(data, 50),
+              },
+              {
+                type: "line",
+                name: "200 Day MA",
+                showInLegend: true,
+                yValueFormatString: "$#,###.##",
+                color: "#C70039",
+                dataPoints: calculateMovingAverage(data, 200),
               },
             ],
           },
@@ -259,15 +442,23 @@ export function generateChartOptions(type, config) {
               title: "Volume",
               prefix: "$",
               tickLength: 0,
+              includeZero: false,
             },
             toolTip: {
               shared: true,
+              contentFormatter: function (e) {
+                let content = `<strong>${e.entries[0].dataPoint.x.toLocaleDateString()}</strong>`;
+                e.entries.forEach(function (entry) {
+                  content += `<br/>${entry.dataSeries.name}: ${entry.dataPoint.y.toLocaleString()}`;
+                });
+                return content;
+              },
             },
             data: [
               {
                 color: "#049C",
                 name: "Volume",
-                yValueFormatString: "$#,###.##",
+                yValueFormatString: "#,###",
                 type: "column",
                 dataPoints: data.map((point) => ({
                   x: new Date(point.Date),
@@ -291,13 +482,26 @@ export function generateChartOptions(type, config) {
             },
           ],
           slider: {
-            minimum: new Date("2022-05-01"),
-            maximum: new Date("2022-07-01"),
+            minimum: new Date(data[0].Date),
+            maximum: new Date(data[data.length - 1].Date),
             fontColor: "white",
             indexLabelFontColor: "white",
           },
         },
       };
+
+      function calculateMovingAverage(data, days) {
+        const maData = [];
+        for (let i = 0; i < data.length; i++) {
+          if (i < days - 1) {
+            maData.push({ x: new Date(data[i].Date), y: null });
+          } else {
+            const sum = data.slice(i - days + 1, i + 1).reduce((acc, cur) => acc + cur.Close, 0);
+            maData.push({ x: new Date(data[i].Date), y: sum / days });
+          }
+        }
+        return maData;
+      }
   
 
     case "regression":
@@ -418,17 +622,20 @@ export function generateChartOptions(type, config) {
       throw new Error("Unknown chart type");
   }
 }
-export async function getStockOverview(stockSymbol) {
+// Use a constant for the backend URL to ensure consistency
+
+export async function getStockOverview(stockSymbols) {
   try {
-    const response = await axios.get(`${pyBackEnd}/stockoverview`, {
-      params: { symbol: stockSymbol },
+    console.log("Stock Symbols:", stockSymbols); // Add a console log to check the symbols
+    const response = await axios.post(`${pyBackEnd}/fetch-stock-overview`, {
+      symbols: stockSymbols,
     });
     return response.data;
   } catch (error) {
     console.error('Error fetching stock overview:', error);
     return null;
   }
-}
+} 
 
 
 export const returnInfo = {

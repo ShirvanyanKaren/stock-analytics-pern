@@ -5,10 +5,12 @@ import { stockSearch } from "../utils/helpers";
 import defaultStockImage from "../assets/default-stock.jpeg";
 import { faCaretDown, faCaretUp, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useNavigate, Link, useLocation } from "react-router-dom";
-import "../App.scss"; // Import the existing CSS file for styling
+import { useNavigate, Link, useLocation } from "react-router-dom"
+import { faArrowsToEye } from "@fortawesome/free-solid-svg-icons";
+import "../App.scss";
+import Button from "react-bootstrap/Button";
 
-const SearchBar = () => {
+const SearchBar = ({ handleAddStock, watchlist, watchlistId }) => {
   const [options, setOptions] = useState([]);
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
@@ -17,17 +19,22 @@ const SearchBar = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (query.length > 0) {
-        const data = await stockSearch(query);
-        const options = data.map((stock) => ({
-          exchange: stock.exchange,
-          image: stock.image ? `https://eodhd.com${stock.image}` : defaultStockImage,
-          label: stock.code,
-          open: stock.open.toFixed(2),
-          close: stock.close.toFixed(2),
-          change: ((stock.close - stock.open) / stock.open).toFixed(2),
-          name: stock.name,
-        }));
-        setOptions(options);
+        try {
+          const data = await stockSearch(query);
+          const options = data.map((stock) => ({
+            exchange: stock.exchange,
+            image: stock.image ? `https://eodhd.com${stock.image}` : defaultStockImage,
+            label: stock.code,
+            open: stock.open.toFixed(2),
+            close: stock.close.toFixed(2),
+            change: ((stock.close - stock.open) / stock.open).toFixed(2),
+            name: stock.name,
+          }));
+          console.log(options);
+          setOptions(options);
+        } catch (error) {
+          console.error("Error fetching stock data:", error);
+        }
       }
     };
     fetchData();
@@ -35,6 +42,7 @@ const SearchBar = () => {
 
   const handleSubmit = useCallback((event) => {
     event.preventDefault();
+    if (watchlist) return;
     if (query && options.length > 0) {
       const firstOption = options[0];
       const route = firstOption.exchange === "KO" 
@@ -48,8 +56,8 @@ const SearchBar = () => {
     setQuery(event.target.value);
   }, []);
 
-  const renderOption = useCallback((option) => (
-    <div className="list-group-item list-group-item-action active absolute search-list text-decoration-none">
+  const renderOption = useCallback((option, index) => (
+    <div key={option.label + index} className="list-group-item list-group-item-action active absolute search-list text-decoration-none">
       <img src={option.image} alt={option.name} />
       <div className="search-items justify-content-around align-items-center">
         <li>
@@ -67,27 +75,37 @@ const SearchBar = () => {
           {(option.change * 100).toFixed(2)}%
         </li>
         <div>
-          <AddPortfolio
-            stockDetails={option}
-            stockSymbol={option.label}
-            longName={option.name}
-            open={parseFloat(option.open)}
-            page={false}
-          />
+          {watchlist ? (
+            <button
+              title="Add to Watchlist"
+              onClick={() => handleAddStock(option.label)} 
+              className="add-watchlist-btn btn btn-primary d-flex justify-content-center"
+            >
+              <FontAwesomeIcon icon={faArrowsToEye} />
+            </button>
+          ) : (
+            <AddPortfolio
+              stockDetails={option}
+              stockSymbol={option.label}
+              longName={option.name}
+              open={parseFloat(option.open)}
+              page={false}
+            />
+          )}
         </div>
       </div>
     </div>
-  ), []);
+  ), [watchlist, handleAddStock]);
+  
 
   return (
     <div className="drop-down-custom">
-      <form onSubmit={handleSubmit} className="d-flex">
+      <form onSubmit={handleSubmit } className="d-flex">
         <Dropdown>
-          <Dropdown.Toggle variant="none"
-          id="dropdown-search">
+          <Dropdown.Toggle variant="none" id="dropdown-search">
             <input
               className="search-bar-input me-3 mt-2 mb-2 text-center"
-              placeholder={ location.pathname.split('/')[1] === 'stockinfo' ? 'Search for other stock' : 'Search for a stock' }
+              placeholder={location.pathname.split('/')[1] === 'stockinfo' ? 'Search for other stock' : 'Search for a company'}
               style={{ borderRadius: "15px" }}
               name="query"
               value={query}
@@ -96,7 +114,7 @@ const SearchBar = () => {
             <FontAwesomeIcon icon={faSearch} />
           </Dropdown.Toggle>
           <Dropdown.Menu className="w-100 dropdown-menu">
-            {options.length > 0 ? options.map(renderOption) : null}
+            {options.length > 0 ? options.map(renderOption) : <Dropdown.Item>No results found</Dropdown.Item>}
           </Dropdown.Menu>
         </Dropdown>
       </form>

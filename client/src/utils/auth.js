@@ -29,19 +29,18 @@ class AuthService {
     return localStorage.getItem("id_token");
   }
 
-  login(idToken) {
-    console.log("here")
+  async login(idToken) {
     localStorage.removeItem("id_token");
+    await idbPromise("stockWeights", "delete");
+    await idbPromise("watchlist", "delete");
     localStorage.setItem("id_token", idToken);
-    console.log("idToken", idToken);
     window.location.assign("/");
   }
 
-  logout() {
+  async logout() {
     const tokenId = decode(localStorage.getItem("id_token"));
-    console.log("tokenId", tokenId.data.id);
-    idbPromise("stockWeights", "delete", tokenId.data.id);
-    console.log(tokenId.data.id)
+    await idbPromise("stockWeights", "delete", tokenId.data.id);
+    await idbPromise("watchlist", "delete", tokenId.data.id);
     localStorage.removeItem("id_token");
     window.location.reload();
   }
