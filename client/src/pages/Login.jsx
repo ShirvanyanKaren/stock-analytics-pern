@@ -4,6 +4,9 @@ import { ADD_USER } from "../utils/mutations";
 import { SAVE_USER } from "../utils/actions";
 import { useDispatch } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import googleLogo from '../assets/google-icon-logo.svg'
 import Auth from "../utils/auth";
 
 const Login = () => {
@@ -13,15 +16,25 @@ const Login = () => {
   const location = useLocation();
   const userNameRegex = /^[a-zA-Z0-9]{3,30}$/;
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const params = useParams();
+  const locationSearch = location.search;
 
   useEffect(() => {
-    location.state = localStorage.getItem("redirect") || "/";
-    if (Auth.loggedIn()) {
-      console.log("here bro")
-      console.log(location.state)
-      navigate(location.state);
+    if (locationSearch) {
+      const token = locationSearch.split("=")[1];
+      Auth.login(token);
+      Auth.getProfile(token).then((data) => {
+        dispatch({
+          type: ADD_USER,
+          payload: data,
+        });
+        navigate("/");
+      });
     }
+  
   }, []);
+
+
 
   useEffect(() => {
     if (location.pathname === "/signup") {
@@ -81,7 +94,7 @@ const Login = () => {
       if (!validateForm(formState)) return;
       if (justifyActive === "login" && !emailRegex.test(formState.email)) [formState.username, formState.email] = [formState.email, formState.username];
       const res = justifyActive === "signup" ? await signupUser(formState) : await loginUser(formState);
-      if (res.statusText !== "OK") {  
+      if (res.status !== 200) {  
         let error = res?.response?.data?.message;
         setFormState({
           ...formState,
@@ -89,6 +102,7 @@ const Login = () => {
         });
         throw new Error(res);
       }
+      console.log(res)
       const userId = res.data.user.id;
       const token = res.data.token;
       Auth.login(token);
@@ -186,11 +200,19 @@ const Login = () => {
                 { justifyActive === "login" ? "Login" : "Register" }
               </button>
             </form>
-            { justifyActive === "login" ? (
-              <p className="text-center mt-3">
-                Not a member? <a href="#!" onClick={() => handleJustifyClick("signup")}>Register</a>
-              </p>
-            ) : null}
+            <button type="submit" 
+            className="btn btn-light w-100 mt-2"
+            onClick={() => {
+              window.location.href = 'http://localhost:3001/api/users/google-auth';
+            }}
+            >
+            <span className=''>
+               <img 
+                className="google-logo"
+                src={googleLogo} alt='google logo' /></span>
+                { justifyActive === "login" ? "Login with Google" : "Register with Google" } 
+
+            </button>
           </div>
 
         </div>

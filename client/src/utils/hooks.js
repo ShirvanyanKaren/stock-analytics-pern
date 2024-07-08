@@ -5,6 +5,7 @@ import decode from "jwt-decode";
 
 export const fetchWatchlists = async (setWatchlists, setCurrentWatchlist, setWatchlistStocks, setWatchlistId, dispatch) => {
     const checkForWatchLists = await idbPromise("watchlist", "get");
+    
     let watchListObjects = {};
     let currentName, watchlistNames, watchlistId;
   
