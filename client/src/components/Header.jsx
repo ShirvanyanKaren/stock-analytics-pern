@@ -36,7 +36,7 @@ const Header = () => {
   return (
     <>
       <header className="header-main">
-        <div className="d-flex justify-content-around align-items-center m-2">
+        <div className="d-flex justify-content-around align-items-center">
           <Navbar.Brand className="logo-cinco d-flex align-items-center">
             <Link to="/" className="navbar-brand ms-2">
               CincoData [ ]

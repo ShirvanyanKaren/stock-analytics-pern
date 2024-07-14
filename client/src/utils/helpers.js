@@ -25,21 +25,6 @@ export async function fetchStockStatistics(symbol) {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ////NEW AS OF 6/24/24 watchlist helper functions
 // Watchlist helper functions
 export async function addStock(stockState) {
@@ -112,10 +97,10 @@ export async function getWatchlistInfo(stockSymbols) {
   }
 }
 
-export async function getWatchlist(userId) {
-  const response = await axios.get(`${pyBackEnd}/get-watchlist`, {
+export async function getWatchlistRatios(stock) {
+  const response = await axios.get(`${pyBackEnd}/ratios`, {
     params: {
-      user_id: userId,
+      symbol: stock,
     },
   });
   return response.data;
@@ -145,6 +130,7 @@ export async function stockInfo(stockSymbol) {
 }
 
 export async function linReg(searchParams, startDate, endDate, weights) {
+  console.log(typeof weights)
   const response = await axios.get(`${pyBackEnd}/linreg`, {
     params: {
       stocks: searchParams.symbol,
@@ -624,11 +610,11 @@ export function generateChartOptions(type, config) {
 }
 // Use a constant for the backend URL to ensure consistency
 
-export async function getStockOverview(stockSymbols) {
+export async function getStockOverview(stockSymbols, metrics) {
   try {
-    console.log("Stock Symbols:", stockSymbols); // Add a console log to check the symbols
     const response = await axios.post(`${pyBackEnd}/fetch-stock-overview`, {
       symbols: stockSymbols,
+      metrics: metrics
     });
     return response.data;
   } catch (error) {
@@ -637,6 +623,7 @@ export async function getStockOverview(stockSymbols) {
   }
 } 
 
+// key board shortcut for selecting multiline object / function on mac vsc
 
 export const returnInfo = {
   "SMB Beta":
@@ -644,49 +631,49 @@ export const returnInfo = {
   "HML Beta":
     "The sensitivity of a portfolio's excess returns to the returns of the HML factor. A beta of 1.0 indicates perfect correlation to the factor, 0.0 indicates no correlation, And negative values indicate an inverse correlation.",
   "Portfolio Beta":
-    "The sensitivity Of a portfolio's excess returns to the returns of the Mkt-Rf factor. A beta of 1.0 indicates perfect correlation to the factor, 0.0 indicates no correlation, And negative values indicate an inverse correlation.",
+    "The sensitivity of a portfolio's excess returns to the returns of the Mkt-Rf factor. A beta of 1.0 indicates perfect correlation to the factor, 0.0 indicates no correlation, And negative values indicate an inverse correlation.",
   "SMB P-Value":
-    "The probability of observing a value as extreme or more extreme than the observed value by chance, assuming the null hypothesis is true. A p-value Of 0.05 or less is considered statistically significant.",
+    "The probability of observing a value as extreme or more extreme than the observed value by chance, assuming the null hypothesis is true. A p-value of 0.05 or less is considered statistically significant.",
   "HML P-Value":
-    "The probability of observing a value as extreme or more extreme than the observed value by chance, assuming the null hypothesis is true. A p-value Of 0.05 or less is considered statistically significant.",
+    "The probability of observing a value as extreme or more extreme than the observed value by chance, assuming the null hypothesis is true. A p-value of 0.05 or less is considered statistically significant.",
   "Mkt-Rf P-Value":
-    "The probability Of observing a value as extreme or more extreme than the observed value by chance, assuming the null hypothesis is true. A p-value Of 0.05 or less is considered statistically significant.",
+    "The probability of observing a value as extreme or more extreme than the observed value by chance, assuming the null hypothesis is true. A p-value of 0.05 or less is considered statistically significant.",
   "R-Squared":
-    "The percentage Of a portfolio's excess returns that can be explained by the returns Of the SMB And HML factors. A value Of 1.0 indicates perfect correlation, 0.0 indicates no correlation, And negative values indicate an inverse correlation.",
+    "The percentage of a portfolio's excess returns that can be explained by the returns of the SMB And HML factors. A value of 1.0 indicates perfect correlation, 0.0 indicates no correlation, And negative values indicate an inverse correlation.",
   "Sharpe Ratio":
-    "The average return earned In excess Of the risk-free rate per unit Of volatility or total risk. A higher Sharpe ratio indicates a better historical risk-adjusted performance.",
-  "Period Type": "The type Of period for which the financial data is reported.",
+    "The average return earned In excess of the risk-free rate per unit of volatility or total risk. A higher Sharpe ratio indicates a better historical risk-adjusted performance.",
+  "Period Type": "The type of period for which the financial data is reported.",
   "Currency Code":
     "The code that represents the currency used In financial transactions, such as USD for US dollars.",
   "Average Dilution Earnings":
     "Earnings calculated after accounting for potential dilution from options, warrants, or convertible securities.",
   "Basic Average Shares":
-    "The average number Of shares outstanding during a specific reporting period, not adjusted for potential dilution.",
+    "The average number of shares outstanding during a specific reporting period, not adjusted for potential dilution.",
   "Basic E P S":
-    "Earnings per share calculated using the number Of basic shares outstanding.",
-  "Cost Of Revenue":
-    "The direct costs attributable to the production Of the goods sold by a company.",
+    "Earnings per share calculated using the number of basic shares outstanding.",
+  "Cost of Revenue":
+    "The direct costs attributable to the production of the goods sold by a company.",
   "Diluted Average Shares":
-    "The average number Of shares outstanding during the period, adjusted for the effects Of dilutive securities.",
+    "The average number of shares outstanding during the period, adjusted for the effects of dilutive securities.",
   "Diluted EPS":
-    "Earnings per share calculated using the diluted number Of shares outstanding.",
+    "Earnings per share calculated using the diluted number of shares outstanding.",
   "Diluted NI Available to Com Stockholders":
     "Net income available to common stockholders, adjusted for dilutive effects.",
   "EBIT":
-    "Earnings Before Interest And Taxes; a measure Of a firm's profit that includes all expenses except interest And income tax expenses.",
+    "Earnings Before Interest And Taxes; a measure of a firm's profit that includes all expenses except interest And income tax expenses.",
   "EBITDA":
-    "Earnings Before Interest, Taxes, Depreciation, And Amortization; an indicator Of a company's financial performance.",
+    "Earnings Before Interest, Taxes, Depreciation, And Amortization; an indicator of a company's financial performance.",
   "Gross Profit":
     "The profit a company makes after deducting the costs associated with making And selling its products.",
   "Interest Expense": "The cost incurred by an entity for borrowed funds.",
   "Interest Expense Non Operating":
-    "Interest expense that is not related to the principal operations Of the business.",
+    "Interest expense that is not related to the principal operations of the business.",
   "Interest Income":
     "The income a company earns from its cash holdings And marketable securities.",
   "Interest Income Non Operating":
-    "Interest income that is not generated from the principal operations Of the business.",
+    "Interest income that is not generated from the principal operations of the business.",
   "Minority Interests":
-    "The portion Of subsidiary companies' equity that is not owned by the parent corporation.",
+    "The portion of subsidiary companies' equity that is not owned by the parent corporation.",
   "Net Income Common Stockholders":
     "Net income that is available to common stockholders.",
   "Net Income Continuous Operations":
@@ -694,9 +681,9 @@ export const returnInfo = {
   "Net Income From Continuing And Discontinued Operation":
     "Total earnings that include both continuing operations And those that have been or are to be discontinued.",
   "Net Income From Continuing Operation Net Minority Interest":
-    "Income from continuing operations that excludes the effects Of minority interests.",
+    "Income from continuing operations that excludes the effects of minority interests.",
   "Net Income Including Noncontrolling Interests":
-    "Total earnings that include the interests Of noncontrolling stakeholders.",
+    "Total earnings that include the interests of noncontrolling stakeholders.",
   "Net Interest Income":
     "The difference between the revenue generated from a bank's assets And the expenses associated with paying out its liabilities.",
   "Net Non Operating Interest Income Expense":
@@ -704,79 +691,79 @@ export const returnInfo = {
   "Normalized E B I T D A":
     "EBITDA adjusted for non-recurring, irregular, And one-time items.",
   "Normalized Income":
-    "Net income adjusted to eliminate the effects Of nonrecurring gains And losses.",
+    "Net income adjusted to eliminate the effects of nonrecurring gains And losses.",
   "Operating Expense": "Expenses incurred from normal business operations.",
   "Operating Income":
     "The profit realized from a business's ongoing operations.",
   "Operating Revenue":
     "The revenue generated from a company's primary activities.",
   "Other Income Expense":
-    "Revenues or expenses that are not related to the core operations Of a business.",
+    "Revenues or expenses that are not related to the core operations of a business.",
   "Other Non Operating Income Expenses":
     "Gains or losses not related to the core business operations.",
   "Otherunder Preferred Stock Dividend":
     "Dividends On preferred stock that must be subtracted from net income In earnings per share calculations.",
-  "Pretax Income": "The income Of a company before taxes are deducted.",
-  "Reconciled Cost Of Revenue":
-    "Adjusted reporting Of the cost Of revenue, reconciling reported figures with actual figures.",
+  "Pretax Income": "The income of a company before taxes are deducted.",
+  "Reconciled Cost of Revenue":
+    "Adjusted reporting of the cost of revenue, reconciling reported figures with actual figures.",
   "Reconciled Depreciation":
     "Adjusted depreciation expense that aligns reported figures with actual depreciation costs.",
   "Research And Development":
-    "Expenses associated with the research And development Of a company’s products or services.",
+    "Expenses associated with the research And development of a company’s products or services.",
   "Restructuring And Merger Acquisition":
     "Costs related to restructuring And merger And acquisition activities.",
   "Selling General And Administration":
     "Expenses associated with selling products And managing the business.",
   "Special Income Charges":
     "Non-recurring or special charges that need to be noted separately from regular income.",
-  "Tax Effect Of Unusual Items":
-    "The tax impact Of items that are unusual or nonrecurring.",
+  "Tax Effect of Unusual Items":
+    "The tax impact of items that are unusual or nonrecurring.",
   "Tax Provision":
-    "The total amount Of current income tax liability for a period.",
+    "The total amount of current income tax liability for a period.",
   "Tax Rate for Calcs":
     "The tax rate used for calculation purposes In financial modeling.",
-  "Total Expenses": "The total amount Of expenses incurred by a company.",
+  "Total Expenses": "The total amount of expenses incurred by a company.",
   "Total Operating Income As Reported":
     "Total income from operations as reported In financial statements.",
   "Total Revenue":
-    "The total amount Of income generated by the sale Of goods or services.",
-  "Total Unusual Items": "Total Of items that are unusual or nonrecurring.",
+    "The total amount of income generated by the sale of goods or services.",
+  "Total Unusual Items": "Total of items that are unusual or nonrecurring.",
   "Total Unusual Items Excluding Goodwill":
-    "Total Of unusual or nonrecurring items excluding the effects Of goodwill.",
+    "Total of unusual or nonrecurring items excluding the effects of goodwill.",
   "Accounts Payable":
-    "The amount Of money a company owes to suppliers for items or services purchased On credit.",
+    "The amount of money a company owes to suppliers for items or services purchased On credit.",
   "Accounts Receivable":
     "Money owed to a company by its customers for products or services sold On credit.",
   "Accumulated Depreciation":
-    "The total depreciation Of an asset accumulated up to a specified date.",
+    "The total depreciation of an asset accumulated up to a specified date.",
   "Additional Paid In Capital":
-    "The amount Of capital from investors above the par value Of stock.",
+    "The amount of capital from investors above the par value of stock.",
   "Capital Lease Obligations":
-    "A lease considered to have the economic characteristics Of asset ownership.",
+    "A lease considered to have the economic characteristics of asset ownership.",
   "Capital Stock":
-    "The total amount Of a company's equity represented by shares.",
+    "The total amount of a company's equity represented by shares.",
   "Cash And Cash Equivalents":
-    "Company assets In the form Of cash or assets easily converted to cash.",
+    "Company assets In the form of cash or assets easily converted to cash.",
   "Cash Cash Equivalents And Short Term Investments":
     "Short-term investments that are highly liquid And easily converted to cash.",
   "Cash Equivalents":
-    "Short-term, highly liquid investments that are easily convertible to known amounts Of cash.",
+    "Short-term, highly liquid investments that are easily convertible to known amounts of cash.",
   "Cash Financial": "Cash held for financial purposes.",
   "Common Stock":
-    "A type Of equity security that represents ownership In a corporation.",
+    "A type of equity security that represents ownership In a corporation.",
   "Common Stock Equity": "The equity held by common stockholders.",
   "Construction In Progress":
-    "The costs Of construction work that is not yet completed.",
+    "The costs of construction work that is not yet completed.",
   "Current Accrued Expenses":
     "Expenses that have been incurred but not yet paid.",
   "Current Assets":
     "Assets that are expected to be converted into cash within a year.",
   "Current Capital Lease Obligation":
-    "The portion Of a capital lease obligation that is due within one year.",
+    "The portion of a capital lease obligation that is due within one year.",
   "Current Debt":
-    "The portion Of a company's debt that is due within one year.",
+    "The portion of a company's debt that is due within one year.",
   "Current Debt And Capital Lease Obligation":
-    "The portion Of both current debt And capital lease obligations due within one year.",
+    "The portion of both current debt And capital lease obligations due within one year.",
   "Current Deferred Liabilities":
     "Liabilities that have been deferred And are due within a year.",
   "Current Deferred Revenue":
@@ -794,33 +781,33 @@ export const returnInfo = {
   "Goodwill And Other Intangible Assets":
     "Goodwill And other intangible assets acquired by a company.",
   "Gross P P E":
-    "The total cost Of property, plant, And equipment before depreciation.",
+    "The total cost of property, plant, And equipment before depreciation.",
   "Interest Payable":
-    "The amount Of interest expense that has been incurred but not yet paid.",
+    "The amount of interest expense that has been incurred but not yet paid.",
   Inventory:
     "The raw materials, work-In-progress goods, And finished goods that a company has On hand.",
   "Invested Capital":
-    "The total amount Of money that was invested into a company by its shareholders And debt holders.",
+    "The total amount of money that was invested into a company by its shareholders And debt holders.",
   "Land And Improvements": "Land And any improvements made to it.",
   Leases:
     "Contracts In which the property owner allows another party to use the property for a specific period In exchange for payment.",
-  "Line Of Credit":
+  "Line of Credit":
     "An arrangement between a financial institution And a customer that establishes a maximum loan balance that the lender allows the borrower to access or maintain.",
   "Long Term Capital Lease Obligation":
     "A lease obligation with a term longer than one year.",
   "Long Term Debt": "Loans And financial obligations lasting over one year.",
   "Long Term Debt And Capital Lease Obligation":
-    "The sum Of long-term debt And capital lease obligations.",
+    "The sum of long-term debt And capital lease obligations.",
   "Long Term Provisions":
     "Long-term liabilities that are uncertain In amount or timing.",
   "Machinery Furniture Equipment":
-    "Physical assets used In the production Of goods And services.",
+    "Physical assets used In the production of goods And services.",
   "Minority Interest":
-    "The portion Of a subsidiary corporation's stock that is not owned by the parent corporation.",
+    "The portion of a subsidiary corporation's stock that is not owned by the parent corporation.",
   "Net Debt":
-    "The total amount Of a company's debt minus cash And cash equivalents.",
+    "The total amount of a company's debt minus cash And cash equivalents.",
   "Net P P E":
-    "The value Of a company's property, plant, And equipment after accounting for depreciation.",
+    "The value of a company's property, plant, And equipment after accounting for depreciation.",
   "Net Tangible Assets":
     "A company's total assets minus its intangible assets And liabilities.",
   "Non Current Accrued Expenses":
@@ -838,7 +825,7 @@ export const returnInfo = {
   "Non Current Note Receivables":
     "Notes receivable that are not expected to be collected within one year.",
   "Ordinary Shares Number":
-    "The number Of ordinary shares issued by a company.",
+    "The number of ordinary shares issued by a company.",
   "Other Current Assets":
     "Miscellaneous short-term assets that do not fall into standard categories.",
   "Other Current Borrowings":
@@ -863,9 +850,9 @@ export const returnInfo = {
   "Payables And Accrued Expenses":
     "Money owed by a company to its creditors And expenses that have been incurred but not yet paid.",
   "Preferred Securities Outside Stock Equity":
-    "Preferred securities that are not part Of stock equity.",
+    "Preferred securities that are not part of stock equity.",
   "Preferred Stock":
-    "A class Of ownership In a corporation that has a higher claim On its assets And earnings than common stock.",
+    "A class of ownership In a corporation that has a higher claim On its assets And earnings than common stock.",
   "Prepaid Assets":
     "Expenses paid In advance And recorded as assets until they are used or consumed.",
   Properties: "Real estate And other physical assets owned by a company.",
@@ -875,37 +862,37 @@ export const returnInfo = {
   "Restricted Cash":
     "Cash that is restricted for a specific purpose And not available for general business use.",
   "Retained Earnings":
-    "The portion Of net income that is retained by the company rather than distributed to shareholders.",
-  "Share Issued": "The number Of shares that have been issued by a company.",
+    "The portion of net income that is retained by the company rather than distributed to shareholders.",
+  "Share Issued": "The number of shares that have been issued by a company.",
   "Stockholders Equity":
     "The equity stake currently held On the books by a firm's equity investors.",
   "Tangible Book Value":
-    "The value Of a company’s physical assets minus its liabilities.",
+    "The value of a company’s physical assets minus its liabilities.",
   "Total Assets":
-    "The total value Of everything a company owns And uses to conduct its business.",
+    "The total value of everything a company owns And uses to conduct its business.",
   "Total Capitalization":
-    "The sum Of a company's long-term debt, stock, And retained earnings.",
-  "Total Debt": "The sum Of a company's short-term And long-term debt.",
+    "The sum of a company's long-term debt, stock, And retained earnings.",
+  "Total Debt": "The sum of a company's short-term And long-term debt.",
   "Total Equity Gross Minority Interest":
     "The total equity including the portion attributable to minority interests.",
   "Total Liabilities Net Minority Interest":
     "Total liabilities minus the portion attributable to minority interests.",
   "Total Non Current Assets":
-    "The total value Of a company's long-term assets.",
+    "The total value of a company's long-term assets.",
   "Total Non Current Liabilities Net Minority Interest":
     "Total long-term liabilities minus the portion attributable to minority interests.",
   "Total Tax Payable":
-    "The total amount Of tax a company owes to tax authorities.",
+    "The total amount of tax a company owes to tax authorities.",
   "Treasury Shares Number":
-    "The number Of shares that a company has bought back from shareholders.",
+    "The number of shares that a company has bought back from shareholders.",
   "Work In Process":
-    "Goods that are In the process Of being manufactured but are not yet completed.",
+    "Goods that are In the process of being manufactured but are not yet completed.",
   "Working Capital":
     "The difference between a company's current assets And current liabilities.",
   "Asset Impairment Charge":
-    "A charge taken to write down the carrying value Of an asset when its market value falls below its book value.",
+    "A charge taken to write down the carrying value of an asset when its market value falls below its book value.",
   "Beginning Cash Position":
-    "The amount Of cash available at the start Of a period.",
+    "The amount of cash available at the start of a period.",
   "Capital Expenditure":
     "Funds used by a company to acquire or upgrade physical assets such as property, industrial buildings, or equipment.",
   "Cash Flow from Continuing Financing Activities":
@@ -941,108 +928,108 @@ export const returnInfo = {
   "Changes In Cash":
     "The increase or decrease In a company’s cash balance during a period.",
   "Common Stock Issuance":
-    "The process Of creating new shares And selling them to investors.",
+    "The process of creating new shares And selling them to investors.",
   "Deferred Income Tax":
     "A tax liability that a company owes but does not need to pay until a future period.",
   "Deferred Tax":
     "A tax liability that is due In the future but is recorded as an expense In the current period.",
   Depreciation:
-    "The allocation Of the cost Of a tangible asset over its useful life.",
+    "The allocation of the cost of a tangible asset over its useful life.",
   "Depreciation Amortization Depletion":
-    "The combined allocation Of the cost Of tangible And intangible assets over their useful lives.",
+    "The combined allocation of the cost of tangible And intangible assets over their useful lives.",
   "Depreciation And Amortization":
-    "The combined allocation Of the cost Of tangible And intangible assets over their useful lives.",
-  "Effect Of Exchange Rate Changes":
-    "The impact Of changes In exchange rates On a company’s financial statements.",
-  "End Cash Position": "The amount Of cash available at the end Of a period.",
+    "The combined allocation of the cost of tangible And intangible assets over their useful lives.",
+  "Effect of Exchange Rate Changes":
+    "The impact of changes In exchange rates On a company’s financial statements.",
+  "End Cash Position": "The amount of cash available at the end of a period.",
   "Financing Cash Flow":
     "The cash generated or used by a company from its financing activities.",
   "Free Cash Flow":
     "The cash generated by a company after accounting for capital expenditures.",
-  "Gain Loss On Sale Of PPE":
-    "The gain or loss recognized from the sale Of property, plant, And equipment.",
+  "Gain Loss On Sale of PPE":
+    "The gain or loss recognized from the sale of property, plant, And equipment.",
   "Income Tax Paid Supplemental Data":
     "Additional data On income taxes paid during a period.",
   "Interest Paid Supplemental Data":
     "Additional data On interest paid during a period.",
   "Investing Cash Flow":
     "The cash generated or used by a company from its investing activities.",
-  "Issuance Of Capital Stock":
-    "The process Of creating new shares Of capital stock And selling them to investors.",
-  "Issuance Of Debt":
-    "The process Of creating new debt And selling it to investors.",
+  "Issuance of Capital Stock":
+    "The process of creating new shares of capital stock And selling them to investors.",
+  "Issuance of Debt":
+    "The process of creating new debt And selling it to investors.",
   "Long Term Debt Issuance":
-    "The process Of creating new long-term debt And selling it to investors.",
-  "Long Term Debt Payments": "The repayment Of long-term debt obligations.",
+    "The process of creating new long-term debt And selling it to investors.",
+  "Long Term Debt Payments": "The repayment of long-term debt obligations.",
   "Net Business Purchase And Sale":
-    "The net effect Of purchases And sales Of businesses during a period.",
+    "The net effect of purchases And sales of businesses during a period.",
   "Net Common Stock Issuance":
-    "The net amount Of common stock issued during a period.",
+    "The net amount of common stock issued during a period.",
   "Net Foreign Currency Exchange Gain Loss":
     "The net gain or loss from foreign currency exchange transactions.",
   "Net Income":
-    "The total profit Of a company after all expenses And taxes have been deducted.",
+    "The total profit of a company after all expenses And taxes have been deducted.",
   "Net Income from Continuing Operations":
     "The income from continuing operations excluding any discontinued operations.",
   "Net Intangibles Purchase And Sale":
-    "The net effect Of purchases And sales Of intangible assets during a period.",
+    "The net effect of purchases And sales of intangible assets during a period.",
   "Net Investment Purchase And Sale":
-    "The net effect Of purchases And sales Of investments during a period.",
-  "Net Issuance Payments Of Debt":
-    "The net amount Of debt issued And repaid during a period.",
+    "The net effect of purchases And sales of investments during a period.",
+  "Net Issuance Payments of Debt":
+    "The net amount of debt issued And repaid during a period.",
   "Net Long Term Debt Issuance":
-    "The net amount Of long-term debt issued during a period.",
+    "The net amount of long-term debt issued during a period.",
   "Net Other Financing Charges":
-    "The net effect Of other financing charges during a period.",
+    "The net effect of other financing charges during a period.",
   "Net Other Investing Changes":
-    "The net effect Of other investing changes during a period.",
+    "The net effect of other investing changes during a period.",
   "Net PPE Purchase And Sale":
-    "The net effect Of purchases And sales Of property, plant, And equipment during a period.",
+    "The net effect of purchases And sales of property, plant, And equipment during a period.",
   "Operating Cash Flow":
     "The cash generated or used by a company from its operating activities.",
   "Operating Gains Losses":
     "The gains or losses generated from operating activities.",
   "Other Non Cash Items": "Other items that do not involve cash transactions.",
   "Proceeds from Stock Option Exercised":
-    "The cash received from the exercise Of stock options.",
-  "Purchase Of Business": "The cash paid to acquire a business.",
-  "Purchase Of Intangibles": "The cash paid to acquire intangible assets.",
-  "Purchase Of Investment": "The cash paid to acquire investments.",
-  "Purchase Of PPE": "The cash paid to acquire property, plant, And equipment.",
-  "Repayment Of Debt": "The repayment Of debt obligations.",
-  "Sale Of Business": "The cash received from the sale Of a business.",
-  "Sale Of Intangibles":
-    "The cash received from the sale Of intangible assets.",
-  "Sale Of Investment": "The cash received from the sale Of investments.",
+    "The cash received from the exercise of stock options.",
+  "Purchase of Business": "The cash paid to acquire a business.",
+  "Purchase of Intangibles": "The cash paid to acquire intangible assets.",
+  "Purchase of Investment": "The cash paid to acquire investments.",
+  "Purchase of PPE": "The cash paid to acquire property, plant, And equipment.",
+  "Repayment of Debt": "The repayment of debt obligations.",
+  "Sale of Business": "The cash received from the sale of a business.",
+  "Sale of Intangibles":
+    "The cash received from the sale of intangible assets.",
+  "Sale of Investment": "The cash received from the sale of investments.",
   "Stock Based Compensation":
-    "The compensation given to employees In the form Of stock options or shares.",
-  "52 Week High": "The highest price Of a stock In the past 52 weeks.",
-  "52 Week Low": "The lowest price Of a stock In the past 52 weeks.",
-  "Beta": "A measure Of a stock's volatility In relation to the market.",
-  "Open": "The price Of a stock at the beginning Of a trading day.",
+    "The compensation given to employees In the form of stock options or shares.",
+  "52 Week High": "The highest price of a stock In the past 52 weeks.",
+  "52 Week Low": "The lowest price of a stock In the past 52 weeks.",
+  "Beta": "A measure of a stock's volatility In relation to the market.",
+  "Open": "The price of a stock at the beginning of a trading day.",
   "Previous Close":
-    "The price Of a stock at the end Of the previous trading day.",
-  "Volume": "The number Of shares traded during a specific period.",
-  "Shares Outstanding": "The number Of shares that a company has issued.",
-  "Market Cap": "The total value Of a company's outstanding shares.",
-  "Day High": "The highest price Of a stock during a trading day.",
-  "Day Low": "The lowest price Of a stock during a trading day.",
+    "The price of a stock at the end of the previous trading day.",
+  "Volume": "The number of shares traded during a specific period.",
+  "Shares Outstanding": "The number of shares that a company has issued.",
+  "Market Cap": "The total value of a company's outstanding shares.",
+  "Day High": "The highest price of a stock during a trading day.",
+  "Day Low": "The lowest price of a stock during a trading day.",
   "Dividend Yield": "The annual dividend payment divided by the stock's price.",
-  "Forward PE": "The price Of a stock divided by its earnings per share.",
+  "Forward PE": "The price of a stock divided by its earnings per share.",
   "Dividend Rate": "The annual dividend payment.",
   "Mkt-RF": "The excess return of the market over the risk-free rate.",
-  "Mkt-RF P-Value": "The probability Of observing a value as extreme or more extreme than the observed value by chance, assuming the null hypothesis is true. A p-value Of 0.05 or less is considered statistically significant.",
-  "Adj. R-Squared": "The percentage Of a portfolio's excess returns that can be explained by the returns Of the Mkt-RF factor. A value Of 1.0 indicates perfect correlation, 0.0 indicates no correlation, And negative values indicate an inverse correlation.",
-  "F-statistic": "A measure Of the overall significance Of the regression model.",
-  "Prob (F-statistic)": "The probability Of observing an F-statistic as extreme or more extreme than the observed value by chance, assuming the null hypothesis is true. A p-value Of 0.05 or less is considered statistically significant.",
-  "Covariance Type": "The type Of covariance used In the regression model.",
+  "Mkt-RF P-Value": "The probability of observing a value as extreme or more extreme than the observed value by chance, assuming the null hypothesis is true. A p-value of 0.05 or less is considered statistically significant.",
+  "Adj. R-Squared": "The percentage of a portfolio's excess returns that can be explained by the returns of the Mkt-RF factor. A value off 1.0 indicates perfect correlation, 0.0 indicates no correlation, And negative values indicate an inverse correlation.",
+  "F-statistic": "A measure of the overall significance of the regression model.",
+  "Prob (F-statistic)": "The probability of observing an F-statistic as extreme or more extreme than the observed value by chance, assuming the null hypothesis is true. A p-value of 0.05 or less is considered statistically significant.",
+  "Covariance Type": "The type of covariance used In the regression model.",
   "No. Observations": "The number of observations used In the regression model.",
-  "AIC": "Akaike Information Criterion; a measure Of the relative quality Of a statistical model.",
-  "BIC": "Bayesian Information Criterion; a measure Of the relative quality Of a statistical model.",
-  "Log-Likelihood": "The log-likelihood Of the regression model.",
-  "R-squared": "The percentage Of a portfolio's excess returns that can be explained by the returns Of the SMB And HML factors. A value Of 1.0 indicates perfect correlation, 0.0 indicates no correlation, And negative values indicate an inverse correlation.",
+  "AIC": "Akaike Information Criterion; a measure of the relative quality of a statistical model.",
+  "BIC": "Bayesian Information Criterion; a measure of the relative quality of a statistical model.",
+  "Log-Likelihood": "The log-likelihood of the regression model.",
+  "R-squared": "The percentage of a portfolio's excess returns that can be explained by the returns of the SMB And HML factors. A value of 1.0 indicates perfect correlation, 0.0 indicates no correlation, And negative values indicate an inverse correlation.",
   "Method": "The method used to calculate the regression model. Least Squares is the most common method.",
-  "Model": "The type Of regression model used. OLS is Ordinary Least Squares and it is the most common type of regression model.",
+  "Model": "The type of regression model used. OLS is Ordinary Least Squares and it is the most common type of regression model.",
   "Df Residuals": "The degrees of freedom of the residuals.",
   "Df Model": "The degrees of freedom of the model.",
 }

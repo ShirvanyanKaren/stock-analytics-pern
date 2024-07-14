@@ -5,10 +5,8 @@ import decode from "jwt-decode";
 
 export const fetchWatchlists = async (setWatchlists, setCurrentWatchlist, setWatchlistStocks, setWatchlistId, dispatch) => {
     const checkForWatchLists = await idbPromise("watchlist", "get");
-    
     let watchListObjects = {};
     let currentName, watchlistNames, watchlistId;
-  
     if (checkForWatchLists.length > 0) { 
         console.log("checkForWatchLists");
         watchlistNames = checkForWatchLists.map(watchlist => watchlist.watchlist_name);
@@ -26,14 +24,17 @@ export const fetchWatchlists = async (setWatchlists, setCurrentWatchlist, setWat
         const decoded = decode(token);
         const userId = decoded?.data.id;
         const userWatchlists = await getWatchlists(userId);
+        console.log(userWatchlists, "userWatchlists");
         watchlistNames = Object.keys(userWatchlists);
         currentName = watchlistNames[0];
         watchlistId = userWatchlists[currentName].id;
-  
+    
         for (let i = 0; i < watchlistNames.length; i++) {
+            const metrics = userWatchlists[watchlistNames[i]].metrics;
             const watchListItems = userWatchlists[watchlistNames[i]].watches;
-            const watchListArray = watchListItems.length ? await getStockOverview(watchListItems) : [];
+            const watchListArray = watchListItems.length ? await getStockOverview(watchListItems, metrics) : [];
             watchListObjects[watchlistNames[i]] = watchListArray;
+            console.log(watchListArray, "watchListArray");
             idbPromise("watchlist", "put", { watchlist: watchListArray, watchlist_name: watchlistNames[i], watchlist_id: userWatchlists[watchlistNames[i]].id });
         }
     }

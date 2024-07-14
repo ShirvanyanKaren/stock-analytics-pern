@@ -2,6 +2,8 @@ import React from 'react';
 import { styled } from '@mui/material/styles';
 import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import { returnInfo } from '../utils/helpers';
 
 const ToolTip = (props) => {
@@ -34,7 +36,15 @@ const ToolTip = (props) => {
             {props.text ? (
                 <span className='float-end fw-bold stock-details-info'>{`${props.info}: ${props.text}`}</span>
             ) : (
-                <span>{props.info}</span>
+                <span>
+                 <span 
+                    className='me-1'
+                    style={{ width: '10px', height: '10px', cursor: 'pointer'}}
+                    >
+                        <FontAwesomeIcon icon={faQuestionCircle} />
+                    </span>
+                    {props.info}
+                </span>
             )}
         </HtmlTooltip>
     );

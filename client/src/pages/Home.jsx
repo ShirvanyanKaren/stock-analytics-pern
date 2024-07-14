@@ -7,40 +7,11 @@ import Auth from '../utils/auth';
 import decode from 'jwt-decode';
 
 const Home = () => {
-  const [decodedToken, setToken] = useState('');
-  const [loading, setLoading] = useState(true);
-  const CheckStockWeights = useSelector((state) => state.stockWeights);
-  const dispatch = useDispatch();
 
-  const checkLoginPortfolios = async () => {
-    const decoded = Auth.loggedIn() ? Auth.getProfile() : '';
-    console.log('decoded:', decoded);
-    if (Object.keys(CheckStockWeights).length > 0) return;
-    try {
-      const user_id = decoded.data.id;
-      const portfolio = await getPortfolio(user_id);
-      const stocks = portfolio.stocks;
-      await idbPromise('stockWeights', 'put', {
-        ...stocks,
-        portfolio_id: portfolio.id
-      });
-
-      dispatch({
-        type: SET_STOCK_WEIGHTS,
-        payload: stocks
-      });
-    } catch (error) {
-      console.error('Error fetching portfolio:', error);
-    }
-  };
-
-  useEffect(() => {
-    checkLoginPortfolios().finally(() => setLoading(false));
-  }, []);
 
   return (
     <div className="container">
-      {loading && Auth.loggedIn() ? (
+      {/* {loading && Auth.loggedIn() ? (
         <div className="container row justify-content-center">
           <div className="spinner-border" role="status">
             <span className="visually-hidden">Loading...</span>
@@ -49,7 +20,7 @@ const Home = () => {
             <h1>Setting everything up. This will only take a moment</h1>
           </div>
         </div>
-      ) : (
+      ) : ( */}
         <>
           <section className="hero">
             <div className="hero-content">
@@ -80,7 +51,7 @@ const Home = () => {
             <button type="submit" className="button-2">Subscribe</button>
           </section>
         </>
-      )}
+      {/* )} */}
     </div>
   );
 };

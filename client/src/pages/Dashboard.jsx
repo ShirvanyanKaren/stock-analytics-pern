@@ -4,6 +4,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Dropdown, DropdownButton, Button, Modal } from 'react-bootstrap';
 import { idbPromise } from '../utils/helpers';
 import { fetchWatchlists, handleAddStock, changeWatchlist, handleCreateWatchlist } from '../utils/hooks';
+import { getPortfolio } from '../services/portfolios';
+import { SET_STOCK_WEIGHTS } from '../utils/actions';
 import SearchBar from '../components/SearchBar';
 import decode from 'jwt-decode';
 import StockCard from '../components/StockCard';
@@ -12,6 +14,7 @@ import '../styles/Dashboard.scss';
 
 const Dashboard = () => {
     const [user, setUser] = useState(Auth?.getProfile()?.data?.username);
+    const CheckStockWeights = useSelector((state) => state.stockWeights);
     const [dashContent, setDashContent] = useState('Watchlist');
     const dashBoardOptions = ['Watchlist', 'Portfolio', 'News'];
     const [watchlists, setWatchlists] = useState(['']);
@@ -33,6 +36,32 @@ const Dashboard = () => {
         setWatchlistName('');
         setError('');
     };
+  
+    const checkLoginPortfolios = async () => {
+      const decoded = Auth.loggedIn() ? Auth.getProfile() : '';
+      console.log('decoded:', decoded);
+      if (Object.keys(CheckStockWeights).length > 0) return;
+      try {
+        const user_id = decoded.data.id;
+        const portfolio = await getPortfolio(user_id);
+        const stocks = portfolio.stocks;
+        await idbPromise('stockWeights', 'put', {
+          ...stocks,
+          portfolio_id: portfolio.id
+        });
+  
+        dispatch({
+          type: SET_STOCK_WEIGHTS,
+          payload: stocks
+        });
+      } catch (error) {
+        console.error('Error fetching portfolio:', error);
+      }
+    };
+  
+    useEffect(() => {
+      checkLoginPortfolios().finally(() => setLoading(false));
+    }, []);
     
     const [watchlistName, setWatchlistName] = useState('');
     const handleClose = () => {
@@ -149,7 +178,11 @@ const Dashboard = () => {
                         </Modal>
                         <div className='watchlist-cards m-2 d-flex justify-content-center'>
                             {watchlistStocks.map((stock, index) => (
-                                <StockCard key={index} stock={stock} />
+                                <StockCard key={index}
+                                 stock={stock} 
+                                 currentWatchlist={currentWatchlist}
+                                
+                                />
                             ))}
                         </div>
                         <Modal show={showCreate} onHide={handleCloseCreate}>

@@ -30,11 +30,6 @@ function App() {
     }
   };
 
-  // const handleWatchlistUpdate = (watchlist, stocks) => {
-  //   setCurrentWatchlist(watchlist);
-  //   setWatchlistStocks(stocks);
-  // };
-
   return (
     <StoreProvider>
       <Provider store={store}>

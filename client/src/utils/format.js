@@ -17,10 +17,11 @@ export const titleCase = (str) => {
     .split(" ")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ")
-    .replace(/([a-z])([A-Z])/g, "$1 $2");
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/([A-Z][^\s]*)/g, " $1");
 };
 
-export const formatNumber = (num, toFixed) => {
+export const formatNumber = (num) => {
   if (num === null || num === undefined) {
     return "----";
   }
@@ -31,7 +32,7 @@ export const formatNumber = (num, toFixed) => {
   } else if (Math.abs(num) > 1000) {
     return (num / 1000).toFixed(2) + " K";
   } else {
-    return typeof num === "number" ? num.toFixed(toFixed) : num;
+    return typeof num === "number" ? num.toFixed(2) : num;
   }
 };
 

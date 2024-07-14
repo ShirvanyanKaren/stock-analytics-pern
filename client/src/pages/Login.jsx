@@ -6,7 +6,10 @@ import { useDispatch } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import axios from 'axios';
 import googleLogo from '../assets/google-icon-logo.svg'
+import xLogo from '../assets/X_icon.svg'
+import xWhiteLogo from '../assets/x-white-icon.png'
 import Auth from "../utils/auth";
 
 const Login = () => {
@@ -117,6 +120,34 @@ const Login = () => {
     }
   };
 
+
+
+  const handleGoogleAuth = async () => {
+    try {
+      const res = await axios.post('http://localhost:3001/api/oauth/google')
+      console.log(res);
+      const data = res.data;
+      window.location.href = data.url;
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  const handleXAuth = async () => {
+    try {
+      const res = await axios.post('http://localhost:3001/api/oauth/twitter')
+      console.log(res);
+      const data = res.data;
+      console.log(data.url);
+      window.location.href = data.url
+    }
+    catch (e) {
+      console.log(e);
+    }
+  }
+
+
+
   return (
     <div className="container mt-5 w-50">
       <div className="card p-4">
@@ -201,10 +232,8 @@ const Login = () => {
               </button>
             </form>
             <button type="submit" 
-            className="btn btn-light w-100 mt-2"
-            onClick={() => {
-              window.location.href = 'http://localhost:3001/api/users/google-auth';
-            }}
+            className="btn btn-light w-100 mt-3"
+            onClick={() => handleGoogleAuth()}
             >
             <span className=''>
                <img 
@@ -213,7 +242,18 @@ const Login = () => {
                 { justifyActive === "login" ? "Login with Google" : "Register with Google" } 
 
             </button>
+            <button type="submit"
+            className="btn btn-dark w-100 mt-3"
+            onClick={() => handleXAuth()}
+            >
+                { justifyActive === "login" ? "Login with" : "Register with" }
+                <span className=''>
+               <img 
+                className="x-logo"
+                src={xWhiteLogo} alt='x logo' /></span>
+            </button>
           </div>
+        
 
         </div>
         {formState.error && (
