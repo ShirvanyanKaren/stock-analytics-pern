@@ -17,6 +17,8 @@ from pydantic import BaseModel
 from dotenv import load_dotenv
 import os
 from openai import OpenAI
+from typing import List
+
 
 load_dotenv()
 
@@ -25,9 +27,18 @@ app = FastAPI()
 class SymbolList(BaseModel):
     symbols: list[str]
 
+#app.add_middleware(
+    #CORSMiddleware,
+   # allow_origins=["*"],
+    #allow_credentials=True,
+    #allow_methods=["*"],
+    #allow_headers=["*"], 
+#)
+
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:3000"],  # Add your React app's URL
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -45,23 +56,34 @@ async def stock_graph(symbol: str, start: str, end: str):
     stock = fetch_stock_graph(symbol, start, end)
     return stock
 
+
+
 @app.get("/financials")
 def all_statements(symbol: str, quarterly: bool):
-    quarterly = 'q' if quarterly else 'a'
-    stock = Ticker(symbol)
-    income = stock.income_statement(quarterly)
-    balance = stock.balance_sheet(quarterly)
-    cash = stock.cash_flow(quarterly)
+    quarterly = 'quarterly' if quarterly else 'yearly'
+    stock = yf.Ticker(symbol)
+    try:
+        if quarterly == 'quarterly':
+            income = stock.quarterly_financials
+            balance = stock.quarterly_balance_sheet
+            cash = stock.quarterly_cashflow
+        else:
+            income = stock.financials
+            balance = stock.balance_sheet
+            cash = stock.cashflow
 
-    income.reset_index(inplace=True)
-    balance.reset_index(inplace=True)
-    cash.reset_index(inplace=True)
+        income.reset_index(inplace=True)
+        balance.reset_index(inplace=True)
+        cash.reset_index(inplace=True)
 
-    return {
-        'income': income.dropna(thresh=len(income.columns) / 2).to_json(orient='records'),
-        'balance': balance.dropna(thresh=len(balance.columns) / 2).to_json(orient='records'),
-        'cash': cash.dropna(thresh=len(cash.columns) / 2).to_json(orient='records')
-    }
+        return {
+            'income': income.dropna(thresh=len(income.columns) / 2).to_json(orient='records'),
+            'balance': balance.dropna(thresh=len(balance.columns) / 2).to_json(orient='records'),
+            'cash': cash.dropna(thresh=len(cash.columns) / 2).to_json(orient='records')
+        }
+    except Exception as e:
+        print(f"Error fetching financial data for {symbol}: {e}")
+        raise HTTPException(status_code=500, detail="Error fetching financial data")
 
 def process_symbol(symbol: str):
     symbol = symbol.upper()
@@ -282,8 +304,22 @@ async def stock_statistics(symbol: str):
 
 
 
+class SymbolList(BaseModel):
+    symbols: List[str]
 
-
+@app.post("/get-financial-metrics")
+def get_financial_metrics(symbols: SymbolList):
+    unique_metrics = set()
+    for symbol in symbols.symbols:
+        ticker = yf.Ticker(symbol)
+        financials = ticker.financials
+        if financials.empty:
+            print(f"No financial data available for {symbol}.")
+            continue
+        most_recent_year = financials.columns[0]
+        metrics = financials[most_recent_year].dropna().index.tolist()
+        unique_metrics.update(metrics)
+    return list(unique_metrics)
 
 if __name__ == "__main__":
     load_dotenv()

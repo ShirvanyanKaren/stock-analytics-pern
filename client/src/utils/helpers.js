@@ -192,18 +192,22 @@ export async function getStockWeightsIdb() {
 }
 
 export async function getCompanyFinancials(stockSymbol, quarterly) {
-  const response = await axios.get(`${pyBackEnd}/financials`, {
-    params: {
-      symbol: stockSymbol,
-      quarterly: quarterly,
-    },
-  });
-  let data = response.data;
-  for (let key in data) {
-    data[key] = JSON.parse(data[key]);
-    data[key].sort((a, b) => new Date(b.asOfDate) - new Date(a.asOfDate));
+  try {
+    const response = await axios.get(`${pyBackEnd}/financials`, {
+      params: {
+        symbol: stockSymbol,
+        quarterly: quarterly,
+      },
+    });
+    let data = response.data;
+    for (let key in data) {
+      data[key] = JSON.parse(data[key]);
+    }
+    return data;
+  } catch (error) {
+    console.error('Error fetching financial data:', error);
+    return null;
   }
-  return data;
 }
 
 export async function getFamaFrenchData(startDate, endDate, stockWeights) {
@@ -636,6 +640,21 @@ export async function getStockOverview(stockSymbols) {
     return null;
   }
 } 
+
+
+
+export async function getFinancialMetrics(symbols) {
+  try {
+    const response = await axios.post(`${pyBackEnd}/get-financial-metrics`, {
+      symbols: symbols,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching financial metrics:', error);
+    return [];
+  }
+}
+
 
 
 export const returnInfo = {
