@@ -203,12 +203,19 @@ export async function getCompanyFinancials(stockSymbol, quarterly) {
     for (let key in data) {
       data[key] = JSON.parse(data[key]);
     }
-    return data;
+    // Combine all financial data into one object for easier access
+    const combinedData = {
+      ...data.income[0],
+      ...data.balance[0],
+      ...data.cash[0]
+    };
+    return combinedData;
   } catch (error) {
     console.error('Error fetching financial data:', error);
     return null;
   }
 }
+
 
 export async function getFamaFrenchData(startDate, endDate, stockWeights) {
   const response = await axios.get(`${pyBackEnd}/famafrench`, {

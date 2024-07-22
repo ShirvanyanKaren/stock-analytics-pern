@@ -58,12 +58,12 @@ async def stock_graph(symbol: str, start: str, end: str):
 
 
 
+
 @app.get("/financials")
 def all_statements(symbol: str, quarterly: bool):
-    quarterly = 'quarterly' if quarterly else 'yearly'
     stock = yf.Ticker(symbol)
     try:
-        if quarterly == 'quarterly':
+        if quarterly:
             income = stock.quarterly_financials
             balance = stock.quarterly_balance_sheet
             cash = stock.quarterly_cashflow
@@ -72,14 +72,25 @@ def all_statements(symbol: str, quarterly: bool):
             balance = stock.balance_sheet
             cash = stock.cashflow
 
+        if income.empty or balance.empty or cash.empty:
+            raise HTTPException(status_code=404, detail="No financial data available")
+
+        # Get the most recent date
+        most_recent_date = max(income.columns[0], balance.columns[0], cash.columns[0])
+
+        # Select only the most recent data
+        income = income[most_recent_date].to_frame().T
+        balance = balance[most_recent_date].to_frame().T
+        cash = cash[most_recent_date].to_frame().T
+
         income.reset_index(inplace=True)
         balance.reset_index(inplace=True)
         cash.reset_index(inplace=True)
 
         return {
-            'income': income.dropna(thresh=len(income.columns) / 2).to_json(orient='records'),
-            'balance': balance.dropna(thresh=len(balance.columns) / 2).to_json(orient='records'),
-            'cash': cash.dropna(thresh=len(cash.columns) / 2).to_json(orient='records')
+            'income': income.to_json(orient='records'),
+            'balance': balance.to_json(orient='records'),
+            'cash': cash.to_json(orient='records')
         }
     except Exception as e:
         print(f"Error fetching financial data for {symbol}: {e}")
@@ -307,17 +318,18 @@ async def stock_statistics(symbol: str):
 class SymbolList(BaseModel):
     symbols: List[str]
 
+
 @app.post("/get-financial-metrics")
 def get_financial_metrics(symbols: SymbolList):
     unique_metrics = set()
     for symbol in symbols.symbols:
         ticker = yf.Ticker(symbol)
-        financials = ticker.financials
+        financials = ticker.quarterly_financials
         if financials.empty:
             print(f"No financial data available for {symbol}.")
             continue
-        most_recent_year = financials.columns[0]
-        metrics = financials[most_recent_year].dropna().index.tolist()
+        most_recent_quarter = financials.columns[0]
+        metrics = financials[most_recent_quarter].dropna().index.tolist()
         unique_metrics.update(metrics)
     return list(unique_metrics)
 

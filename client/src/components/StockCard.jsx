@@ -13,7 +13,8 @@ const StockCard = ({ stock, selectedMetrics }) => {
   useEffect(() => {
     const fetchFinancials = async () => {
       try {
-        const data = await getCompanyFinancials(stock.symbol, false);
+        const data = await getCompanyFinancials(stock.symbol, true); // Use quarterly data
+        console.log('Fetched financial data:', data); // Debugging line to check fetched data
         setFinancials(data);
       } catch (err) {
         console.error('Error fetching financials:', err);
@@ -57,7 +58,7 @@ const StockCard = ({ stock, selectedMetrics }) => {
             </p>
             {selectedMetrics.map((metric, index) => (
               <p key={index}>
-                {metric}: {financials && financials.income && financials.income[0] && financials.income[0][metric] ? financials.income[0][metric] : 'N/A'}
+                {metric}: {financials && financials[metric] ? formatNumber(financials[metric], 2) : 'N/A'}
               </p>
             ))}
           </div>
