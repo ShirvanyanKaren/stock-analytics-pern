@@ -72,9 +72,6 @@ def all_statements(symbol: str, quarterly: bool):
             balance = stock.balance_sheet
             cash = stock.cashflow
 
-        if income.empty or balance.empty or cash.empty:
-            raise HTTPException(status_code=404, detail="No financial data available")
-
         # Get the most recent date
         most_recent_date = max(income.columns[0], balance.columns[0], cash.columns[0])
 
@@ -95,6 +92,7 @@ def all_statements(symbol: str, quarterly: bool):
     except Exception as e:
         print(f"Error fetching financial data for {symbol}: {e}")
         raise HTTPException(status_code=500, detail="Error fetching financial data")
+
 
 def process_symbol(symbol: str):
     symbol = symbol.upper()
@@ -332,6 +330,28 @@ def get_financial_metrics(symbols: SymbolList):
         metrics = financials[most_recent_quarter].dropna().index.tolist()
         unique_metrics.update(metrics)
     return list(unique_metrics)
+
+
+# new function for stockfinancials.jsx component, we used the old one for the metrics
+
+@app.get("/financial_statements")
+def get_financial_statements(symbol: str, quarterly: bool):
+    quarterly = 'q' if quarterly else 'a'
+    stock = Ticker(symbol)
+    income = stock.income_statement(quarterly)
+    balance = stock.balance_sheet(quarterly)
+    cash = stock.cash_flow(quarterly)
+
+    income.reset_index(inplace=True)
+    balance.reset_index(inplace=True)
+    cash.reset_index(inplace=True)
+
+    return {
+        'income': income.dropna(thresh=len(income.columns) / 2).to_json(orient='records'),
+        'balance': balance.dropna(thresh=len(balance.columns) / 2).to_json(orient='records'),
+        'cash': cash.dropna(thresh=len(cash.columns) / 2).to_json(orient='records')
+    }
+
 
 if __name__ == "__main__":
     load_dotenv()

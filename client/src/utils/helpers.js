@@ -217,6 +217,7 @@ export async function getCompanyFinancials(stockSymbol, quarterly) {
 }
 
 
+
 export async function getFamaFrenchData(startDate, endDate, stockWeights) {
   const response = await axios.get(`${pyBackEnd}/famafrench`, {
     params: {
@@ -662,6 +663,22 @@ export async function getFinancialMetrics(symbols) {
   }
 }
 
+// new function for the getfinancialstatement function on main.py for the stockcomponent.jsx
+
+export async function getFinancialStatements(stockSymbol, quarterly) {
+  const response = await axios.get(`${pyBackEnd}/financial_statements`, {
+    params: {
+      symbol: stockSymbol,
+      quarterly: quarterly,
+    },
+  });
+  let data = response.data;
+  for (let key in data) {
+    data[key] = JSON.parse(data[key]);
+    data[key].sort((a, b) => new Date(b.asOfDate) - new Date(a.asOfDate));
+  }
+  return data;
+}
 
 
 export const returnInfo = {

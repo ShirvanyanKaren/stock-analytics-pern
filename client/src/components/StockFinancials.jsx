@@ -1,4 +1,4 @@
-import { getCompanyFinancials, idbPromise } from "../utils/helpers";
+import { getFinancialStatements, idbPromise } from "../utils/helpers";
 import { formatDate, formatNumber, titleCase } from "../utils/format";
 import { useEffect, useState, useCallback } from "react";
 import { useOutletContext } from "react-router-dom";
@@ -24,7 +24,7 @@ const StockFinancials = ({ symbol }) => {
         data = cachedData.data;
       } else {
         await idbPromise("financials", "delete");
-        data = await getCompanyFinancials(symbol, isQuarters);
+        data = await getFinancialStatements(symbol, isQuarters);
         await idbPromise("financials", "put", { symbol, quarters: isQuarters, data });
       }
 
