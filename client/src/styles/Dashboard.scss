@@ -1,5 +1,4 @@
-$primary-color: #f7fafc; /* New top header color */
-$secondary-color: #00bfff; /* New light blue color */
+@import 'variables';
 
 .dashboard {
   .dashboard-options {
@@ -21,5 +20,21 @@ $secondary-color: #00bfff; /* New light blue color */
       justify-content: space-between;
     }
   }
-}
 
+  .create-watchlist-btn,
+  .customize-metrics-btn {
+    background-color: $secondary-color;
+    color: white;
+    font-size: large;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    &:hover {
+      background-color: darken($secondary-color, 10%);
+    }
+    &:disabled {
+      background-color: lighten($secondary-color, 30%);
+      cursor: not-allowed;
+    }
+  }
+}

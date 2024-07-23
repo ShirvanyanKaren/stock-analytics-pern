@@ -1,3 +1,5 @@
+@import 'variables';
+
 .s-card {
   margin: 10px;
   width: 30%;
@@ -14,7 +16,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    .company-logo{
+    .company-logo {
       display: flex;
       justify-content: center;
       align-items: center;
@@ -22,8 +24,6 @@
       height: 150px;
       background-color: #464d51;
       border-radius: 50%;
-      display: flex;
-      justify-content: center;
       img {
         width: 75px;
         height: 75px;
@@ -36,5 +36,14 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+
+    p {
+      &.text-success {
+        color: green;
+      }
+      &.text-danger {
+        color: red;
+      }
+    }
   }
 }

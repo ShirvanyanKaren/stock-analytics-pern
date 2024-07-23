@@ -153,16 +153,6 @@ const Dashboard = () => {
             {option}
           </button>
         ))}
-        <div className='m-1'>
-          <Button variant='primary' onClick={handleShowCreate}>
-            Create Watchlist
-          </Button>
-        </div>
-        <div className='m-1'>
-          <Button variant='primary' onClick={handleShowCustomize}>
-            Customize Metrics
-          </Button>
-        </div>
       </div>
       {dashContent === 'Watchlist' && (
         <>
@@ -197,6 +187,16 @@ const Dashboard = () => {
                 <div className='m-1'>
                   <Button variant='primary' onClick={handleShow}>
                     Add Stock
+                  </Button>
+                </div>
+                <div className='m-1'>
+                  <Button variant='primary' onClick={handleShowCreate}>
+                    Create Watchlist
+                  </Button>
+                </div>
+                <div className='m-1'>
+                  <Button variant='primary' onClick={handleShowCustomize}>
+                    Customize Metrics
                   </Button>
                 </div>
               </div>

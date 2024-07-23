@@ -9,12 +9,12 @@ import { getCompanyFinancials } from '../utils/helpers';
 const StockCard = ({ stock, selectedMetrics }) => {
   const [financials, setFinancials] = useState(null);
   const [error, setError] = useState(null);
+  const [showMore, setShowMore] = useState(false);
 
   useEffect(() => {
     const fetchFinancials = async () => {
       try {
         const data = await getCompanyFinancials(stock.symbol, true); // Use quarterly data
-        console.log('Fetched financial data:', data); // Debugging line to check fetched data
         setFinancials(data);
       } catch (err) {
         console.error('Error fetching financials:', err);
@@ -27,6 +27,24 @@ const StockCard = ({ stock, selectedMetrics }) => {
   if (error) {
     return <div>Error: {error}</div>;
   }
+
+  const renderMetrics = () => {
+    const metricsToShow = showMore ? selectedMetrics : selectedMetrics.slice(0, 4);
+    return metricsToShow.map((metric, index) => {
+      const value = financials ? financials[metric] : 'N/A';
+      let valueClass = '';
+      if (value > 0) {
+        valueClass = 'text-success';
+      } else if (value < 0) {
+        valueClass = 'text-danger';
+      }
+      return (
+        <p key={index}>
+          {metric}: <span className={valueClass}>{financials ? formatNumber(value, 2) : 'N/A'}</span>
+        </p>
+      );
+    });
+  };
 
   return (
     <div className='card s-card'>
@@ -45,28 +63,24 @@ const StockCard = ({ stock, selectedMetrics }) => {
             <p>Price: {stock.price}</p>
             <p>
               Day Change:&nbsp;
-              <span className={stock.priceChange > 0 ? 'text-success' : 'text-danger'}>
+              <span className={stock.priceChange > 0 ? 'text-success' : stock.priceChange < 0 ? 'text-danger' : ''}>
                 {formatNumber(stock.priceChange, 2)}%
               </span>
             </p>
             <p>After Hours Price: {formatNumber(stock.afterHoursPrice, 2)}</p>
             <p>
               After Hours Change:&nbsp;
-              <span className={stock.afterHoursChange > 0 ? 'text-success' : 'text-danger'}>
+              <span className={stock.afterHoursChange > 0 ? 'text-success' : stock.afterHoursChange < 0 ? 'text-danger' : ''}>
                 {formatNumber(stock.afterHoursChange, 3)}%
               </span>
             </p>
-            {selectedMetrics.map((metric, index) => (
-              <p key={index}>
-                {metric}: {financials && financials[metric] ? formatNumber(financials[metric], 2) : 'N/A'}
-              </p>
-            ))}
+            {renderMetrics()}
           </div>
         </div>
       </div>
       <div>
         <div className='d-flex justify-content-center'>
-          <button className='btn btn-light'>
+          <button className='btn btn-light' onClick={() => setShowMore(!showMore)}>
             Show more info
             <span className='ms-1'>
               <FontAwesomeIcon icon={faArrowDownShortWide} />

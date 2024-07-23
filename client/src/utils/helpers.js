@@ -191,6 +191,7 @@ export async function getStockWeightsIdb() {
   return response;
 }
 
+//// this is used for the data processing on dashboard.jsx page and the stockcard.jsx components
 export async function getCompanyFinancials(stockSymbol, quarterly) {
   try {
     const response = await axios.get(`${pyBackEnd}/financials`, {

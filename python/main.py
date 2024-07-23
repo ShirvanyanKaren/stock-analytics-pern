@@ -57,7 +57,7 @@ async def stock_graph(symbol: str, start: str, end: str):
     return stock
 
 
-
+# function for the dashboard page and stockcards components
 
 @app.get("/financials")
 def all_statements(symbol: str, quarterly: bool):
