@@ -18,7 +18,6 @@ function App() {
   const [helpMode, setHelpMode] = useState(false);
   const [popupInfo, setPopupInfo] = useState("");
   const [currentWatchlist, setCurrentWatchlist] = useState(sessionStorage.getItem("currentWatchlist") || "Default Watchlist");
-  // const [watchlistStocks, setWatchlistStocks] = useState(JSON.parse(sessionStorage.getItem(currentWatchlist)) || []);
 
   const toggleHelpMode = () => {
     setHelpMode(!helpMode);
@@ -29,11 +28,6 @@ function App() {
       setPopupInfo(info);
     }
   };
-
-  // const handleWatchlistUpdate = (watchlist, stocks) => {
-  //   setCurrentWatchlist(watchlist);
-  //   setWatchlistStocks(stocks);
-  // };
 
   return (
     <StoreProvider>

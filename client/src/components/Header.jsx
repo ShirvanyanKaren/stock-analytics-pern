@@ -1,4 +1,3 @@
-// src/components/Header.jsx
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
@@ -10,7 +9,7 @@ import Auth from "../utils/auth";
 import SearchBar from "./SearchBar"; 
 import Watchlist from "./Watchlist";
 import Draggable from 'react-draggable'; 
-import '../styles/Watchlist.scss'
+import '../styles/Watchlist.scss';
 
 const Header = () => {
   const [watchListClose, setWatchListClose] = useState(true);
@@ -55,7 +54,9 @@ const Header = () => {
                   <NavDropdown.Item as={Link} to="/linear-regression">Linear Regression</NavDropdown.Item>
                 </NavDropdown>
                 <NavDropdown title="Learning" id="learning-dropdown">
-                  {/* Add relevant links here if needed */}
+                  <NavDropdown.Item as={Link} to="/investment-tutorials">Investment Tutorials</NavDropdown.Item>
+                  <NavDropdown.Item as={Link} to="/blogs-and-articles">Blogs and Articles</NavDropdown.Item>
+                  {/* Add other learning links here if needed */}
                 </NavDropdown>
                 <NavDropdown title="News" id="news-dropdown">
                   {/* Add relevant links here if needed */}
@@ -87,7 +88,7 @@ const Header = () => {
         <Draggable> 
           <div className="watchlist-container">
             <div className="d-flex justify-content-end">
-            <button type="button" className="btn-close btn-close-white" aria-label="Close" onClick={handleWatchlist}></button>
+              <button type="button" className="btn-close btn-close-white" aria-label="Close" onClick={handleWatchlist}></button>
             </div>
             <Watchlist />
           </div>

@@ -10,8 +10,10 @@ import StockLinReg from "./pages/StockLinReg";
 import FamaFrench from "./pages/FamaFrench";
 import Glossary from "./pages/Glossary";
 import Dashboard from "./pages/Dashboard";
-import Auth from "./utils/auth";
 import App from "./App";
+import Blog from "./pages/Blog";
+
+import InvestmentTutorials from "./pages/InvestmentTutorials";
 
 const router = createBrowserRouter([
   {
@@ -19,50 +21,21 @@ const router = createBrowserRouter([
     element: <App />,
     errorElement: <ErrorPage />,
     children: [
-      {
-        index: true,
-        element: Auth.loggedIn() ? <Dashboard /> : <Home />,
-      },
-      {
-        path: "/login",
-        element: <Login />,
-      },
-      {
-        path: "/signup",
-        element: <Login />,
-      },
-      {
-        path: "/stockinfo/:symbol",
-        element: <StockInfo />,
-      },
-      {
-        path: "/linear-regression/:symbol",
-        element: <StockLinReg />,
-      },
-      {
-        path: "/linear-regression",
-        element: <StockLinReg />,
-      },
-      {
-        path: "/famafrench",
-        element: <FamaFrench />,
-      },
-      {
-        path: "/glossary",
-        element: <Glossary />,
-      },
-      {
-        path: "/glossary/:term",
-        element: <Glossary />,
-      },
-      {
-        path: "/stocks/:symbol",
-        element: <StockInfo />,
-      },
-      {
-        path: "/dashboard",
-        element: Auth.loggedIn() ? <Dashboard /> : <Home />,
-      }
+      { index: true, element: <Home /> },
+      { path: "/login", element: <Login /> },
+      { path: "/signup", element: <Login /> },
+      { path: "/stockinfo/:symbol", element: <StockInfo /> },
+      { path: "/stocklinreg/:symbol", element: <StockLinReg /> },
+      { path: "/linear-regression/:symbol", element: <StockLinReg /> }, // Ensure this path matches the path in Header.jsx
+      { path: "/linear-regression/", element: <StockLinReg /> }, // Ensure this path matches the path in Header.jsx
+      { path: "/famafrench", element: <FamaFrench /> },
+      { path: "/glossary", element: <Glossary /> },
+      { path: "/glossary/:term", element: <Glossary /> },
+      { path: "/investment-tutorials", element: <InvestmentTutorials /> },
+      { path: "/dashboard", element: <Dashboard /> },
+      { path: "/portfolio", element: <Home /> }, // Assuming Portfolio points to Home for now
+      { path: "/blogs-and-articles", element: <Blog /> },
+
     ],
   },
 ]);

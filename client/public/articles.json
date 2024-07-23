@@ -1,0 +1,72 @@
+[
+  {
+    "id": 3,
+    "title": "Global Trade Dynamics",
+    "category": "Economics",
+    "summary": "Explore the complexities of global trade.",
+    "content": "Global trade involves the exchange of goods and services across international borders, influenced by trade agreements, tariffs, and global economic policies. Understanding these dynamics is crucial for businesses and investors as they navigate the international market landscape."
+  },
+  {
+    "id": 4,
+    "title": "Inflation and Its Effects",
+    "category": "Economics",
+    "summary": "Understanding inflation and its impact on the economy.",
+    "content": "Inflation is the rate at which the general level of prices for goods and services rises, eroding purchasing power. This article explores how inflation is measured, its causes, and its effect on both personal and national economic health."
+  },
+  {
+    "id": 5,
+    "title": "Fiscal Policies and Their Impact",
+    "category": "Economics",
+    "summary": "An analysis of fiscal policies.",
+    "content": "Fiscal policy involves government spending and taxation to influence the economy. This article examines different types of fiscal policies and their impact on economic growth, employment, and inflation."
+  },
+  {
+    "id": 6,
+    "title": "Monetary Policy Explained",
+    "category": "Finance",
+    "summary": "A guide to understanding monetary policy.",
+    "content": "Monetary policy refers to the actions undertaken by a central bank, such as the Federal Reserve, to control the money supply and interest rates. It is a crucial tool for managing economic stability and growth."
+  },
+  {
+    "id": 7,
+    "title": "The Stock Market: An Overview",
+    "category": "Finance",
+    "summary": "Explore the fundamentals of the stock market.",
+    "content": "This article provides an overview of how the stock market works, including different types of stocks, market indices, and how stocks are traded."
+  },
+  {
+    "id": 8,
+    "title": "Credit Scores and Their Importance",
+    "category": "Finance",
+    "summary": "Understanding the role of credit scores in finance.",
+    "content": "Credit scores are used by lenders to determine the creditworthiness of an individual. This article explains how credit scores are calculated and how they affect your financial opportunities."
+  },
+  {
+    "id": 9,
+    "title": "Investment Strategies for Beginners",
+    "category": "Finance",
+    "summary": "Basic investment strategies for the novice investor.",
+    "content": "This article covers fundamental investment strategies suitable for beginners, including diversified portfolios, risk management, and long-term planning."
+  },
+  {
+    "id": 10,
+    "title": "Understanding Market Trends",
+    "category": "Finance",
+    "summary": "Learn to identify and understand market trends.",
+    "content": "Market trends indicate the general direction in which a market or an asset's price is moving. This article discusses how to identify trends and how they can influence investment decisions."
+  },
+  {
+    "id": 11,
+    "title": "Real Estate Investment Basics",
+    "category": "Finance",
+    "summary": "An introduction to investing in real estate.",
+    "content": "This article introduces the basics of real estate investment, including different types of properties, financing options, and tips for successful investment."
+  },
+  {
+    "id": 12,
+    "title": "Budgeting and Saving Tips",
+    "category": "Finance",
+    "summary": "Practical advice for budgeting and saving.",
+    "content": "Effective budgeting and saving are foundational to financial health. This article provides practical tips and strategies for managing personal finances effectively."
+  }
+]

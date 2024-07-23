@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import CanvasJSReact from "@canvasjs/react-stockcharts";
 import { Dropdown } from "react-bootstrap";
 import { linReg, idbPromise, indexOptions, generateChartOptions } from "../utils/helpers";
@@ -14,7 +14,6 @@ const CanvasJSChart = CanvasJSReact.CanvasJSChart;
 const StockLinReg = () => {
   const { symbol } = useParams();
   const navigate = useNavigate();
-  const location = useLocation();
   const [dataPoints, setDataPoints] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [useWeights, setUseWeights] = useState(false);
