@@ -24,21 +24,21 @@ const router = createBrowserRouter([
       { index: true, element: <Home /> },
       { path: "/login", element: <Login /> },
       { path: "/signup", element: <Login /> },
-      { path: "/stockinfo/:symbol", element: <StockInfo /> },
+      { path: "/stocks/:symbol", element: <StockInfo /> }, // Update this path to match "/stocks/:symbol"
       { path: "/stocklinreg/:symbol", element: <StockLinReg /> },
-      { path: "/linear-regression/:symbol", element: <StockLinReg /> }, // Ensure this path matches the path in Header.jsx
-      { path: "/linear-regression/", element: <StockLinReg /> }, // Ensure this path matches the path in Header.jsx
+      { path: "/linear-regression/:symbol", element: <StockLinReg /> },
+      { path: "/linear-regression/", element: <StockLinReg /> },
       { path: "/famafrench", element: <FamaFrench /> },
       { path: "/glossary", element: <Glossary /> },
       { path: "/glossary/:term", element: <Glossary /> },
       { path: "/investment-tutorials", element: <InvestmentTutorials /> },
       { path: "/dashboard", element: <Dashboard /> },
-      { path: "/portfolio", element: <Home /> }, // Assuming Portfolio points to Home for now
+      { path: "/portfolio", element: <Home /> },
       { path: "/blogs-and-articles", element: <Blog /> },
-
     ],
   },
 ]);
+
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <RouterProvider router={router} />
