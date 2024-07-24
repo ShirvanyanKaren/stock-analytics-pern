@@ -25,6 +25,7 @@ const router = createBrowserRouter([
       { path: "/login", element: <Login /> },
       { path: "/signup", element: <Login /> },
       { path: "/stocks/:symbol", element: <StockInfo /> }, // Update this path to match "/stocks/:symbol"
+      { path: "/stockinfo/:symbol", element: <StockInfo /> }, // Ensure this route is correctly defined
       { path: "/stocklinreg/:symbol", element: <StockLinReg /> },
       { path: "/linear-regression/:symbol", element: <StockLinReg /> },
       { path: "/linear-regression/", element: <StockLinReg /> },
