@@ -12,8 +12,8 @@ import Glossary from "./pages/Glossary";
 import Dashboard from "./pages/Dashboard";
 import App from "./App";
 import Blog from "./pages/Blog";
-
 import InvestmentTutorials from "./pages/InvestmentTutorials";
+import StandardDeviation from "./pages/StandardDeviation"; // Import the StandardDeviation component
 
 const router = createBrowserRouter([
   {
@@ -24,8 +24,8 @@ const router = createBrowserRouter([
       { index: true, element: <Home /> },
       { path: "/login", element: <Login /> },
       { path: "/signup", element: <Login /> },
-      { path: "/stocks/:symbol", element: <StockInfo /> }, // Update this path to match "/stocks/:symbol"
-      { path: "/stockinfo/:symbol", element: <StockInfo /> }, // Ensure this route is correctly defined
+      { path: "/stocks/:symbol", element: <StockInfo /> },
+      { path: "/stockinfo/:symbol", element: <StockInfo /> },
       { path: "/stocklinreg/:symbol", element: <StockLinReg /> },
       { path: "/linear-regression/:symbol", element: <StockLinReg /> },
       { path: "/linear-regression/", element: <StockLinReg /> },
@@ -36,10 +36,10 @@ const router = createBrowserRouter([
       { path: "/dashboard", element: <Dashboard /> },
       { path: "/portfolio", element: <Home /> },
       { path: "/blogs-and-articles", element: <Blog /> },
+      { path: "/standard-deviation", element: <StandardDeviation /> }, // Add the route
     ],
   },
 ]);
-
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <RouterProvider router={router} />

@@ -1,0 +1,61 @@
+/* src/styles/STD.css */
+
+.container {
+    padding: 20px;
+  }
+  
+  .card {
+    margin: 10px 0;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+  
+  .card-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+  
+  .card-table {
+    margin-top: 10px;
+  }
+  
+  .card-image {
+    text-align: center;
+  }
+  
+  .card-image img {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  .carousel-item img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+  }
+  
+  @keyframes fade {
+    from { opacity: 0.4 }
+    to { opacity: 1 }
+  }
+  
+  .carousel-item {
+    animation: fade 0.8s;
+  }
+  
+  .carousel-control-prev,
+  .carousel-control-next {
+    filter: brightness(0) invert(1);
+  }
+  
+  .carousel-control-prev:hover,
+  .carousel-control-next:hover {
+    filter: brightness(0) invert(0.5);
+  }
+  

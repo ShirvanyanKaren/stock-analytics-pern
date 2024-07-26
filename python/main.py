@@ -353,6 +353,162 @@ def get_financial_statements(symbol: str, quarterly: bool):
     }
 
 
+
+
+
+
+import io
+import base64
+import matplotlib.pyplot as plt
+from fastapi import FastAPI, HTTPException
+import yfinance as yf
+import pandas as pd
+import numpy as np
+import scipy.stats as stats
+
+@app.get("/standard-deviation")
+def get_standard_deviation(symbol: str, start_date: str, end_date: str):
+    try:
+        # Fetch data
+        stock_data = yf.download(symbol, start=start_date, end=end_date)
+        
+        # Calculate daily change percentage
+        stock_data['Daily Change %'] = ((stock_data['Close'] - stock_data['Open']) / stock_data['Open']) * 100
+        
+        # Define bins and labels
+        bins = np.arange(-3, 3.5, 0.5).tolist()
+        bin_labels = [f"{bins[i]:.1f}% to {bins[i+1]:.1f}%" for i in range(len(bins)-1)]
+        stock_data['Bin'] = pd.cut(stock_data['Daily Change %'], bins=bins, labels=bin_labels, include_lowest=True)
+
+        # Create frequency table
+        frequency_table = pd.DataFrame({
+            'Bins': stock_data['Bin'].value_counts(sort=False).index.categories,
+            'Qty': stock_data['Bin'].value_counts(sort=False).values
+        })
+        frequency_table['Qty%'] = (frequency_table['Qty'] / frequency_table['Qty'].sum()) * 100
+        frequency_table['Cum%'] = frequency_table['Qty%'].cumsum()
+        frequency_table.sort_values(by='Bins', inplace=True)
+        frequency_table['Qty%'] = frequency_table['Qty%'].map('{:.2f}%'.format)
+        frequency_table['Cum%'] = frequency_table['Cum%'].map('{:.2f}%'.format)
+
+        # Create statistics table
+        stats_data = {
+            'Up Days': ((stock_data['Close'] > stock_data['Open']).sum(), f"{stock_data[stock_data['Close'] > stock_data['Open']]['Daily Change %'].max():.2f}%"),
+            'Down Days': ((stock_data['Close'] < stock_data['Open']).sum(), f"{stock_data[stock_data['Close'] < stock_data['Open']]['Daily Change %'].min():.2f}%"),
+            'Average': (stock_data['Daily Change %'].mean(),),
+            'ST DEV': (stock_data['Daily Change %'].std(),),
+            'Variance': (stock_data['Daily Change %'].var(),),
+            'Max': (stock_data['Daily Change %'].max(),),
+            'Min': (stock_data['Daily Change %'].min(),)
+        }
+        stats_df = pd.DataFrame(stats_data, index=['Value', 'Percent' if 'Percent' in stats_data else '']).T
+        stats_df['Value'] = stats_df['Value'].astype(float).map('{:.2f}'.format)
+        stats_df = stats_df.reset_index().rename(columns={'index': 'Statistic'})
+
+        # Calculate price differences for standard deviation analysis
+        stock_data['Daily_Price_Difference'] = stock_data['Close'] - stock_data['Open']
+        stock_data['Weekly_Price_Difference'] = stock_data['Close'] - stock_data['Open'].shift(4)
+        stock_data['Monthly_Price_Difference'] = stock_data['Close'] - stock_data['Open'].shift(19)
+
+        # Calculate standard deviations
+        daily_std = np.std(stock_data['Daily_Price_Difference'])
+        weekly_std = np.std(stock_data['Weekly_Price_Difference'].dropna())
+        monthly_std = np.std(stock_data['Monthly_Price_Difference'].dropna())
+
+        current_stock_price = stock_data['Close'].iloc[-1]
+
+        # Create price table
+        prices_data = {
+            'Frequency': ['Daily', 'Weekly', 'Monthly'],
+            '1st Std Deviation (-)': [current_stock_price - daily_std, current_stock_price - weekly_std, current_stock_price - monthly_std],
+            '1st Std Deviation (+)': [current_stock_price + daily_std, current_stock_price + weekly_std, current_stock_price + monthly_std],
+            '2nd Std Deviation (-)': [current_stock_price - 2 * daily_std, current_stock_price - 2 * weekly_std, current_stock_price - 2 * monthly_std],
+            '2nd Std Deviation (+)': [current_stock_price + 2 * daily_std, current_stock_price + 2 * weekly_std, current_stock_price + 2 * monthly_std],
+            '3rd Std Deviation (-)': [current_stock_price - 3 * daily_std, current_stock_price - 3 * weekly_std, current_stock_price - 3 * monthly_std],
+            '3rd Std Deviation (+)': [current_stock_price + 3 * daily_std, current_stock_price + 3 * weekly_std, current_stock_price + 3 * monthly_std]
+        }
+        prices_table = pd.DataFrame(prices_data)
+
+        # Generate plots
+        histogram_plot = generate_histogram_plot(stock_data, symbol)
+        daily_plot = generate_distribution_plot(stock_data['Daily_Price_Difference'], daily_std, 'Daily', symbol)
+        weekly_plot = generate_distribution_plot(stock_data['Weekly_Price_Difference'].dropna(), weekly_std, 'Weekly', symbol)
+        monthly_plot = generate_distribution_plot(stock_data['Monthly_Price_Difference'].dropna(), monthly_std, 'Monthly', symbol)
+        frequency_bar_chart = generate_frequency_bar_chart(frequency_table, symbol)
+
+        return {
+            "frequency_table": frequency_table.to_dict(orient='list'),
+            "stats_df": stats_df.to_dict(orient='list'),
+            "stats": {
+                "daily_std": daily_std,
+                "weekly_std": weekly_std,
+                "monthly_std": monthly_std,
+                "current_price": current_stock_price
+            },
+            "prices_table": prices_table.to_dict(orient='list'),
+            "histogram_plot": histogram_plot,
+            "daily_plot": daily_plot,
+            "weekly_plot": weekly_plot,
+            "monthly_plot": monthly_plot,
+            "frequency_bar_chart": frequency_bar_chart
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+def generate_histogram_plot(stock_data, symbol):
+    plt.switch_backend('Agg')  # Use a non-interactive backend
+    plt.figure(figsize=(10, 6))
+    plt.hist(stock_data['Daily_Price_Difference'], bins=30, color='blue', alpha=0.4, label='Daily')
+    plt.hist(stock_data['Weekly_Price_Difference'].dropna(), bins=30, color='green', alpha=0.4, label='Weekly')
+    plt.hist(stock_data['Monthly_Price_Difference'].dropna(), bins=30, color='red', alpha=0.4, label='Monthly')
+    plt.title(f'{symbol} Price Difference Histograms')
+    plt.xlabel('Price Difference')
+    plt.ylabel('Frequency')
+    plt.legend(loc='upper right')
+    return plot_to_base64(plt)
+
+def generate_distribution_plot(changes, std, label, symbol):
+    plt.switch_backend('Agg')  # Use a non-interactive backend
+    mean_change = changes.mean()
+    plt.figure(figsize=(10, 6))
+    hist_data = plt.hist(changes, bins=30, color='blue', alpha=0.5, density=True, label=f'{label} Price Difference')
+    xmin, xmax = plt.xlim()
+    x = np.linspace(xmin, xmax, 100)
+    p = stats.norm.pdf(x, mean_change, std)
+    plt.plot(x, p, 'k', linewidth=2, label='Normal Distribution Fit')
+    plt.title(f'Normal Distribution Fit for {label} Price Differences of {symbol}')
+    plt.xlabel(f'{label} Price Difference')
+    plt.ylabel('Density')
+    plt.axvline(mean_change, color='red', linestyle='dashed', linewidth=2, label='Mean')
+    plt.axvline(mean_change + std, color='green', linestyle='dashed', linewidth=2, label='+1 STD')
+    plt.axvline(mean_change - std, color='green', linestyle='dashed', linewidth=2, label='-1 STD')
+    plt.axvline(mean_change + 2 * std, color='yellow', linestyle='dashed', linewidth=2, label='+2 STD')
+    plt.axvline(mean_change - 2 * std, color='yellow', linestyle='dashed', linewidth=2, label='-2 STD')
+    plt.axvline(mean_change + 3 * std, color='orange', linestyle='dashed', linewidth=2, label='+3 STD')
+    plt.axvline(mean_change - 3 * std, color='orange', linestyle='dashed', linewidth=2, label='-3 STD')
+    plt.legend()
+    return plot_to_base64(plt)
+
+def generate_frequency_bar_chart(frequency_table, symbol):
+    plt.switch_backend('Agg')  # Use a non-interactive backend
+    plt.figure(figsize=(12, 8))
+    plt.barh(np.arange(len(frequency_table)), frequency_table['Qty'], color='blue', edgecolor='black')
+    plt.xlabel('Frequency')
+    plt.ylabel('Daily Change in %')
+    plt.title(f'Daily Change in Percentage from Open to Close, past 6 months - {symbol}')
+    plt.yticks(ticks=np.arange(len(frequency_table)), labels=frequency_table['Bins'])
+    plt.gca().invert_yaxis()
+    plt.grid(axis='x', linestyle='--', alpha=0.7)
+    plt.tight_layout()
+    return plot_to_base64(plt)
+
+def plot_to_base64(plt):
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    plt.close()
+    buf.seek(0)
+    return base64.b64encode(buf.getvalue()).decode('utf-8')
+
 if __name__ == "__main__":
     load_dotenv()
     PORT = int(os.getenv("PORT", 8000))

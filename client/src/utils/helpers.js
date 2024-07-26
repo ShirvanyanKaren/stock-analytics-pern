@@ -30,7 +30,19 @@ export async function fetchStockStatistics(symbol) {
 
 
 
-
+//new analysis tool fucntion
+// In helpers.js, add this function
+export const getStandardDeviation = async (symbol, startDate, endDate) => {
+  try {
+    const response = await axios.get(`${pyBackEnd}/standard-deviation`, {
+      params: { symbol, start_date: startDate, end_date: endDate }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching standard deviation data:', error);
+    throw error;
+  }
+};
 
 
 
