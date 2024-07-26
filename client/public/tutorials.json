@@ -1,77 +1,129 @@
 [
-    {
-      "id": 1,
-      "title": "Investing in Stocks",
-      "category": "Stocks",
-      "summary": "This tutorial provides a foundational understanding of stock investing, exploring what stocks are, how the stock market works, and the various types of stocks available for investment.",
-      "content": {
-        "sections": [
-          {
-            "header": "Introduction",
-            "content": "<p>Stocks represent ownership in a company. When you buy a stock, you become a part-owner of that company. This guide will help you understand the basic concepts of stock investing, including the mechanics of the stock market and the different types of stocks.</p>"
-          },
-          {
-            "header": "What are Stocks?",
-            "content": "<p><strong>Stocks</strong>, also known as shares, are units of ownership in a corporation. When you purchase a stock, you are buying a piece of the company’s assets and earnings.</p><p><em>Easy Definition:</em> Imagine owning a part of your favorite store or brand; that's what buying a stock feels like.</p>"
-          },
-          {
-            "header": "How the Stock Market Works",
-            "content": "<p>The stock market is a platform where investors buy and sell shares of companies. It functions through a network of exchanges, like the New York Stock Exchange (NYSE) or Nasdaq.</p><p><strong>Price Movements:</strong> Stock prices change based on supply and demand. Prices rise when more people want to buy a stock than sell it, and fall when more people want to sell than buy.</p>"
-          },
-          {
-            "header": "Types of Stocks",
-            "content": "<ul><li><strong>Common Stocks:</strong> These give shareholders voting rights but with variable dividends.</li><li><strong>Preferred Stocks:</strong> Provide no voting rights but offer fixed dividends and priority over common stock in asset liquidation.</li><li><strong>Growth Stocks:</strong> Typically do not pay dividends but have high growth potential.</li><li><strong>Value Stocks:</strong> Appear underpriced compared to their fundamentals but are expected to appreciate.</li><li><strong>Dividend Stocks:</strong> Pay regular dividends and are favored by those seeking steady income.</li></ul>"
-          },
-          {
-            "header": "Why Invest in Stocks?",
-            "content": "<p><strong>Capital Appreciation:</strong> Stocks have the potential for significant price appreciation, making them an attractive investment for growing wealth.</p><p><strong>Dividends:</strong> Some stocks provide a steady income through dividends, which are portions of a company's earnings distributed to shareholders.</p><p><strong>Diversification:</strong> Stocks allow investors to diversify their investment portfolios, reducing risk.</p>"
-          },
-          {
-            "header": "Risks and Considerations",
-            "content": "<p><strong>Market Risk:</strong> Stock prices can be highly volatile, influenced by internal company factors or external economic conditions.</p><p><strong>Liquidity Risk:</strong> Some stocks may be harder to sell quickly at a fair price.</p><p><strong>Interest Rate Risk:</strong> Generally, stock prices are inversely related to interest rate changes.</p>"
-          },
-          {
-            "header": "Conclusion: Building a Stock Portfolio",
-            "content": "<p>Investing in stocks is a fundamental strategy for anyone looking to build a diversified investment portfolio. By understanding different stock types and market dynamics, investors can better navigate the complexities of the market and make informed decisions. This foundation is crucial before moving into more sophisticated areas like options trading.</p>"
-          }
-        ],
-        "minimizable": true
-      }
-    },
-    {
-      "id": 2,
-      "title": "Introduction to Options Trading",
-      "category": "Options",
-      "summary": "Building on our last article about investing in stocks, this tutorial delves into options, a versatile financial derivative. We’ll explore the mechanics of options trading, including calls, puts, expirations, the Greeks, and various trading strategies. Our goal is to help you understand the significance of options in broader investment strategies and how they differ from traditional stock investing.",
-      "content": {
-        "sections": [
-          {
-            "header": "Introduction",
-            "content": "<p>After mastering the basics of stock investing, options trading is the next step for diversifying your investment techniques. Options are not just about buying and selling stocks at advantageous prices but also about strategic flexibility and risk management.</p>"
-          },
-          {
-            "header": "Calls and Puts",
-            "content": "<p><strong>Call Options:</strong> A call option gives you the right, not the obligation, to buy a stock at a predetermined price (strike price) within a certain time frame. It’s like securing a price today for a purchase you might make tomorrow. <em>Easy Definition:</em> If you believe a stock's price will rise, buying a call option lets you buy it cheaper later.</p><p><strong>Put Options:</strong> A put option gives you the right, not the obligation, to sell a stock at a predetermined price before the option expires. It’s akin to having an insurance policy against a stock price fall. <em>Easy Definition:</em> If you think a stock's price will fall, buying a put option lets you sell it at a higher price later.</p>"
-          },
-          {
-            "header": "Expirations",
-            "content": "<p>Every option has an expiration date, which is the last day you can exercise your option. The time until expiration is a critical factor in the pricing of options, as it affects the probability of the option ending in profit. While we briefly touch on the concept of 'Theta,' which represents time decay in option pricing, the focus here is on how different expiration periods can suit various trading strategies.</p>"
-          },
-          {
-            "header": "The Greeks and Factors Affecting Option Prices",
-            "content": "<p>The Greeks: These are measures that describe different dimensions of risk in an options contract:</p><ul><li><strong>Delta:</strong> Shows how much an option's price is expected to move per a one-point change in the underlying asset.</li><li><strong>Gamma:</strong> Measures the rate of change in Delta and affects the stability of an option’s price.</li><li><strong>Vega:</strong> Indicates how much the price of an option changes with a 1% change in implied volatility.</li><li><strong>Rho:</strong> Measures the sensitivity of an option's price to a change in interest rates.</li></ul><p><strong>Volatility Index (VIX):</strong> Often known as the 'fear gauge,' it measures the market's expectation of volatility and significantly impacts option pricing.</p>"
-          },
-          {
-            "header": "Trading Strategies",
-            "content": "<ul><li><strong>Covered Call:</strong> This strategy involves holding a long position in a stock and selling a call option on the same stock to generate income from the option premium.</li><li><strong>Protective Put:</strong> Buying puts to guard against a decline in the stock price of assets you own.</li><li><strong>Bull Call Spread:</strong> Using two call options to capture profit in a moderately rising market.</li><li><strong>Bear Put Spread:</strong> A strategy that involves buying a put and selling another put at a lower strike price to benefit from a moderately falling market.</li></ul>"
-          },
-          {
-            "header": "Conclusion: Value Investing vs. Trading",
-            "content": "<p>Understanding options deepens your toolbox as an investor, allowing for sophisticated strategies beyond traditional stock buying. Distinguishing between value investing and trading is crucial:</p><p><strong>Value Investing:</strong> Focuses on long-term potential, buying stocks perceived to be underpriced.</p><p><strong>Trading:</strong> Often short-term, aiming to profit from market movements and volatility.</p><p>Both paths require different mindsets and strategies, but a well-rounded investor can appreciate and utilize both approaches to maximize their portfolio's potential.</p>"
-          }
-        ],
-        "minimizable": true
-      }
+  {
+    "id": 1,
+    "title": "Investing in Stocks",
+    "category": "Stocks",
+    "summary": "This tutorial provides a foundational understanding of stock investing, exploring what stocks are, how the stock market works, and the various types of stocks available for investment.",
+    "content": {
+      "sections": [
+        {
+          "header": "Introduction",
+          "content": "<p>Stocks represent ownership in a company. When you buy a stock, you become a part-owner of that company. This guide will help you understand the basic concepts of stock investing, including the mechanics of the stock market and the different types of stocks.</p>"
+        },
+        {
+          "header": "What are Stocks?",
+          "content": "<p><strong>Stocks</strong>, also known as shares, are units of ownership in a corporation. When you purchase a stock, you are buying a piece of the company’s assets and earnings.</p><p><em>Easy Definition:</em> Imagine owning a part of your favorite store or brand; that's what buying a stock feels like.</p>"
+        },
+        {
+          "header": "How the Stock Market Works",
+          "content": "<p>The stock market is a platform where investors buy and sell shares of companies. It functions through a network of exchanges, like the New York Stock Exchange (NYSE) or Nasdaq.</p><p><strong>Price Movements:</strong> Stock prices change based on supply and demand. Prices rise when more people want to buy a stock than sell it, and fall when more people want to sell than buy.</p>"
+        },
+        {
+          "header": "Types of Stocks",
+          "content": "<ul><li><strong>Common Stocks:</strong> These give shareholders voting rights but with variable dividends.</li><li><strong>Preferred Stocks:</strong> Provide no voting rights but offer fixed dividends and priority over common stock in asset liquidation.</li><li><strong>Growth Stocks:</strong> Typically do not pay dividends but have high growth potential.</li><li><strong>Value Stocks:</strong> Appear underpriced compared to their fundamentals but are expected to appreciate.</li><li><strong>Dividend Stocks:</strong> Pay regular dividends and are favored by those seeking steady income.</li></ul>"
+        },
+        {
+          "header": "Why Invest in Stocks?",
+          "content": "<p><strong>Capital Appreciation:</strong> Stocks have the potential for significant price appreciation, making them an attractive investment for growing wealth.</p><p><strong>Dividends:</strong> Some stocks provide a steady income through dividends, which are portions of a company's earnings distributed to shareholders.</p><p><strong>Diversification:</strong> Stocks allow investors to diversify their investment portfolios, reducing risk.</p>"
+        },
+        {
+          "header": "Risks and Considerations",
+          "content": "<p><strong>Market Risk:</strong> Stock prices can be highly volatile, influenced by internal company factors or external economic conditions.</p><p><strong>Liquidity Risk:</strong> Some stocks may be harder to sell quickly at a fair price.</p><p><strong>Interest Rate Risk:</strong> Generally, stock prices are inversely related to interest rate changes.</p>"
+        },
+        {
+          "header": "Conclusion: Building a Stock Portfolio",
+          "content": "<p>Investing in stocks is a fundamental strategy for anyone looking to build a diversified investment portfolio. By understanding different stock types and market dynamics, investors can better navigate the complexities of the market and make informed decisions. This foundation is crucial before moving into more sophisticated areas like options trading.</p>"
+        }
+      ],
+      "minimizable": true
     }
-  ]
-  
+  },
+  {
+    "id": 2,
+    "title": "How to know if a Stock is a good investment?",
+    "category": "Stocks",
+    "summary": "This tutorial provides a brief summary on what it takes to know if a stock is a good investment.",
+    "content": {
+      "sections": [
+        {
+          "header": "Introduction",
+          "content": "<p> The short answer is there is no “quick” answer to this question due to the fact that everyone has different preferences when investing. This guide will help you understand the basics on what it takes to begin the correct stocks that fit your investment style.</p>"
+        },
+        {
+          "header": "Why are Investing Styles Important?",
+          "content": "<p> The Stock Market is very intimidating, not only is it fast and stops for no one, there is also real risk and a plethora of data and information to digest. Instead of focusing on digesting all the data/ information you see, why not just focus on the data you NEED for YOUR investing style? Focusing only on the data/ information you need helps you cut out most of the ““noise””. The “”noise”” is a term used to refer to the tsunami wave of data/information you see when you open up a typical stock app or website. The “”noise”” can be any random data or information that is not relevant to your current investment strategy, the noise is what makes us feel overwhelmed when doing investment research.  </p>"
+        },
+          {
+            "header": "The Types of Investors",
+            "content": "<p>In the world of investing, there are many different styles or types of investors, each with unique approaches and data needs. First, we have 'value investors' who focus on stocks they believe are undervalued compared to their actual worth. They rely heavily on financial ratios like price-to-earnings (P/E) and price-to-book (P/B) ratios. Next, there are 'growth investors,' who seek companies with strong potential for future growth, often paying attention to revenue growth rates and industry expansion potential.'Income investors' prioritize steady income, typically through dividends, and are interested in dividend yield and stability. 'Momentum investors' look for stocks with upward price trends and often use technical analysis tools like moving averages and relative strength indicators. Lastly, 'contrarian investors' go against market trends, looking for opportunities in stocks that have been undervalued by market sentiment. Each style has its own set of key data points that guide their investment decisions, allowing them to focus on the most relevant information and filter out the rest. Remembering what type of investor you are and your goals is vital to not making easily avoided mistakes. For example, if you consider yourself a long term / value investor then your trades will last a lot longer than a momentum trader, but if you decide to invest like a momentum trader with the goals of a long term investor, you may not be ready / expecting the stock market moves that come along with momentum trading.</p>"
+          },
+          {
+            "header": "Essential Research Areas for Every Investor",
+            "content": "<p>Every seasoned investor understands the importance of continuous education and research across various fields to stay updated and make informed decisions. Key areas include:</p><ul><li><strong>Financial Accounting:</strong> Helps investors understand the financial health and performance of a company.</li><li><strong>Managerial Accounting:</strong> Provides insight into the day-to-day financial operations of a company.</li><li><strong>Macro Economics:</strong> Offers a broad view of economic conditions and trends that affect all sectors.</li><li><strong>Micro Economics:</strong> Focuses on individual markets and sectors, revealing supply and demand dynamics.</li><li><strong>Business Law:</strong> Essential for understanding the regulatory environment affecting investments.</li><li><strong>World and Domestic News:</strong> Keeps investors aware of global events that could impact markets.</li><li><strong>Statistics from the Equity Itself:</strong> Specific data like historical performance, volatility, and market presence.</li><li><strong>Corporate Finance:</strong> Critical for assessing investment risks and opportunities in various companies.</li></ul><p>While some momentum traders may focus narrowly on technical analysis and specific metrics, their approach can be severely limited by a lack of broader knowledge that influences equity movements. In contrast, well-rounded investors who engage in diverse areas of study are often better equipped to navigate the complexities of the market.</p>"
+          },
+          {
+            "header": "Focusing on Your Investment Style to Avoid Noise",
+            "content": "<p>Mastering your investment style is crucial in efficiently navigating the vast ocean of information available to investors. By understanding and adhering to your specific style, you can effectively filter out the 'noise'—the irrelevant data that does not align with your investment strategy. Noise can manifest as random, unstructured data or information that might seem urgent or important but does not impact your investment decisions.</p><p>For instance, a value investor may disregard short-term market fluctuations that are irrelevant to long-term fundamental valuations. Similarly, a dividend-focused investor might ignore high-growth tech stocks that do not offer dividends. By concentrating on metrics and developments pertinent to your style, you not only enhance your strategic focus but also conserve time and reduce the risk of information overload. This targeted approach allows you to optimize your research and decision-making processes, leading to more informed and potentially more profitable investment choices.</p>"
+          },
+          
+        {
+          "header": "Why Invest in Stocks?",
+          "content": "<p><strong>Capital Appreciation:</strong> Stocks have the potential for significant price appreciation, making them an attractive investment for growing wealth.</p><p><strong>Dividends:</strong> Some stocks provide a steady income through dividends, which are portions of a company's earnings distributed to shareholders.</p><p><strong>Diversification:</strong> Stocks allow investors to diversify their investment portfolios, reducing risk.</p>"
+        },
+        {
+          "header": "Risks and Considerations",
+          "content": "<p><strong>Market Risk:</strong> Stock prices can be highly volatile, influenced by internal company factors or external economic conditions.</p><p><strong>Liquidity Risk:</strong> Some stocks may be harder to sell quickly at a fair price.</p><p><strong>Interest Rate Risk:</strong> Generally, stock prices are inversely related to interest rate changes.</p>"
+        },
+        {
+          "header": "Conclusion: Building a Stock Portfolio",
+          "content": "<p>Investing in stocks is a fundamental strategy for anyone looking to build a diversified investment portfolio. By understanding different stock types and market dynamics, investors can better navigate the complexities of the market and make informed decisions. This foundation is crucial before moving into more sophisticated areas like options trading.</p>"
+        }
+      ],
+      "minimizable": true
+    }
+  },
+  {
+    "id": 3,
+    "title": "Introduction to Options Trading",
+    "category": "Options",
+    "summary": "Building on our last article about investing in stocks, this tutorial delves into options, a versatile financial derivative. We’ll explore the mechanics of options trading, including calls, puts, expirations, the Greeks, and various trading strategies. Our goal is to help you understand the significance of options in broader investment strategies and how they differ from traditional stock investing.",
+    "content": {
+      "sections": [
+        {
+          "header": "Introduction",
+          "content": "<p>After mastering the basics of stock investing, options trading is the next step for diversifying your investment techniques. Options are not just about buying and selling stocks at advantageous prices but also about strategic flexibility and risk management.</p>"
+        },
+        {
+          "header": "Calls and Puts",
+          "content": "<p><strong>Call Options:</strong> A call option gives you the right, not the obligation, to buy a stock at a predetermined price (strike price) within a certain time frame. It’s like securing a price today for a purchase you might make tomorrow. <em>Easy Definition:</em> If you believe a stock's price will rise, buying a call option lets you buy it cheaper later.</p><p><strong>Put Options:</strong> A put option gives you the right, not the obligation, to sell a stock at a predetermined price before the option expires. It’s akin to having an insurance policy against a stock price fall. <em>Easy Definition:</em> If you think a stock's price will fall, buying a put option lets you sell it at a higher price later.</p>"
+        },
+        {
+          "header": "Expirations",
+          "content": "<p>Every option has an expiration date, which is the last day you can exercise your option. The time until expiration is a critical factor in the pricing of options, as it affects the probability of the option ending in profit. While we briefly touch on the concept of 'Theta,' which represents time decay in option pricing, the focus here is on how different expiration periods can suit various trading strategies.</p>"
+        },
+        {
+          "header": "The Greeks and Factors Affecting Option Prices",
+          "content": "<p>The Greeks: These are measures that describe different dimensions of risk in an options contract:</p><ul><li><strong>Delta:</strong> Shows how much an option's price is expected to move per a one-point change in the underlying asset.</li><li><strong>Gamma:</strong> Measures the rate of change in Delta and affects the stability of an option’s price.</li><li><strong>Vega:</strong> Indicates how much the price of an option changes with a 1% change in implied volatility.</li><li><strong>Rho:</strong> Measures the sensitivity of an option's price to a change in interest rates.</li></ul><p><strong>Volatility Index (VIX):</strong> Often known as the 'fear gauge,' it measures the market's expectation of volatility and significantly impacts option pricing.</p>"
+        },
+        {
+          "header": "Trading Strategies",
+          "content": "<ul><li><strong>Covered Call:</strong> This strategy involves holding a long position in a stock and selling a call option on the same stock to generate income from the option premium.</li><li><strong>Protective Put:</strong> Buying puts to guard against a decline in the stock price of assets you own.</li><li><strong>Bull Call Spread:</strong> Using two call options to capture profit in a moderately rising market.</li><li><strong>Bear Put Spread:</strong> A strategy that involves buying a put and selling another put at a lower strike price to benefit from a moderately falling market.</li></ul>"
+        },
+        {
+          "header": "Conclusion: Value Investing vs. Trading",
+          "content": "<p>Understanding options deepens your toolbox as an investor, allowing for sophisticated strategies beyond traditional stock buying. Distinguishing between value investing and trading is crucial:</p><p><strong>Value Investing:</strong> Focuses on long-term potential, buying stocks perceived to be underpriced.</p><p><strong>Trading:</strong> Often short-term, aiming to profit from market movements and volatility.</p><p>Both paths require different mindsets and strategies, but a well-rounded investor can appreciate and utilize both approaches to maximize their portfolio's potential.</p>"
+        }
+      ],
+      "minimizable": true
+    }
+  }
+]
+
+
+
+
+
+
+
+
+
