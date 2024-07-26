@@ -1,23 +1,20 @@
-// src/App.jsx
+import React, { useState } from 'react';
 import { Outlet } from "react-router-dom";
 import { Provider } from "react-redux";
 import { StoreProvider } from "./utils/GlobalState";
 import Header from "./components/Header";
 import HelpButton from "./components/HelpButton";
 import InfoPopup from "./components/InfoPopup";
-import Watchlist from "./components/Watchlist"; // Import the Watchlist component
 import { HighlightProvider } from "./contexts/HighlightContext";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-bootstrap";
 import "animate.css";
 import "./App.scss";
 import store from "./utils/store";
-import { useState } from "react";
 
 function App() {
   const [helpMode, setHelpMode] = useState(false);
   const [popupInfo, setPopupInfo] = useState("");
-  const [currentWatchlist, setCurrentWatchlist] = useState(sessionStorage.getItem("currentWatchlist") || "Default Watchlist");
 
   const toggleHelpMode = () => {
     setHelpMode(!helpMode);

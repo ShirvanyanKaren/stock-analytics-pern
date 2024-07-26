@@ -1,19 +1,19 @@
-// main.jsx
-import "bootstrap/dist/css/bootstrap.min.css";
+import React from 'react';
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import "bootstrap/dist/css/bootstrap.min.css";
+import App from "./App";
 import ErrorPage from "./pages/ErrorPage";
-import StockInfo from "./pages/StockInfo";
-import Login from "./pages/Login";
 import Home from "./pages/Home";
+import Login from "./pages/Login";
+import StockInfo from "./pages/StockInfo";
 import StockLinReg from "./pages/StockLinReg";
 import FamaFrench from "./pages/FamaFrench";
 import Glossary from "./pages/Glossary";
-import Dashboard from "./pages/Dashboard";
-import App from "./App";
-import Blog from "./pages/Blog";
-
 import InvestmentTutorials from "./pages/InvestmentTutorials";
+import Dashboard from "./pages/Dashboard";
+import Blog from "./pages/Blog";
+import ArticlePage from "./pages/ArticlePage";
 
 const router = createBrowserRouter([
   {
@@ -24,8 +24,8 @@ const router = createBrowserRouter([
       { index: true, element: <Home /> },
       { path: "/login", element: <Login /> },
       { path: "/signup", element: <Login /> },
-      { path: "/stocks/:symbol", element: <StockInfo /> }, // Update this path to match "/stocks/:symbol"
-      { path: "/stockinfo/:symbol", element: <StockInfo /> }, // Ensure this route is correctly defined
+      { path: "/stocks/:symbol", element: <StockInfo /> },
+      { path: "/stockinfo/:symbol", element: <StockInfo /> },
       { path: "/stocklinreg/:symbol", element: <StockLinReg /> },
       { path: "/linear-regression/:symbol", element: <StockLinReg /> },
       { path: "/linear-regression/", element: <StockLinReg /> },
@@ -36,11 +36,13 @@ const router = createBrowserRouter([
       { path: "/dashboard", element: <Dashboard /> },
       { path: "/portfolio", element: <Home /> },
       { path: "/blogs-and-articles", element: <Blog /> },
+      { path: "/article/:id", element: <ArticlePage /> }, // Add this line
     ],
   },
 ]);
 
-
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <RouterProvider router={router} />
+  <React.StrictMode>
+    <RouterProvider router={router} />
+  </React.StrictMode>
 );

@@ -1,4 +1,3 @@
-// src/pages/Blog.jsx
 import React from 'react';
 import BlogContainer from '../components/Blogs/BlogContainer';
 
