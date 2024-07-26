@@ -364,8 +364,8 @@ export function generateFinancialsChartOptions(data) {
       },
       buttons: [{
         range: 1,
-        rangeType: "year",
-        label: "5Y"
+        rangeType: "Months",
+        label: "6M"
       }],
       buttonStyle: {
         display: "none"
