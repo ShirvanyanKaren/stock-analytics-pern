@@ -3,13 +3,15 @@
 .dashboard {
   .dashboard-options {
     .btn {
-      background-color: $primary-color;
+      background-color: $third-color;
       font-size: x-large;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      border: 1px solid #ddd;
+      border: 1px solid $border-color;
+      color: $text-color;
       &.active {
         font-weight: bold;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background-color: $secondary-color;
       }
     }
   }
@@ -24,7 +26,7 @@
   .create-watchlist-btn,
   .customize-metrics-btn {
     background-color: $secondary-color;
-    color: white;
+    color: $text-color;
     font-size: large;
     padding: 10px 20px;
     border: none;

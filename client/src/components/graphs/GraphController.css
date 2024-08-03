@@ -1,62 +1,69 @@
 .graph-controller-container {
-    margin: 20px 0;
-    padding: 20px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .graph-controller-container h4 {
-    margin-bottom: 20px;
-  }
-  
-  .graph-controller-container label {
-    display: block;
-    font-weight: bold;
-    margin-top: 10px;
-  }
-  
-  .graph-controller-container input[type="range"] {
-    width: 100%;
-  }
-  
-  .graph-controller-container .form-group {
-    margin-bottom: 20px;
-  }
-  
-  .graph-controller-container .form-check-inline {
-    margin-right: 20px;
-  }
-  
-  .graph-controller-container .form-text {
-    margin-top: 5px;
-  }
-  
-  .bar-container {
-    height: 100px;
-    width: 20px;
-    border: 1px solid #ccc;
-    position: relative;
-    margin: 20px auto;
-  }
-  
-  .bar {
-    width: 100%;
-    position: absolute;
-    bottom: 0;
-  }
-  
-  .strike-price-indicator {
-    position: relative;
-    height: 0;
-    width: 100%;
-  }
-  
-  .strike-price-marker {
-    position: absolute;
-    top: -20px;
-    color: red;
-    font-size: 20px;
-  }
-  
+  margin: 20px 0;
+  padding: 20px;
+  background-color: var(--third-color); /* Updated for night mode */
+  border: 1px solid var(--border-color); /* Updated for night mode */
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  color: var(--text-color); /* Ensure text color is applied */
+}
+
+.graph-controller-container h4 {
+  margin-bottom: 20px;
+  color: var(--text-color); /* Ensure text color is applied */
+}
+
+.graph-controller-container label {
+  display: block;
+  font-weight: bold;
+  margin-top: 10px;
+  color: var(--text-color); /* Ensure text color is applied */
+}
+
+.graph-controller-container input[type="range"] {
+  width: 100%;
+  background-color: var(--primary-color); /* Updated for night mode */
+  color: var(--text-color); /* Ensure text color is applied */
+}
+
+.graph-controller-container .form-group {
+  margin-bottom: 20px;
+}
+
+.graph-controller-container .form-check-inline {
+  margin-right: 20px;
+}
+
+.graph-controller-container .form-text {
+  margin-top: 5px;
+  color: var(--text-color); /* Ensure text color is applied */
+}
+
+.bar-container {
+  height: 100px;
+  width: 20px;
+  border: 1px solid var(--border-color); /* Updated for night mode */
+  position: relative;
+  margin: 20px auto;
+  background-color: var(--third-color); /* Updated for night mode */
+}
+
+.bar {
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  background-color: var(--secondary-color); /* Updated for night mode */
+}
+
+.strike-price-indicator {
+  position: relative;
+  height: 0;
+  width: 100%;
+}
+
+.strike-price-marker {
+  position: absolute;
+  top: -20px;
+  color: red;
+  font-size: 20px;
+}

@@ -1,49 +1,163 @@
-@import 'variables';
+/* stock-info-page.css */
 
-.s-card {
+:root {
+  --primary-color: #23272F;
+  --secondary-color: #149ECA;
+  --third-color: #1C1E21;
+  --text-color: #F6F7F9;
+  --table-header-color: #343A46;
+  --table-cell-bg-color: #2C2F33;
+  --table-cell-text-color: #E6E6E6;
+  --border-color: #343A46;
+}
+
+.stock-info-page {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--primary-color);
+  color: var(--text-color);
+}
+
+.nav-bar-custom {
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.summary-section {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+}
+
+.chart-section {
+  width: 100%;
+  max-width: 1200px;
+  margin: 20px 0;
+}
+
+.overview-section {
+  width: 100%;
+  max-width: 800px;
+  margin: 20px 0;
+  color: var(--text-color) !important; /* Ensure text is visible */
+}
+
+.info-statistics-section {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 20px 0;
+  color: var(--text-color) !important; /* Ensure text is visible */
+}
+
+.info-statistics-section > * {
+  flex: 1;
+  min-width: 300px;
   margin: 10px;
-  width: 30%;
-  box-sizing: border-box;
-  padding: 10px; 
+}
 
-  .card-content {
-    display: flex;
+.financials-section {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  color: var(--text-color) !important; /* Ensure text is visible */
+}
+
+.sticky-card-container {
+  flex: 0 0 300px;
+  margin-right: 20px;
+}
+
+.financials-content {
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.chart-section,
+.details-section,
+.overview-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: var(--third-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+  .summary-section,
+  .financials-section {
+    grid-template-columns: 1fr;
   }
+}
 
-  .company-container {
-    flex: 1; 
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    .company-logo {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 150px;
-      height: 150px;
-      background-color: #464d51;
-      border-radius: 50%;
-      img {
-        width: 75px;
-        height: 75px;
-      }
-    }
-  }
+.stock-overview {
+  padding: 20px;
+  color: var(--text-color) !important; /* Ensure text is visible */
+}
 
-  .stock-info {
-    flex: 1; /* Metrics take up the other half of the card */
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+h2 {
+  margin-bottom: 15px;
+  color: var(--secondary-color);
+}
 
-    p {
-      &.text-success {
-        color: green;
-      }
-      &.text-danger {
-        color: red;
-      }
-    }
-  }
+.stock-volume {
+  margin-top: 20px;
+}
+
+.info {
+  cursor: pointer;
+  padding: 5px 10px;
+  transition: all 0.3s ease;
+}
+
+.info:hover,
+.active-stat {
+  background: var(--secondary-color);
+  color: var(--text-color);
+  border-radius: 4px;
+}
+
+.stock-info-page .nav-bar .btn,
+.linear-reg .nav-bar .btn {
+  margin: 5px;
+  font-size: 1rem;
+}
+
+.stock-info-page .nav-bar .btn.active,
+.linear-reg .nav-bar .btn.active {
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+}
+
+.stock-info-page .nav-bar .btn:not(.active),
+.linear-reg .nav-bar .btn:not(.active) {
+  background-color: var(--third-color);
+  color: var(--text-color);
+}
+
+/* New styles for the table */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  background-color: var(--table-header-color);
+  color: var(--text-color);
+  padding: 10px;
+}
+
+.table td {
+  background-color: var(--table-cell-bg-color);
+  color: var(--table-cell-text-color);
+  padding: 10px;
+  border: 1px solid var(--border-color);
 }

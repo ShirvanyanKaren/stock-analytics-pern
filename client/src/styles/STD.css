@@ -1,61 +1,108 @@
 /* src/styles/STD.css */
 
+:root {
+  --primary-color: #23272F;
+  --secondary-color: #149ECA;
+  --third-color: #1C1E21;
+  --text-color: #F6F7F9;
+  --border-color: #343A46;
+}
+
 .container {
-    padding: 20px;
-  }
-  
-  .card {
-    margin: 10px 0;
-    padding: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  
-  .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-  }
-  
-  .card-title {
-    font-size: 1.5rem;
-    font-weight: bold;
-  }
-  
-  .card-table {
-    margin-top: 10px;
-  }
-  
-  .card-image {
-    text-align: center;
-  }
-  
-  .card-image img {
-    max-width: 100%;
-    height: auto;
-  }
-  
-  .carousel-item img {
-    width: 100%;
-    height: auto;
-    object-fit: contain;
-  }
-  
-  @keyframes fade {
-    from { opacity: 0.4 }
-    to { opacity: 1 }
-  }
-  
-  .carousel-item {
-    animation: fade 0.8s;
-  }
-  
-  .carousel-control-prev,
-  .carousel-control-next {
-    filter: brightness(0) invert(1);
-  }
-  
-  .carousel-control-prev:hover,
-  .carousel-control-next:hover {
-    filter: brightness(0) invert(0.5);
-  }
-  
+  padding: 20px;
+  background-color: var(--primary-color);
+  color: var(--text-color);
+}
+
+.card {
+  margin: 10px 0;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+  background-color: var(--third-color);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.card-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--secondary-color);
+}
+
+.card-table {
+  margin-top: 10px;
+}
+
+.card-image {
+  text-align: center;
+}
+
+.card-image img {
+  max-width: 100%;
+  height: auto;
+}
+
+.carousel-item img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+@keyframes fade {
+  from { opacity: 0.4 }
+  to { opacity: 1 }
+}
+
+.carousel-item {
+  animation: fade 0.8s;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+  filter: brightness(0) invert(1);
+}
+
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+  filter: brightness(0) invert(0.5);
+}
+
+.sticky-card {
+  position: sticky;
+  top: 10px;
+  width: 100%;
+  max-width: 300px;
+  background-color: var(--third-color);
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  overflow: hidden;
+  transition: max-height 0.3s ease-in-out;
+  z-index: 1000;
+}
+
+.sticky-card.minimized .card-content {
+  display: none;
+}
+
+.sticky-card .card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--third-color);
+  padding: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.sticky-card .toggle-btn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: var(--text-c
