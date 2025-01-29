@@ -7,6 +7,6 @@ const seedDatabase = async () => {
     await userSeeds(10);
     await stockSeeds(10);
     process.exit(0);
-    }
+}
 
 seedDatabase();

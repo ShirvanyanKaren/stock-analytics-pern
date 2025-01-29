@@ -97,16 +97,17 @@ router.post('/stock/:watchlist_id', async (req, res) => {
         const foundStock = await WatchListStock.findOne({
             where: {
                 watchlist_id: req.params.watchlist_id,
-                stock_symbol: req.body.stock_symbol,
+                stock_symbol: req.body.stockSymbol,
             },
         });
         if (foundStock) return res.status(400).json({ message: 'Stock already in watchlist' });
         const watchListStock = await WatchListStock.create({
             watchlist_id: req.params.watchlist_id,
-            stock_symbol: req.body.stock_symbol,
+            stock_symbol: req.body.stockSymbol,
         });
         res.status(200).json(watchListStock);
     } catch (err) {
+        console.log(err, req.body, req.params);
         res.status(400).json(err);
     }
 }

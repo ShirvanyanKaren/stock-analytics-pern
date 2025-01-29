@@ -102,6 +102,10 @@ def fetch_stock_info(symbol: str):
             for key, value in stock_key_stats[symbol].items():
                 if key not in stock_info[symbol]:
                     stock_info[symbol][key] = value
+        price_change = stock_info[symbol]['open'] - stock_info[symbol]['previousClose']
+        price_change_percent = (price_change / stock_info[symbol]['previousClose']) * 100
+        stock_info[symbol]['priceChange'] = price_change
+        stock_info[symbol]['priceChangePercent'] = price_change_percent
         stock_info[symbol]['longName'] = long_name
         stock_info[symbol]['52WeekHigh'] = stock_info[symbol].pop('fiftyTwoWeekHigh')
         stock_info[symbol]['52WeekLow'] = stock_info[symbol].pop('fiftyTwoWeekLow')
@@ -113,7 +117,13 @@ def fetch_stock_info(symbol: str):
 def fetch_stock_graph(symbol: str, start: str, end: str):
     start_date = dt.datetime.strptime(start, '%Y-%m-%d')
     end_date = dt.datetime.strptime(end, '%Y-%m-%d')
-    stock = yf.download(symbol, start=start_date, end=end_date)
+    if end_date - start_date > dt.timedelta(days=365 * 6):
+        interval = '3mo'
+    elif end_date - start_date > dt.timedelta(days=365 * 3):
+        interval = '1mo'
+    else:
+        interval = '1d'
+    stock = yf.download(symbol, start=start_date, end=end_date, interval=interval)
     stock.reset_index(inplace=True)
     stock['Date'] = stock['Date'].dt.strftime('%Y-%m-%d')
     stock = stock.to_json(orient='records')
@@ -200,6 +210,7 @@ async def lin_reg(stocks: str, index: str, start: str, end: str, stockWeights: s
 
 @app.get("/famafrench")
 async def fama_french(stockWeights: str, start: str, end: str):
+    print(stockWeights, "stockWeights")
     weighted_portfolio = await get_stock_weights(stockWeights)
     ff3_monthly = pd.DataFrame(gff.famaFrench3Factor(frequency='m'))
     ff3_monthly.rename(columns={'date_ff_factors':'Date'}, inplace=True)
@@ -326,18 +337,3 @@ if __name__ == "__main__":
     PORT = int(os.getenv("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=PORT)
     print(f"process id: {os.getpid()}")
-
-
-
-
-
-
-
-
-    
-   
-
-
-
-    
-   
