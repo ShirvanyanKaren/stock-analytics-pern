@@ -4,14 +4,12 @@ const authMiddleware = require('../../utils/auth');
 
 router.post('/login', async (req, res) => {
     try {
-        // find user by email or username depending on what was entered
         const user = req.body.email.length ? await User.findOne({ where: { email: req.body.email } }) : await User.findOne({ where: { username: req.body.username } });
         const validPassword =  user?.checkPassword(req.body.password); 
         if (!user && !validPassword) {
         res.status(400).json({ message: 'Incorrect email or password, please try again' });
         return;
         }
-    
         const token = authMiddleware.signToken(user);
         res.json({ token, user });
     } catch (err) {
@@ -21,12 +19,12 @@ router.post('/login', async (req, res) => {
     }
 );
 
+
 router.post('/signup', async (req, res) => {
     try {
-        // check if user already exists
         const emailExists = await User.findOne({ where: { email: req.body.email } });
         const userExists = await User.findOne({ where: { username: req.body.username } });
-
+        
         if (userExists || emailExists) {
         res.status(400).json({ message: userExists ? 'Username already exists' : 'Email already exists' });
         return;

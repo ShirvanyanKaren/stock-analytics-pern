@@ -22,6 +22,10 @@
         "@fortawesome/react-fontawesome": "^0.1.19",
         "@mui/icons-material": "^5.15.19",
         "@mui/material": "^5.15.19",
+        "@radix-ui/react-dropdown-menu": "^2.1.1",
+        "@radix-ui/react-icons": "^1.3.0",
+        "@radix-ui/react-navigation-menu": "^1.2.0",
+        "@radix-ui/react-slot": "^1.1.0",
         "@reduxjs/toolkit": "^1.9.5",
         "@stripe/stripe-js": "^2.1.3",
         "@testing-library/react": "^14.0.0",
@@ -29,6 +33,8 @@
         "animate.css": "^4.1.1",
         "axios": "^1.6.0",
         "bootstrap": "^5.3.2",
+        "class-variance-authority": "^0.7.0",
+        "clsx": "^2.1.1",
         "currency-converter-lt": "^2.0.0",
         "dotenv": "^16.3.1",
         "emailjs": "^4.0.3",
@@ -41,6 +47,7 @@
         "intro.js": "^7.2.0",
         "introjs": "^0.2.2",
         "jwt-decode": "^3.1.2",
+        "lucide-react": "^0.438.0",
         "mdb-react-ui-kit": "^6.3.0",
         "openai": "^4.48.1",
         "react": "^18.2.0",
@@ -56,6 +63,8 @@
         "react-tsparticles": "^2.12.2",
         "redux": "^4.2.1",
         "sass": "^1.69.5",
+        "tailwind-merge": "^2.5.2",
+        "tailwindcss-animate": "^1.0.7",
         "tsparticles": "^2.12.0",
         "vitest": "^0.32.0",
         "words-to-numbers": "^1.5.1"
@@ -63,11 +72,14 @@
     "devDependencies": {
         "@types/react": "^18.0.37",
         "@types/react-dom": "^18.0.11",
+        "autoprefixer": "^10.4.20",
         "dotenv": "16.3.1",
         "eslint": "^8.38.0",
         "eslint-plugin-react": "^7.32.2",
         "eslint-plugin-react-hooks": "^4.6.0",
         "eslint-plugin-react-refresh": "^0.3.4",
+        "postcss": "^8.4.44",
+        "tailwindcss": "^3.4.10",
         "vite": "^5.3.0"
     }
 }

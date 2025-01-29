@@ -22,10 +22,15 @@
     "animate.css": "^4.1.1",
     "axios": "^1.5.0",
     "bootstrap": "^5.3.1",
+    "dayjs": "^1.11.13",
     "dotenv": "^16.3.1",
+    "react-apexcharts": "^1.4.1",
     "react-bootstrap": "^2.8.0",
     "react-toastify": "^10.0.5",
     "sequelize": "^6.33.0",
     "words-to-numbers": "^1.5.1"
   }
 }
+
+
+

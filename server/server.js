@@ -13,6 +13,14 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cors());
 
+// cors middleware allow from https://2709-172-251-5-191.ngrok-free.app 
+// app.use(function (req, res, next) {
+//   res.header("Access-Control-Allow-Origin", "https://2709-172-251-5-191.ngrok-free.app");
+//   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+//   next();
+// });
+
+// app.use(authMiddleware);
 
 app.use(controllers);
 

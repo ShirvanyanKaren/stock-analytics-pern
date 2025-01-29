@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Dict, Any
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 import pandas_datareader.data as pdr
@@ -22,8 +22,26 @@ load_dotenv()
 
 app = FastAPI()
 
-class SymbolList(BaseModel):
+
+class Metrics(BaseModel):
+    ratios: Dict[str, bool]
+    financials: Dict[str, bool]
+    stockPerformance: Dict[str, bool]
+    def get_ratios(self):
+        validRatios = [ratio for ratio, value in self.ratios.items() if value]
+        return validRatios
+    def get_financials(self):
+        validFinancials = [financial for financial, value in self.financials.items() if value]
+        return validFinancials
+    def get_stockPerformance(self):
+        validStockPerformance = [stockPerformance for stockPerformance, value in self.stockPerformance.items() if value]
+        return validStockPerformance
+    
+
+
+class StockWatchlist(BaseModel):
     symbols: list[str]
+    metrics: Metrics
 
 app.add_middleware(
     CORSMiddleware,
@@ -38,6 +56,11 @@ async def stock_info(symbol: str):
     symbol = process_symbol(symbol)
     stock_info = fetch_stock_info(symbol)
     return stock_info
+
+@app.get("/ratios")
+async def stock_ratios(symbol: str):
+    ratios = Ticker(symbol).key_stats
+    return ratios
 
 @app.get("/stockgraph")
 async def stock_graph(symbol: str, start: str, end: str):
@@ -79,6 +102,10 @@ def fetch_stock_info(symbol: str):
             for key, value in stock_key_stats[symbol].items():
                 if key not in stock_info[symbol]:
                     stock_info[symbol][key] = value
+        price_change = stock_info[symbol]['open'] - stock_info[symbol]['previousClose']
+        price_change_percent = (price_change / stock_info[symbol]['previousClose']) * 100
+        stock_info[symbol]['priceChange'] = price_change
+        stock_info[symbol]['priceChangePercent'] = price_change_percent
         stock_info[symbol]['longName'] = long_name
         stock_info[symbol]['52WeekHigh'] = stock_info[symbol].pop('fiftyTwoWeekHigh')
         stock_info[symbol]['52WeekLow'] = stock_info[symbol].pop('fiftyTwoWeekLow')
@@ -90,32 +117,42 @@ def fetch_stock_info(symbol: str):
 def fetch_stock_graph(symbol: str, start: str, end: str):
     start_date = dt.datetime.strptime(start, '%Y-%m-%d')
     end_date = dt.datetime.strptime(end, '%Y-%m-%d')
-    stock = yf.download(symbol, start=start_date, end=end_date)
+    if end_date - start_date > dt.timedelta(days=365 * 6):
+        interval = '3mo'
+    elif end_date - start_date > dt.timedelta(days=365 * 3):
+        interval = '1mo'
+    else:
+        interval = '1d'
+    stock = yf.download(symbol, start=start_date, end=end_date, interval=interval)
     stock.reset_index(inplace=True)
     stock['Date'] = stock['Date'].dt.strftime('%Y-%m-%d')
     stock = stock.to_json(orient='records')
     return stock
 
 @app.get("/stockweights")
-async def stock_weights(stocks: str):
+async def get_stock_weights(stocks: str):
     stocks = json.loads(stocks)
     total_value = 0
     weighted_portfolio = {}
     for stock in stocks:
-        value = yf.Ticker(stock).history(period='1d')['Close'][0]
-        stocks[stock] = value * stocks[stock]
-        total_value += stocks[stock]
+        try: 
+            value = yf.Ticker(stock).history(period='1d')['Close'][0]
+            stocks[stock] = value * stocks[stock]
+            total_value += stocks[stock]
+        except Exception as e:
+            print(f"Error fetching data for {stock}: {e}")
+            stocks[stock] = 0
     for stock in stocks:
         weighted_portfolio[stock] = stocks[stock] / total_value
     return weighted_portfolio
 
-def lin_reg_data(symbols, start, end, index, stockWeights):
+async def lin_reg_data(symbols, start, end, index, stockWeights):
     start_date = dt.datetime.strptime(start, '%Y-%m-%d')
     end_date = dt.datetime.strptime(end, '%Y-%m-%d')
     using_weights = False
     if symbols == 'Portfolio' or stockWeights != '':
         using_weights = True
-        stock_weights = json.loads(stockWeights)
+        stock_weights = await get_stock_weights(stockWeights)
     if index in ['UNRATE', 'CPIAUCSL', 'PPIACO', 'FEDFUNDS', 'GDP', 'USEPUINDXD', 'VIXCLS']:
         index_data = pdr.DataReader(index, 'fred', start, end)
         index_data.index = index_data.index.rename('Date')
@@ -153,7 +190,7 @@ def lin_reg_data(symbols, start, end, index, stockWeights):
 @app.get("/linreg")
 async def lin_reg(stocks: str, index: str, start: str, end: str, stockWeights: str):
     symbols = [index, stocks]
-    stocks_df, stock_data = lin_reg_data(symbols, start, end, index, stockWeights)
+    stocks_df, stock_data = await lin_reg_data(symbols, start, end, index, stockWeights)
     formula = 'Dependent ~ Independent'
     model = sma.OLS.from_formula(formula, data=stocks_df).fit()
     coef = model.params[1]
@@ -173,7 +210,8 @@ async def lin_reg(stocks: str, index: str, start: str, end: str, stockWeights: s
 
 @app.get("/famafrench")
 async def fama_french(stockWeights: str, start: str, end: str):
-    weighted_portfolio = await stock_weights(stockWeights)
+    print(stockWeights, "stockWeights")
+    weighted_portfolio = await get_stock_weights(stockWeights)
     ff3_monthly = pd.DataFrame(gff.famaFrench3Factor(frequency='m'))
     ff3_monthly.rename(columns={'date_ff_factors':'Date'}, inplace=True)
     ff3_monthly.set_index('Date', inplace=True)
@@ -237,11 +275,22 @@ async def gpt3():
 
 
 
-def fetch_stock_overview(symbol):
+def fetch_stock_overview(symbol: str, metrics: Metrics):
     try:
+        yf_stock = yf.Ticker(symbol).info
         stock = Ticker(symbol)
         stock_summary = stock.summary_detail[symbol]
         stock_price = stock.price[symbol]
+        stock_metrics = {}
+        valid_ratios = metrics.get_ratios()
+        valid_financials = metrics.get_financials()
+        valid_stockPerformance = metrics.get_stockPerformance()
+        ratios = { ratio: yf_stock.get(ratio, 'N/A') for ratio in valid_ratios }
+        financials = { financial: yf_stock.get(financial, 'N/A') for financial in valid_financials }
+        stockPerformance = { stockPerformance: yf_stock.get(stockPerformance, 'N/A') for stockPerformance in valid_stockPerformance }
+        stock_metrics['ratios'] = ratios
+        stock_metrics['financials'] = financials
+        stock_metrics['stockPerformance'] = stockPerformance
         overview = {
             "price": stock_price.get('regularMarketPrice', 'N/A'),
             "priceChange": stock_price.get('regularMarketChange', 'N/A'),
@@ -252,6 +301,7 @@ def fetch_stock_overview(symbol):
             "lastCloseTime": stock_price.get('regularMarketTime', 'N/A'),
             "afterHoursTime": stock_price.get('postMarketTime', 'N/A'),
             "symbol": symbol,
+            "metrics": stock_metrics,
         }
         return overview
     except Exception as e:
@@ -259,13 +309,15 @@ def fetch_stock_overview(symbol):
         return None
 
 @app.post("/fetch-stock-overview")
-async def stock_overview(symbols: SymbolList):
+async def stock_overview(symbols: StockWatchlist):
     try:
         loop = asyncio.get_event_loop()
+        metrics = symbols.metrics
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            tasks = [loop.run_in_executor(executor, fetch_stock_overview, symbol) for symbol in symbols.symbols]
+            tasks = [loop.run_in_executor(executor, fetch_stock_overview, symbol, metrics) for symbol in symbols.symbols]
             res = await asyncio.gather(*tasks)
         return [r for r in res if r is not None]
+        return res
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="Error fetching stock data")
@@ -280,36 +332,8 @@ async def stock_statistics(symbol: str):
         raise HTTPException(status_code=500, detail="Failed to fetch stock statistics")
     return stats
 
-
-
-
-
-
 if __name__ == "__main__":
     load_dotenv()
     PORT = int(os.getenv("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=PORT)
     print(f"process id: {os.getpid()}")
-
-    # stream = client.chat.completions.create(
-    #     model="gpt-4",
-    #     messages=[{"role": "user", "content": "Say this is a test"}],
-    #     stream=True,
-    # )
-    # for chunk in stream:
-    #     if chunk.choices[0].delta.content is not None:
-    #         print(chunk.choices[0].delta.content, end="")
-
-
-
-
-
-
-
-    
-   
-
-
-
-    
-   
